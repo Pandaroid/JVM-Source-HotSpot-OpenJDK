@@ -26,28 +26,30 @@ package sun.jvm.hotspot.utilities;
 
 import java.util.*;
 
-/** Simple container class for LivenessPaths */
+/**
+ * Simple container class for LivenessPaths
+ */
 
 public class LivenessPathList {
-  public LivenessPathList() {
-    list = new ArrayList();
-  }
+    public LivenessPathList() {
+        list = new ArrayList();
+    }
 
-  public int size() {
-    return list.size();
-  }
+    public int size() {
+        return list.size();
+    }
 
-  public LivenessPath get(int i) {
-    return (LivenessPath) list.get(i);
-  }
+    public LivenessPath get(int i) {
+        return (LivenessPath) list.get(i);
+    }
 
-  void add(LivenessPath path) {
-    list.add(path);
-  }
+    void add(LivenessPath path) {
+        list.add(path);
+    }
 
-  void remove(LivenessPath path) {
-    list.remove(path);
-  }
+    void remove(LivenessPath path) {
+        list.remove(path);
+    }
 
-  private ArrayList list;
+    private ArrayList list;
 }

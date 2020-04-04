@@ -62,10 +62,10 @@ public class SACoreAttachingConnector extends ConnectorImpl implements Attaching
                 false);
 
         transport = new Transport() {
-                   public String name() {
-                       return "filesystem";
-                   }
-               };
+            public String name() {
+                return "filesystem";
+            }
+        };
     }
 
     // security check to see whether the caller can perform attach
@@ -85,34 +85,34 @@ public class SACoreAttachingConnector extends ConnectorImpl implements Attaching
 
     private VirtualMachine createVirtualMachine(Class vmImplClass,
                                                 String javaExec, String corefile)
-        throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+            throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         java.lang.reflect.Method connectByCoreMethod = vmImplClass.getMethod(
-                                 "createVirtualMachineForCorefile",
-                                  new Class[] {
-                                      VirtualMachineManager.class,
-                                      String.class, String.class,
-                                      Integer.TYPE
-                                  });
+                "createVirtualMachineForCorefile",
+                new Class[]{
+                        VirtualMachineManager.class,
+                        String.class, String.class,
+                        Integer.TYPE
+                });
         return (VirtualMachine) connectByCoreMethod.invoke(null,
-                                  new Object[] {
-                                      Bootstrap.virtualMachineManager(),
-                                      javaExec,
-                                      corefile,
-                                      new Integer(0)
-                                  });
+                new Object[]{
+                        Bootstrap.virtualMachineManager(),
+                        javaExec,
+                        corefile,
+                        new Integer(0)
+                });
     }
 
     public VirtualMachine attach(Map arguments) throws IOException,
-                                      IllegalConnectorArgumentsException {
+            IllegalConnectorArgumentsException {
         String javaExec = argument(ARG_JAVA_EXECUTABLE, arguments).value();
         if (javaExec == null || javaExec.equals("")) {
             throw new IllegalConnectorArgumentsException("javaExec should be non-null and non-empty",
-                                                         ARG_JAVA_EXECUTABLE);
+                    ARG_JAVA_EXECUTABLE);
         }
         String corefile = argument(ARG_COREFILE, arguments).value();
         if (corefile == null || corefile.equals("")) {
             throw new IllegalConnectorArgumentsException("corefile should be non-null and non-empty",
-                                                         ARG_COREFILE);
+                    ARG_COREFILE);
         }
 
         checkCoreAttach(corefile);

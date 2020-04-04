@@ -26,6 +26,7 @@ package sun.jvm.hotspot.oops;
 
 import java.io.*;
 import java.util.*;
+
 import sun.jvm.hotspot.debugger.*;
 import sun.jvm.hotspot.runtime.*;
 import sun.jvm.hotspot.types.*;
@@ -38,45 +39,47 @@ import sun.jvm.hotspot.utilities.*;
 // and an array start.
 abstract class ArrayData extends ProfileData {
 
-  static final int arrayLenOffSet = 0;
-  static final int arrayStartOffSet = 1;
+    static final int arrayLenOffSet = 0;
+    static final int arrayStartOffSet = 1;
 
-  int arrayUintAt(int index) {
-    int aindex = index + arrayStartOffSet;
-    return uintAt(aindex);
-  }
-  int arrayIntAt(int index) {
-    int aindex = index + arrayStartOffSet;
-    return intAt(aindex);
-  }
+    int arrayUintAt(int index) {
+        int aindex = index + arrayStartOffSet;
+        return uintAt(aindex);
+    }
 
-  // Code generation support for subclasses.
-  static int arrayElementOffset(int index) {
-    return cellOffset(arrayStartOffSet + index);
-  }
+    int arrayIntAt(int index) {
+        int aindex = index + arrayStartOffSet;
+        return intAt(aindex);
+    }
 
-  ArrayData(DataLayout layout) {
-    super(layout);
-  }
+    // Code generation support for subclasses.
+    static int arrayElementOffset(int index) {
+        return cellOffset(arrayStartOffSet + index);
+    }
 
-  static int staticCellCount() {
-    return -1;
-  }
+    ArrayData(DataLayout layout) {
+        super(layout);
+    }
 
-  int arrayLen() {
-    return intAt(arrayLenOffSet);
-  }
+    static int staticCellCount() {
+        return -1;
+    }
 
-  public int cellCount() {
-    return arrayLen() + 1;
-  }
+    int arrayLen() {
+        return intAt(arrayLenOffSet);
+    }
 
-  // Code generation support
-  static int arrayLenOffset() {
-    return cellOffset(arrayLenOffSet);
-  }
-  static int arrayStartOffset() {
-    return cellOffset(arrayStartOffSet);
-  }
+    public int cellCount() {
+        return arrayLen() + 1;
+    }
+
+    // Code generation support
+    static int arrayLenOffset() {
+        return cellOffset(arrayLenOffSet);
+    }
+
+    static int arrayStartOffset() {
+        return cellOffset(arrayStartOffSet);
+    }
 
 }

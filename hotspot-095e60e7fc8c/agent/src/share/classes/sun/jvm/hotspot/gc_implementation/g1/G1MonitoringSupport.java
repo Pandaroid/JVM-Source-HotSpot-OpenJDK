@@ -52,10 +52,10 @@ public class G1MonitoringSupport extends VMObject {
 
     static {
         VM.registerVMInitializedObserver(new Observer() {
-                public void update(Observable o, Object data) {
-                    initialize(VM.getVM().getTypeDataBase());
-                }
-            });
+            public void update(Observable o, Object data) {
+                initialize(VM.getVM().getTypeDataBase());
+            }
+        });
     }
 
     static private synchronized void initialize(TypeDataBase db) {

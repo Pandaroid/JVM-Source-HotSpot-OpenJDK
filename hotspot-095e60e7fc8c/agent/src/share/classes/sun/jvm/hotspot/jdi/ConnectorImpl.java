@@ -40,17 +40,19 @@ abstract class ConnectorImpl implements Connector {
     static String falseString;
 
 
-    /**  This is not public in VirtualMachineManagerImpl
-    ThreadGroup mainGroupForJDI() {
-        return ((VirtualMachineManagerImpl)manager).mainGroupForJDI();
-    }
-    ***/
+    /**
+     * This is not public in VirtualMachineManagerImpl
+     * ThreadGroup mainGroupForJDI() {
+     * return ((VirtualMachineManagerImpl)manager).mainGroupForJDI();
+     * }
+     ***/
 
     // multiple debuggee support for SA/JDI
     private static List freeVMClasses; // List<SoftReference<Class>>
     private static ClassLoader myLoader;
     // debug mode for SA/JDI connectors
     static final protected boolean DEBUG;
+
     static {
         myLoader = ConnectorImpl.class.getClassLoader();
         freeVMClasses = new ArrayList(0);
@@ -68,20 +70,20 @@ abstract class ConnectorImpl implements Connector {
     // returns null if we don't have anything free
     private static synchronized Class getFreeVMImplClass() {
         while (!freeVMClasses.isEmpty()) {
-              SoftReference ref = (SoftReference) freeVMClasses.remove(0);
-              Object o = ref.get();
-              if (o != null) {
-                  if (DEBUG) {
-                      System.out.println("re-using loaded VirtualMachineImpl");
-                  }
-                  return (Class) o;
-              }
+            SoftReference ref = (SoftReference) freeVMClasses.remove(0);
+            Object o = ref.get();
+            if (o != null) {
+                if (DEBUG) {
+                    System.out.println("re-using loaded VirtualMachineImpl");
+                }
+                return (Class) o;
+            }
         }
         return null;
     }
 
     private static Class getVMImplClassFrom(ClassLoader cl)
-                               throws ClassNotFoundException {
+            throws ClassNotFoundException {
         return Class.forName("sun.jvm.hotspot.jdi.VirtualMachineImpl", true, cl);
     }
 
@@ -94,7 +96,7 @@ abstract class ConnectorImpl implements Connector {
      * VirtualMachineImpl classes.
      */
     protected static Class loadVirtualMachineImplClass()
-                               throws ClassNotFoundException {
+            throws ClassNotFoundException {
         Class vmImplClass = getFreeVMImplClass();
         if (vmImplClass == null) {
             ClassLoader cl = new SAJDIClassLoader(myLoader);
@@ -182,15 +184,17 @@ abstract class ConnectorImpl implements Connector {
      * Note that we need to reflectively call the method because of we may
      * have got this from different classloader's namespace */
     private static String getVMVersion(Throwable throwable)
-        throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+            throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         // assert isVMVersionMismatch(throwable), "not a VMVersionMismatch"
         Class expClass = throwable.getClass();
         Method targetVersionMethod = expClass.getMethod("getTargetVersion", new Class[0]);
         return (String) targetVersionMethod.invoke(throwable);
     }
 
-    /** If the causal chain has a sun.jvm.hotspot.runtime.VMVersionMismatchException,
-        attempt to load VirtualMachineImpl class for target VM version. */
+    /**
+     * If the causal chain has a sun.jvm.hotspot.runtime.VMVersionMismatchException,
+     * attempt to load VirtualMachineImpl class for target VM version.
+     */
     protected static Class handleVMVersionMismatch(InvocationTargetException ite) {
         Throwable cause = ite.getCause();
         if (DEBUG) {
@@ -224,7 +228,7 @@ abstract class ConnectorImpl implements Connector {
             // link "sawindbg" - SA native library on Windows.
             sm.checkLink("sawindbg");
         } else {
-           throw new RuntimeException(os + " is not yet supported");
+            throw new RuntimeException(os + " is not yet supported");
         }
     }
 
@@ -234,23 +238,23 @@ abstract class ConnectorImpl implements Connector {
     protected static void setVMDisposeObserver(final Object vm) {
         try {
             Method setDisposeObserverMethod = vm.getClass().getDeclaredMethod("setDisposeObserver",
-                                                         new Class[] { java.util.Observer.class });
+                    new Class[]{java.util.Observer.class});
             setDisposeObserverMethod.setAccessible(true);
             setDisposeObserverMethod.invoke(vm,
-                                         new Object[] {
-                                             new Observer() {
-                                                 public void update(Observable o, Object data) {
-                                                     if (DEBUG) {
-                                                         System.out.println("got VM.dispose notification");
-                                                     }
-                                                     addFreeVMImplClass(vm.getClass());
-                                                 }
-                                             }
-                                         });
+                    new Object[]{
+                            new Observer() {
+                                public void update(Observable o, Object data) {
+                                    if (DEBUG) {
+                                        System.out.println("got VM.dispose notification");
+                                    }
+                                    addFreeVMImplClass(vm.getClass());
+                                }
+                            }
+                    });
         } catch (Exception exp) {
             if (DEBUG) {
-               System.out.println("setVMDisposeObserver() got an exception:");
-               exp.printStackTrace();
+                System.out.println("setVMDisposeObserver() got an exception:");
+                exp.printStackTrace();
             }
         }
     }
@@ -261,7 +265,7 @@ abstract class ConnectorImpl implements Connector {
 
         Iterator iter = values.iterator();
         while (iter.hasNext()) {
-            ArgumentImpl argument = (ArgumentImpl)iter.next();
+            ArgumentImpl argument = (ArgumentImpl) iter.next();
             defaults.put(argument.name(), argument.clone());
         }
         return defaults;
@@ -270,59 +274,59 @@ abstract class ConnectorImpl implements Connector {
     void addStringArgument(String name, String label, String description,
                            String defaultValue, boolean mustSpecify) {
         defaultArguments.put(name,
-                             new StringArgumentImpl(name, label,
-                                                    description,
-                                                    defaultValue,
-                                                    mustSpecify));
+                new StringArgumentImpl(name, label,
+                        description,
+                        defaultValue,
+                        mustSpecify));
     }
 
     void addBooleanArgument(String name, String label, String description,
                             boolean defaultValue, boolean mustSpecify) {
         defaultArguments.put(name,
-                             new BooleanArgumentImpl(name, label,
-                                                     description,
-                                                     defaultValue,
-                                                     mustSpecify));
+                new BooleanArgumentImpl(name, label,
+                        description,
+                        defaultValue,
+                        mustSpecify));
     }
 
     void addIntegerArgument(String name, String label, String description,
                             String defaultValue, boolean mustSpecify,
                             int min, int max) {
         defaultArguments.put(name,
-                             new IntegerArgumentImpl(name, label,
-                                                     description,
-                                                     defaultValue,
-                                                     mustSpecify,
-                                                     min, max));
+                new IntegerArgumentImpl(name, label,
+                        description,
+                        defaultValue,
+                        mustSpecify,
+                        min, max));
     }
 
     void addSelectedArgument(String name, String label, String description,
                              String defaultValue, boolean mustSpecify,
                              List list) {
         defaultArguments.put(name,
-                             new SelectedArgumentImpl(name, label,
-                                                      description,
-                                                      defaultValue,
-                                                      mustSpecify, list));
+                new SelectedArgumentImpl(name, label,
+                        description,
+                        defaultValue,
+                        mustSpecify, list));
     }
 
     ArgumentImpl argument(String name, Map arguments)
-                throws IllegalConnectorArgumentsException {
+            throws IllegalConnectorArgumentsException {
 
-        ArgumentImpl argument = (ArgumentImpl)arguments.get(name);
+        ArgumentImpl argument = (ArgumentImpl) arguments.get(name);
         if (argument == null) {
             throw new IllegalConnectorArgumentsException(
-                         "Argument missing", name);
+                    "Argument missing", name);
         }
         String value = argument.value();
         if (value == null || value.length() == 0) {
             if (argument.mustSpecify()) {
-            throw new IllegalConnectorArgumentsException(
-                         "Argument unspecified", name);
+                throw new IllegalConnectorArgumentsException(
+                        "Argument unspecified", name);
             }
-        } else if(!argument.isValid(value)) {
+        } else if (!argument.isValid(value)) {
             throw new IllegalConnectorArgumentsException(
-                         "Argument invalid", name);
+                    "Argument invalid", name);
         }
 
         return argument;
@@ -339,14 +343,14 @@ abstract class ConnectorImpl implements Connector {
         Iterator iter = defaultArguments().values().iterator();
         boolean first = true;
         while (iter.hasNext()) {
-            ArgumentImpl argument = (ArgumentImpl)iter.next();
+            ArgumentImpl argument = (ArgumentImpl) iter.next();
             if (!first) {
                 string += ", ";
             }
             string += argument.toString();
             first = false;
         }
-        return string  + ")";
+        return string + ")";
     }
 
     abstract class ArgumentImpl implements Connector.Argument, Cloneable, Serializable {
@@ -397,11 +401,11 @@ abstract class ConnectorImpl implements Connector {
 
         public boolean equals(Object obj) {
             if ((obj != null) && (obj instanceof Connector.Argument)) {
-                Connector.Argument other = (Connector.Argument)obj;
+                Connector.Argument other = (Connector.Argument) obj;
                 return (name().equals(other.name())) &&
-                       (description().equals(other.description())) &&
-                       (mustSpecify() == other.mustSpecify()) &&
-                       (value().equals(other.value()));
+                        (description().equals(other.description())) &&
+                        (mustSpecify() == other.mustSpecify()) &&
+                        (value().equals(other.value()));
             } else {
                 return false;
             }
@@ -426,13 +430,13 @@ abstract class ConnectorImpl implements Connector {
     }
 
     class BooleanArgumentImpl extends ConnectorImpl.ArgumentImpl
-                              implements Connector.BooleanArgument {
+            implements Connector.BooleanArgument {
 
         BooleanArgumentImpl(String name, String label, String description,
                             boolean value,
                             boolean mustSpecify) {
             super(name, label, description, null, mustSpecify);
-            if(trueString == null) {
+            if (trueString == null) {
                 trueString = getString("true");
                 falseString = getString("false");
             }
@@ -448,6 +452,7 @@ abstract class ConnectorImpl implements Connector {
 
         /**
          * Performs basic sanity check of argument.
+         *
          * @return <code>true</code> if value is a string
          * representation of a boolean value.
          * @see #stringValueOf(boolean)
@@ -460,11 +465,12 @@ abstract class ConnectorImpl implements Connector {
          * Return the string representation of the <code>value</code>
          * parameter.
          * Does not set or examine the value or the argument.
+         *
          * @return the localized String representation of the
          * boolean value.
          */
         public String stringValueOf(boolean value) {
-            return value? trueString : falseString;
+            return value ? trueString : falseString;
         }
 
         /**
@@ -473,6 +479,7 @@ abstract class ConnectorImpl implements Connector {
          * value {@link #isValid(String)} should be called on
          * {@link #value()} to check its validity.  If it is invalid
          * the boolean returned by this method is undefined.
+         *
          * @return the value of the argument as a boolean.
          */
         public boolean booleanValue() {
@@ -481,7 +488,7 @@ abstract class ConnectorImpl implements Connector {
     }
 
     class IntegerArgumentImpl extends ConnectorImpl.ArgumentImpl
-                              implements Connector.IntegerArgument {
+            implements Connector.IntegerArgument {
 
         private final int min;
         private final int max;
@@ -507,6 +514,7 @@ abstract class ConnectorImpl implements Connector {
 
         /**
          * Performs basic sanity check of argument.
+         *
          * @return <code>true</code> if value represents an int that is
          * <code>{@link #min()} &lt;= value &lt;= {@link #max()}</code>
          */
@@ -516,13 +524,14 @@ abstract class ConnectorImpl implements Connector {
             }
             try {
                 return isValid(Integer.decode(value).intValue());
-            } catch(NumberFormatException exc) {
+            } catch (NumberFormatException exc) {
                 return false;
             }
         }
 
         /**
          * Performs basic sanity check of argument.
+         *
          * @return <code>true</code> if
          * <code>{@link #min()} &lt;= value  &lt;= {@link #max()}</code>
          */
@@ -534,6 +543,7 @@ abstract class ConnectorImpl implements Connector {
          * Return the string representation of the <code>value</code>
          * parameter.
          * Does not set or examine the value or the argument.
+         *
          * @return the String representation of the
          * int value.
          */
@@ -542,7 +552,7 @@ abstract class ConnectorImpl implements Connector {
             // *** Even Brian Beck was unsure if an Arabic programmer
             // *** would expect port numbers in Arabic numerals,
             // *** so punt for now.
-            return ""+value;
+            return "" + value;
         }
 
         /**
@@ -551,6 +561,7 @@ abstract class ConnectorImpl implements Connector {
          * value {@link #isValid(String)} should be called on
          * {@link #value()} to check its validity.  If it is invalid
          * the int returned by this method is undefined.
+         *
          * @return the value of the argument as a int.
          */
         public int intValue() {
@@ -559,13 +570,14 @@ abstract class ConnectorImpl implements Connector {
             }
             try {
                 return Integer.decode(value()).intValue();
-            } catch(NumberFormatException exc) {
+            } catch (NumberFormatException exc) {
                 return 0;
             }
         }
 
         /**
          * The upper bound for the value.
+         *
          * @return the maximum allowed value for this argument.
          */
         public int max() {
@@ -574,6 +586,7 @@ abstract class ConnectorImpl implements Connector {
 
         /**
          * The lower bound for the value.
+         *
          * @return the minimum allowed value for this argument.
          */
         public int min() {
@@ -582,7 +595,7 @@ abstract class ConnectorImpl implements Connector {
     }
 
     class StringArgumentImpl extends ConnectorImpl.ArgumentImpl
-                              implements Connector.StringArgument {
+            implements Connector.StringArgument {
 
         StringArgumentImpl(String name, String label, String description,
                            String value,
@@ -592,6 +605,7 @@ abstract class ConnectorImpl implements Connector {
 
         /**
          * Performs basic sanity check of argument.
+         *
          * @return <code>true</code> always
          */
         public boolean isValid(String value) {
@@ -600,7 +614,7 @@ abstract class ConnectorImpl implements Connector {
     }
 
     class SelectedArgumentImpl extends ConnectorImpl.ArgumentImpl
-                              implements Connector.SelectedArgument {
+            implements Connector.SelectedArgument {
 
         private final List choices;
 
@@ -609,11 +623,12 @@ abstract class ConnectorImpl implements Connector {
                              boolean mustSpecify, List choices) {
             super(name, label, description, value, mustSpecify);
             this.choices = Collections.unmodifiableList(
-                                           new ArrayList(choices));
+                    new ArrayList(choices));
         }
 
         /**
          * Return the possible values for the argument
+         *
          * @return {@link List} of {@link String}
          */
         public List choices() {
@@ -622,6 +637,7 @@ abstract class ConnectorImpl implements Connector {
 
         /**
          * Performs basic sanity check of argument.
+         *
          * @return <code>true</code> if value is one of {@link #choices()}.
          */
         public boolean isValid(String value) {

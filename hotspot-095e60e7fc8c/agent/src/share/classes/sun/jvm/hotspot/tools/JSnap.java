@@ -25,6 +25,7 @@
 package sun.jvm.hotspot.tools;
 
 import java.io.*;
+
 import sun.jvm.hotspot.debugger.JVMDebugger;
 import sun.jvm.hotspot.runtime.*;
 
@@ -44,16 +45,16 @@ public class JSnap extends Tool {
             PerfDataPrologue prologue = PerfMemory.prologue();
             if (prologue.accessible()) {
                 PerfMemory.iterate(new PerfMemory.PerfDataEntryVisitor() {
-                        public boolean visit(PerfDataEntry pde) {
-                            if (pde.supported()) {
-                                out.print(pde.name());
-                                out.print('=');
-                                out.println(pde.valueAsString());
-                            }
-                            // goto next entry
-                            return true;
+                    public boolean visit(PerfDataEntry pde) {
+                        if (pde.supported()) {
+                            out.print(pde.name());
+                            out.print('=');
+                            out.println(pde.valueAsString());
                         }
-                    });
+                        // goto next entry
+                        return true;
+                    }
+                });
             } else {
                 out.println("PerfMemory is not accessible");
             }

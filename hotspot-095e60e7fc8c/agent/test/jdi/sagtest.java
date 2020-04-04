@@ -23,37 +23,36 @@
  */
 
 /**
- *  @test *  @bug 0000000
- *  @summary This is just an exercise of various JDI elements for use in
- *           testing the SA/JDI client
- *
- *  @author jjh
- *
- *  @run build TestScaffold VMConnection TargetListener TargetAdapter sagdoit
- *  @run compile -g -source 1.5 sagtarg.java
- *  @run main sagtest
+ * @test *  @bug 0000000
+ * @summary This is just an exercise of various JDI elements for use in
+ * testing the SA/JDI client
+ * @author jjh
+ * @run build TestScaffold VMConnection TargetListener TargetAdapter sagdoit
+ * @run compile -g -source 1.5 sagtarg.java
+ * @run main sagtest
  */
+
 import com.sun.jdi.*;
 import com.sun.jdi.event.*;
 import com.sun.jdi.request.*;
 
 import java.util.*;
 
-    /********** target program **********/
+/********** target program **********/
 
 // The target program is sagtarg.java
 
-    /********** test program **********/
+/********** test program **********/
 
 public class sagtest extends TestScaffold {
     ReferenceType targetClass;
     ThreadReference mainThread;
 
-    sagtest (String args[]) {
+    sagtest(String args[]) {
         super(args);
     }
 
-    public static void main(String[] args)      throws Exception {
+    public static void main(String[] args) throws Exception {
         new sagtest(args).startTests();
     }
 

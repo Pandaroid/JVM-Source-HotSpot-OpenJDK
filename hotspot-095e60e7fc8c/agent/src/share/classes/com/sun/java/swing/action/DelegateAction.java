@@ -30,34 +30,28 @@ import java.awt.event.ActionListener;
 import javax.swing.AbstractAction;
 import javax.swing.Icon;
 
-public abstract class DelegateAction extends AbstractAction
-{
+public abstract class DelegateAction extends AbstractAction {
 
-    public DelegateAction(String name, Icon icon)
-    {
+    public DelegateAction(String name, Icon icon) {
         super(name, icon);
     }
 
-    public void addActionListener(ActionListener listener)
-    {
+    public void addActionListener(ActionListener listener) {
         this.listener = listener;
     }
 
-    public void removeActionListener(ActionListener listener)
-    {
+    public void removeActionListener(ActionListener listener) {
         this.listener = null;
     }
 
-    public ActionListener[] getActionListeners()
-    {
-        return (new ActionListener[] {
-            listener
+    public ActionListener[] getActionListeners() {
+        return (new ActionListener[]{
+                listener
         });
     }
 
-    public void actionPerformed(ActionEvent evt)
-    {
-        if(listener != null)
+    public void actionPerformed(ActionEvent evt) {
+        if (listener != null)
             listener.actionPerformed(evt);
     }
 

@@ -37,7 +37,7 @@ public class LongTypeImpl extends PrimitiveTypeImpl implements LongType {
     }
 
     PrimitiveValue convert(PrimitiveValue value) throws InvalidTypeException {
-        return vm.mirrorOf(((PrimitiveValueImpl)value).checkedLongValue());
+        return vm.mirrorOf(((PrimitiveValueImpl) value).checkedLongValue());
     }
 
 }

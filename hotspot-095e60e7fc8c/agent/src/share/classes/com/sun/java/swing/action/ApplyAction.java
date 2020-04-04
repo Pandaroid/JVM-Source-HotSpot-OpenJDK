@@ -30,16 +30,13 @@ import javax.swing.KeyStroke;
 // Referenced classes of package com.sun.java.swing.action:
 //            DelegateAction, ActionManager
 
-public class ApplyAction extends DelegateAction
-{
+public class ApplyAction extends DelegateAction {
 
-    public ApplyAction()
-    {
+    public ApplyAction() {
         this(VALUE_SMALL_ICON);
     }
 
-    public ApplyAction(String iconPath)
-    {
+    public ApplyAction(String iconPath) {
         super("Apply", ActionManager.getIcon(iconPath));
         putValue("ActionCommandKey", "apply-command");
         putValue("ShortDescription", "Apply the activity");

@@ -30,7 +30,7 @@ import sun.jvm.hotspot.oops.Klass;
 import sun.jvm.hotspot.oops.java_lang_Class;
 
 public class ClassObjectReferenceImpl extends ObjectReferenceImpl
-                                      implements ClassObjectReference {
+        implements ClassObjectReference {
     private ReferenceType reflectedType;
 
     ClassObjectReferenceImpl(VirtualMachine vm, Instance oRef) {
@@ -47,7 +47,7 @@ public class ClassObjectReferenceImpl extends ObjectReferenceImpl
 
     public String toString() {
         return "instance of " + referenceType().name() +
-               "(reflected class=" + reflectedType().name() + ", " + "id=" +
-               uniqueID() + ")";
+                "(reflected class=" + reflectedType().name() + ", " + "id=" +
+                uniqueID() + ")";
     }
 }

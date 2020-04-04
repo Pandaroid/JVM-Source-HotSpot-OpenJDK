@@ -27,6 +27,7 @@ package sun.jvm.hotspot.jdi;
 import com.sun.jdi.*;
 import sun.jvm.hotspot.oops.Symbol;
 import sun.jvm.hotspot.oops.LocalVariableTableElement;
+
 import java.util.List;
 import java.util.Iterator;
 import java.util.ArrayList;
@@ -39,13 +40,15 @@ public abstract class MethodImpl extends TypeComponentImpl implements Method {
     protected sun.jvm.hotspot.oops.Method saMethod;
 
     abstract int argSlotCount() throws AbsentInformationException;
+
     abstract List allLineLocations(SDE.Stratum stratum,
                                    String sourceName)
-                           throws AbsentInformationException;
+            throws AbsentInformationException;
+
     abstract List locationsOfLine(SDE.Stratum stratum,
                                   String sourceName,
                                   int lineNumber)
-                           throws AbsentInformationException;
+            throws AbsentInformationException;
 
     static MethodImpl createMethodImpl(VirtualMachine vm, ReferenceTypeImpl declaringType,
                                        sun.jvm.hotspot.oops.Method saMethod) {
@@ -58,7 +61,7 @@ public abstract class MethodImpl extends TypeComponentImpl implements Method {
     }
 
     MethodImpl(VirtualMachine vm, ReferenceTypeImpl declaringType,
-               sun.jvm.hotspot.oops.Method saMethod ) {
+               sun.jvm.hotspot.oops.Method saMethod) {
         super(vm, declaringType);
         this.saMethod = saMethod;
         getParser();
@@ -80,7 +83,7 @@ public abstract class MethodImpl extends TypeComponentImpl implements Method {
 
     public String genericSignature() {
         Symbol genSig = saMethod.getGenericSignature();
-        return (genSig != null)? genSig.asString() : null;
+        return (genSig != null) ? genSig.asString() : null;
     }
 
     public String returnTypeName() {
@@ -92,7 +95,7 @@ public abstract class MethodImpl extends TypeComponentImpl implements Method {
     }
 
     private Type findType(String signature) throws ClassNotLoadedException {
-        ReferenceTypeImpl enclosing = (ReferenceTypeImpl)declaringType();
+        ReferenceTypeImpl enclosing = (ReferenceTypeImpl) declaringType();
         return enclosing.findType(signature);
     }
 
@@ -105,8 +108,8 @@ public abstract class MethodImpl extends TypeComponentImpl implements Method {
     }
 
     Type argumentType(int index) throws ClassNotLoadedException {
-        ReferenceTypeImpl enclosing = (ReferenceTypeImpl)declaringType();
-        String signature = (String)argumentSignatures().get(index);
+        ReferenceTypeImpl enclosing = (ReferenceTypeImpl) declaringType();
+        String signature = (String) argumentSignatures().get(index);
         return enclosing.findType(signature);
     }
 
@@ -153,29 +156,29 @@ public abstract class MethodImpl extends TypeComponentImpl implements Method {
     }
 
     public final List allLineLocations()
-                           throws AbsentInformationException {
+            throws AbsentInformationException {
         return allLineLocations(vm.getDefaultStratum(), null);
     }
 
     public List allLineLocations(String stratumID,
                                  String sourceName)
-                           throws AbsentInformationException {
+            throws AbsentInformationException {
         return allLineLocations(declaringType.stratum(stratumID),
-                                sourceName);
+                sourceName);
     }
 
     public final List locationsOfLine(int lineNumber)
-                           throws AbsentInformationException {
+            throws AbsentInformationException {
         return locationsOfLine(vm.getDefaultStratum(),
-                               null, lineNumber);
+                null, lineNumber);
     }
 
     public List locationsOfLine(String stratumID,
                                 String sourceName,
                                 int lineNumber)
-                           throws AbsentInformationException {
+            throws AbsentInformationException {
         return locationsOfLine(declaringType.stratum(stratumID),
-                               sourceName, lineNumber);
+                sourceName, lineNumber);
     }
 
     LineInfo codeIndexToLineInfo(SDE.Stratum stratum,
@@ -184,16 +187,16 @@ public abstract class MethodImpl extends TypeComponentImpl implements Method {
             return new BaseLineInfo(-1, declaringType);
         } else {
             return new StratumLineInfo(stratum.id(), -1,
-                                       null, null);
+                    null, null);
         }
     }
 
     public boolean equals(Object obj) {
         if ((obj != null) && (obj instanceof MethodImpl)) {
-            MethodImpl other = (MethodImpl)obj;
+            MethodImpl other = (MethodImpl) obj;
             return (declaringType().equals(other.declaringType())) &&
-                (ref().equals(other.ref())) &&
-                super.equals(obj);
+                    (ref().equals(other.ref())) &&
+                    super.equals(obj);
         } else {
             return false;
         }
@@ -201,13 +204,13 @@ public abstract class MethodImpl extends TypeComponentImpl implements Method {
 
     // From interface Comparable
     public int compareTo(Method method) {
-        ReferenceTypeImpl declaringType = (ReferenceTypeImpl)declaringType();
-         int rc = declaringType.compareTo(method.declaringType());
-         if (rc == 0) {
-           rc = declaringType.indexOf(this) -
-               declaringType.indexOf(method);
-         }
-         return rc;
+        ReferenceTypeImpl declaringType = (ReferenceTypeImpl) declaringType();
+        int rc = declaringType.compareTo(method.declaringType());
+        if (rc == 0) {
+            rc = declaringType.indexOf(this) -
+                    declaringType.indexOf(method);
+        }
+        return rc;
     }
 
     // from interface Mirror
@@ -218,11 +221,11 @@ public abstract class MethodImpl extends TypeComponentImpl implements Method {
         sb.append(name());
         sb.append("(");
         boolean first = true;
-        for (Iterator it = argumentTypeNames().iterator(); it.hasNext();) {
+        for (Iterator it = argumentTypeNames().iterator(); it.hasNext(); ) {
             if (!first) {
                 sb.append(", ");
             }
-            sb.append((String)it.next());
+            sb.append((String) it.next());
             first = false;
         }
         sb.append(")");

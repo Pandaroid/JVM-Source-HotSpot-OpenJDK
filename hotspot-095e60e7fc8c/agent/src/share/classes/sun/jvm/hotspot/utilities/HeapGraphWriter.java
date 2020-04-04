@@ -31,6 +31,8 @@ import java.io.*;
  */
 
 public interface HeapGraphWriter {
-    /** writes the heap graph in the given file */
+    /**
+     * writes the heap graph in the given file
+     */
     public void write(String fileName) throws IOException;
 }

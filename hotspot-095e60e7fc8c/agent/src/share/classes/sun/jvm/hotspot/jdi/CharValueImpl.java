@@ -27,10 +27,10 @@ package sun.jvm.hotspot.jdi;
 import com.sun.jdi.*;
 
 public class CharValueImpl extends PrimitiveValueImpl
-                           implements CharValue {
+        implements CharValue {
     private char value;
 
-    CharValueImpl(VirtualMachine aVm,char aValue) {
+    CharValueImpl(VirtualMachine aVm, char aValue) {
         super(aVm);
 
         value = aValue;
@@ -38,8 +38,8 @@ public class CharValueImpl extends PrimitiveValueImpl
 
     public boolean equals(Object obj) {
         if ((obj != null) && (obj instanceof CharValue)) {
-            return (value == ((CharValue)obj).value()) &&
-                   super.equals(obj);
+            return (value == ((CharValue) obj).value()) &&
+                    super.equals(obj);
         } else {
             return false;
         }
@@ -65,35 +65,35 @@ public class CharValueImpl extends PrimitiveValueImpl
     }
 
     public boolean booleanValue() {
-        return(value == 0)?false:true;
+        return (value == 0) ? false : true;
     }
 
     public byte byteValue() {
-        return(byte)value;
+        return (byte) value;
     }
 
     public char charValue() {
-        return(char)value;
+        return (char) value;
     }
 
     public short shortValue() {
-        return(short)value;
+        return (short) value;
     }
 
     public int intValue() {
-        return(int)value;
+        return (int) value;
     }
 
     public long longValue() {
-        return(long)value;
+        return (long) value;
     }
 
     public float floatValue() {
-        return(float)value;
+        return (float) value;
     }
 
     public double doubleValue() {
-        return(double)value;
+        return (double) value;
     }
 
     public String toString() {

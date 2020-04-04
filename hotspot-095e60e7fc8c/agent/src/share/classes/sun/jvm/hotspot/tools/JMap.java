@@ -25,6 +25,7 @@
 package sun.jvm.hotspot.tools;
 
 import java.io.*;
+
 import sun.jvm.hotspot.debugger.JVMDebugger;
 import sun.jvm.hotspot.utilities.*;
 
@@ -75,47 +76,47 @@ public class JMap extends Tool {
         Tool tool = null;
         switch (mode) {
 
-        case MODE_HEAP_SUMMARY:
-            tool = new HeapSummary();
-            break;
+            case MODE_HEAP_SUMMARY:
+                tool = new HeapSummary();
+                break;
 
-        case MODE_HISTOGRAM:
-            tool = new ObjectHistogram();
-            break;
+            case MODE_HISTOGRAM:
+                tool = new ObjectHistogram();
+                break;
 
-        case MODE_CLSTATS:
-            tool = new ClassLoaderStats();
-            break;
+            case MODE_CLSTATS:
+                tool = new ClassLoaderStats();
+                break;
 
-        case MODE_PMAP:
-            tool = new PMap();
-            break;
+            case MODE_PMAP:
+                tool = new PMap();
+                break;
 
-        case MODE_HEAP_GRAPH_HPROF_BIN:
-            writeHeapHprofBin();
-            return;
+            case MODE_HEAP_GRAPH_HPROF_BIN:
+                writeHeapHprofBin();
+                return;
 
-        case MODE_HEAP_GRAPH_GXL:
-            writeHeapGXL();
-            return;
+            case MODE_HEAP_GRAPH_GXL:
+                writeHeapGXL();
+                return;
 
-        case MODE_FINALIZERINFO:
-            tool = new FinalizerInfo();
-            break;
+            case MODE_FINALIZERINFO:
+                tool = new FinalizerInfo();
+                break;
 
-        default:
-            usage();
-            break;
-       }
+            default:
+                usage();
+                break;
+        }
 
-       tool.setAgent(getAgent());
-       tool.setDebugeeType(getDebugeeType());
-       tool.run();
+        tool.setAgent(getAgent());
+        tool.setDebugeeType(getDebugeeType());
+        tool.run();
     }
 
     public static void main(String[] args) {
         int mode = MODE_PMAP;
-        if (args.length > 1 ) {
+        if (args.length > 1) {
             String modeFlag = args[0];
             boolean copyArgs = true;
             if (modeFlag.equals("-heap")) {

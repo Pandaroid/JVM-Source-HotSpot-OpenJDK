@@ -36,16 +36,13 @@ import javax.swing.JPanel;
 //            OkCancelButtonPanel, CommonUI
 
 public class OkCancelDialog extends JDialog
-    implements ActionListener
-{
+        implements ActionListener {
 
-    public OkCancelDialog(String title, JPanel panel)
-    {
+    public OkCancelDialog(String title, JPanel panel) {
         this(title, panel, true);
     }
 
-    public OkCancelDialog(String title, JPanel panel, boolean modal)
-    {
+    public OkCancelDialog(String title, JPanel panel, boolean modal) {
         setTitle(title);
         setModal(modal);
         Container pane = getContentPane();
@@ -56,22 +53,17 @@ public class OkCancelDialog extends JDialog
         CommonUI.centerComponent(this);
     }
 
-    public boolean isOk()
-    {
+    public boolean isOk() {
         return okPressed;
     }
 
-    public void actionPerformed(ActionEvent evt)
-    {
+    public void actionPerformed(ActionEvent evt) {
         String command = evt.getActionCommand();
-        if(command.equals("ok-command"))
-        {
+        if (command.equals("ok-command")) {
             okPressed = true;
             setVisible(false);
             dispose();
-        } else
-        if(command.equals("cancel-command"))
-        {
+        } else if (command.equals("cancel-command")) {
             okPressed = false;
             setVisible(false);
             dispose();

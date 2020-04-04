@@ -91,7 +91,7 @@ public class NonConcreteMethodImpl extends MethodImpl {
             return new BaseLineInfo(-1, declaringType);
         } else {
             return new StratumLineInfo(stratum.id(), -1,
-                                       null, null);
+                    null, null);
         }
     }
 

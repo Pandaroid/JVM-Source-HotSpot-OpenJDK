@@ -26,6 +26,7 @@
 package com.sun.java.swing.ui;
 
 import com.sun.java.swing.action.*;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -35,64 +36,52 @@ import javax.swing.*;
 // Referenced classes of package com.sun.java.swing.ui:
 //            CommonUI
 
-public class TabsDlg extends JDialog
-{
+public class TabsDlg extends JDialog {
     private class ApplyListener
-        implements ActionListener
-    {
+            implements ActionListener {
 
-        public void actionPerformed(ActionEvent evt)
-        {
-            if(applyListener != null)
-            {
+        public void actionPerformed(ActionEvent evt) {
+            if (applyListener != null) {
                 applyListener.actionPerformed(evt);
                 enableApplyButton(false);
             }
         }
 
-        private ApplyListener()
-        {
+        private ApplyListener() {
         }
 
     }
 
     private class CancelListener
-        implements ActionListener
-    {
+            implements ActionListener {
 
-        public void actionPerformed(ActionEvent evt)
-        {
-            if(cancelListener != null)
+        public void actionPerformed(ActionEvent evt) {
+            if (cancelListener != null)
                 cancelListener.actionPerformed(evt);
             setVisible(false);
         }
 
-        private CancelListener()
-        {
+        private CancelListener() {
         }
 
     }
 
     private class OkListener
-        implements ActionListener
-    {
+            implements ActionListener {
 
-        public void actionPerformed(ActionEvent evt)
-        {
-            if(okListener != null)
+        public void actionPerformed(ActionEvent evt) {
+            if (okListener != null)
                 okListener.actionPerformed(evt);
             setVisible(false);
         }
 
-        private OkListener()
-        {
+        private OkListener() {
         }
 
     }
 
 
-    public TabsDlg(String title, Vector panels)
-    {
+    public TabsDlg(String title, Vector panels) {
         super(new JFrame(), title, true);
         okListener = null;
         cancelListener = null;
@@ -101,9 +90,8 @@ public class TabsDlg extends JDialog
         pane.setLayout(new BorderLayout());
         tabsPanel = new JTabbedPane();
         int numPanels = panels.size();
-        for(int i = 0; i < numPanels; i++)
-        {
-            JPanel panel = (JPanel)panels.elementAt(i);
+        for (int i = 0; i < numPanels; i++) {
+            JPanel panel = (JPanel) panels.elementAt(i);
             tabsPanel.addTab(panel.getName(), panel);
         }
 
@@ -113,8 +101,7 @@ public class TabsDlg extends JDialog
         CommonUI.centerComponent(this);
     }
 
-    public static void main(String args[])
-    {
+    public static void main(String args[]) {
         JPanel p1 = new JPanel();
         p1.add(new JButton("One"));
         p1.setName("One");
@@ -135,27 +122,24 @@ public class TabsDlg extends JDialog
         tabsDlg = new TabsDlg("Test Dialog", panels);
         tabsDlg.addOkListener(new ActionListener() {
 
-            public void actionPerformed(ActionEvent evt)
-            {
-                System.exit(0);
-            }
+                                  public void actionPerformed(ActionEvent evt) {
+                                      System.exit(0);
+                                  }
 
-        }
-);
+                              }
+        );
         tabsDlg.addCancelListener(new ActionListener() {
 
-            public void actionPerformed(ActionEvent evt)
-            {
-                System.exit(0);
-            }
+                                      public void actionPerformed(ActionEvent evt) {
+                                          System.exit(0);
+                                      }
 
-        }
-);
+                                  }
+        );
         tabsDlg.setVisible(true);
     }
 
-    private JPanel createButtonPanel()
-    {
+    private JPanel createButtonPanel() {
         JPanel panel = new JPanel();
         okAction = new OkAction();
         cancelAction = new CancelAction();
@@ -172,38 +156,31 @@ public class TabsDlg extends JDialog
         return p2;
     }
 
-    public void enableApplyButton(boolean enabled)
-    {
+    public void enableApplyButton(boolean enabled) {
         applyAction.setEnabled(enabled);
     }
 
-    public synchronized void addOkListener(ActionListener l)
-    {
+    public synchronized void addOkListener(ActionListener l) {
         okListener = AWTEventMulticaster.add(okListener, l);
     }
 
-    public synchronized void removeOkListener(ActionListener l)
-    {
+    public synchronized void removeOkListener(ActionListener l) {
         okListener = AWTEventMulticaster.remove(okListener, l);
     }
 
-    public synchronized void addCancelListener(ActionListener l)
-    {
+    public synchronized void addCancelListener(ActionListener l) {
         cancelListener = AWTEventMulticaster.add(cancelListener, l);
     }
 
-    public synchronized void removeCancelListener(ActionListener l)
-    {
+    public synchronized void removeCancelListener(ActionListener l) {
         cancelListener = AWTEventMulticaster.remove(cancelListener, l);
     }
 
-    public synchronized void addApplyListener(ActionListener l)
-    {
+    public synchronized void addApplyListener(ActionListener l) {
         applyListener = AWTEventMulticaster.add(applyListener, l);
     }
 
-    public synchronized void removeApplyListener(ActionListener l)
-    {
+    public synchronized void removeApplyListener(ActionListener l) {
         applyListener = AWTEventMulticaster.remove(applyListener, l);
     }
 
@@ -215,7 +192,6 @@ public class TabsDlg extends JDialog
     private ActionListener cancelListener;
     private ActionListener applyListener;
     private static TabsDlg tabsDlg;
-
 
 
 }

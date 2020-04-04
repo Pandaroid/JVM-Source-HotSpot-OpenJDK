@@ -27,8 +27,8 @@ package sun.jvm.hotspot.utilities.soql;
 import sun.jvm.hotspot.oops.TypeArray;
 
 /**
-   This is JavaScript wrapper for Java Primitive Array.
-*/
+ * This is JavaScript wrapper for Java Primitive Array.
+ */
 
 public class JSJavaTypeArray extends JSJavaArray {
     public JSJavaTypeArray(TypeArray array, JSJavaFactory fac) {

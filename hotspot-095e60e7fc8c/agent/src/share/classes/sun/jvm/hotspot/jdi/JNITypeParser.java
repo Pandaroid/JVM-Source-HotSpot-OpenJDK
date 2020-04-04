@@ -81,7 +81,7 @@ public class JNITypeParser {
     }
 
     String typeName() {
-        return (String)typeNameList().get(typeNameList().size()-1);
+        return (String) typeNameList().get(typeNameList().size() - 1);
     }
 
     List argumentTypeNames() {
@@ -89,7 +89,7 @@ public class JNITypeParser {
     }
 
     String signature() {
-        return (String)signatureList().get(signatureList().size()-1);
+        return (String) signatureList().get(signatureList().size() - 1);
     }
 
     List argumentSignatures() {
@@ -116,13 +116,13 @@ public class JNITypeParser {
 
             currentIndex = 0;
 
-            while(currentIndex < signature.length()) {
+            while (currentIndex < signature.length()) {
                 elem = nextSignature();
                 signatureList.add(elem);
             }
             if (signatureList.size() == 0) {
                 throw new IllegalArgumentException("Invalid JNI signature '" +
-                                                   signature + "'");
+                        signature + "'");
             }
         }
         return signatureList;
@@ -135,13 +135,13 @@ public class JNITypeParser {
 
             currentIndex = 0;
 
-            while(currentIndex < signature.length()) {
+            while (currentIndex < signature.length()) {
                 elem = nextTypeName();
                 typeNameList.add(elem);
             }
             if (typeNameList.size() == 0) {
                 throw new IllegalArgumentException("Invalid JNI signature '" +
-                                                   signature + "'");
+                        signature + "'");
             }
         }
         return typeNameList;
@@ -150,15 +150,15 @@ public class JNITypeParser {
     private String nextSignature() {
         char key = signature.charAt(currentIndex++);
 
-        switch(key) {
+        switch (key) {
             case '[':
-                return  key + nextSignature();
+                return key + nextSignature();
 
             case 'L':
                 int endClass = signature.indexOf(SIGNATURE_ENDCLASS,
-                                                 currentIndex);
+                        currentIndex);
                 String retVal = signature.substring(currentIndex - 1,
-                                                    endClass + 1);
+                        endClass + 1);
                 currentIndex = endClass + 1;
                 return retVal;
 
@@ -179,7 +179,7 @@ public class JNITypeParser {
 
             default:
                 throw new IllegalArgumentException(
-                    "Invalid JNI signature character '" + key + "'");
+                        "Invalid JNI signature character '" + key + "'");
 
         }
     }
@@ -187,9 +187,9 @@ public class JNITypeParser {
     private String nextTypeName() {
         char key = signature.charAt(currentIndex++);
 
-        switch(key) {
+        switch (key) {
             case '[':
-                return  nextTypeName() + "[]";
+                return nextTypeName() + "[]";
 
             case 'B':
                 return "byte";
@@ -199,10 +199,10 @@ public class JNITypeParser {
 
             case 'L':
                 int endClass = signature.indexOf(SIGNATURE_ENDCLASS,
-                                                 currentIndex);
+                        currentIndex);
                 String retVal = signature.substring(currentIndex,
-                                                    endClass);
-                retVal = retVal.replace('/','.');
+                        endClass);
+                retVal = retVal.replace('/', '.');
                 currentIndex = endClass + 1;
                 return retVal;
 
@@ -233,7 +233,7 @@ public class JNITypeParser {
 
             default:
                 throw new IllegalArgumentException(
-                    "Invalid JNI signature character '" + key + "'");
+                        "Invalid JNI signature character '" + key + "'");
 
         }
     }

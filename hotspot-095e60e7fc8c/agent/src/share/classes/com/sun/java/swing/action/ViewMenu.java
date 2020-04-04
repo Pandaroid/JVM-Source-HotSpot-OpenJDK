@@ -28,11 +28,9 @@ package com.sun.java.swing.action;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
-public class ViewMenu extends AbstractAction
-{
+public class ViewMenu extends AbstractAction {
 
-    public ViewMenu()
-    {
+    public ViewMenu() {
         super("View");
         putValue("ActionCommandKey", "view-menu-command");
         putValue("ShortDescription", "View operations");
@@ -40,8 +38,7 @@ public class ViewMenu extends AbstractAction
         putValue("MnemonicKey", VALUE_MNEMONIC);
     }
 
-    public void actionPerformed(ActionEvent actionevent)
-    {
+    public void actionPerformed(ActionEvent actionevent) {
     }
 
     public static final String VALUE_COMMAND = "view-menu-command";

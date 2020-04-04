@@ -27,11 +27,14 @@ package sun.jvm.hotspot.runtime;
 import sun.jvm.hotspot.debugger.*;
 import sun.jvm.hotspot.memory.*;
 import sun.jvm.hotspot.oops.*;
+
 import java.io.*;
 import java.util.*;
 import java.util.Map.Entry;
 
-/** Prints information about Java-level deadlocks in supplied 'tty'. */
+/**
+ * Prints information about Java-level deadlocks in supplied 'tty'.
+ */
 
 public class DeadlockDetector {
 
@@ -39,8 +42,10 @@ public class DeadlockDetector {
         print(tty, true);
     }
 
-    /** prints zero or more deadlocks into 'tty' taking current
-     snapshot of Java threads and locks */
+    /**
+     * prints zero or more deadlocks into 'tty' taking current
+     * snapshot of Java threads and locks
+     */
     public static void print(PrintStream tty, boolean concurrentLocks) {
         tty.println("Deadlock Detection:");
         tty.println();
@@ -57,14 +62,14 @@ public class DeadlockDetector {
 
         Iterator i = threadTable.entrySet().iterator();
         while (i.hasNext()) {
-            Entry e = (Entry)i.next();
+            Entry e = (Entry) i.next();
             if (dfn(e) >= 0) {
                 // this thread was already visited
                 continue;
             }
 
             thisDfn = globalDfn;
-            JavaThread thread = (JavaThread)e.getKey();
+            JavaThread thread = (JavaThread) e.getKey();
             previousThread = thread;
 
             // When there is a deadlock, all the monitors involved in the dependency
@@ -85,7 +90,7 @@ public class DeadlockDetector {
             }
 
             while (waitingToLockMonitor != null ||
-                   waitingToLockBlocker != null) {
+                    waitingToLockBlocker != null) {
                 if (waitingToLockMonitor != null) {
                     currentThread = threads.owningThreadFromMonitor(waitingToLockMonitor);
                 } else {
@@ -113,12 +118,12 @@ public class DeadlockDetector {
                     break;
                 } else {
                     // We have a (new) cycle
-                    numberOfDeadlocks ++;
+                    numberOfDeadlocks++;
                     printOneDeadlock(tty, currentThread, concurrentLocks);
                     break;
                 }
                 previousThread = currentThread;
-                waitingToLockMonitor = (ObjectMonitor)currentThread.getCurrentPendingMonitor();
+                waitingToLockMonitor = (ObjectMonitor) currentThread.getCurrentPendingMonitor();
                 if (concurrentLocks) {
                     waitingToLockBlocker = currentThread.getCurrentParkBlocker();
                 }
@@ -155,13 +160,13 @@ public class DeadlockDetector {
     private static int dfn(JavaThread thread) {
         Object obj = threadTable.get(thread);
         if (obj != null) {
-            return ((Integer)obj).intValue();
+            return ((Integer) obj).intValue();
         }
         return -1;
     }
 
     private static int dfn(Entry e) {
-        return ((Integer)e.getValue()).intValue();
+        return ((Integer) e.getValue()).intValue();
     }
 
     private static void printOneDeadlock(PrintStream tty, JavaThread thread,
@@ -182,7 +187,7 @@ public class DeadlockDetector {
                 if (obj != null) {
                     tty.print(" (Object@");
                     Oop.printOopAddressOn(oop, tty);
-                    tty.print(", a " + oop.getKlass().getName().asString() + ")" );
+                    tty.print(", a " + oop.getKlass().getName().asString() + ")");
                     tty.print(",\n  which is held by");
                 } else {
                     // No Java object associated - a raw monitor
@@ -194,7 +199,7 @@ public class DeadlockDetector {
                 waitingToLockBlocker = currentThread.getCurrentParkBlocker();
                 tty.print(" waiting for ownable synchronizer ");
                 Oop.printOopAddressOn(waitingToLockBlocker, tty);
-                tty.print(", (a " + waitingToLockBlocker.getKlass().getName().asString() + ")" );
+                tty.print(", (a " + waitingToLockBlocker.getKlass().getName().asString() + ")");
                 Oop threadOop = OopUtilities.abstractOwnableSynchronizerGetOwnerThread(waitingToLockBlocker);
                 currentThread = OopUtilities.threadOopGetJavaThread(threadOop);
                 tty.print(",\n which is held by");

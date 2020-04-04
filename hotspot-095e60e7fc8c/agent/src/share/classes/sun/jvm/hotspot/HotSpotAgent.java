@@ -50,7 +50,8 @@ import sun.jvm.hotspot.types.TypeDataBase;
 import sun.jvm.hotspot.utilities.PlatformInfo;
 import sun.jvm.hotspot.utilities.UnsupportedPlatformException;
 
-/** <P> This class wraps much of the basic functionality and is the
+/**
+ * <P> This class wraps much of the basic functionality and is the
  * highest-level factory for VM data structures. It makes it simple
  * to start up the debugging system. </P>
  *
@@ -74,9 +75,9 @@ public class HotSpotAgent {
     //  - Starting debug server for core file
 
     // These are options for the "client" side of things
-    private static final int PROCESS_MODE   = 0;
+    private static final int PROCESS_MODE = 0;
     private static final int CORE_FILE_MODE = 1;
-    private static final int REMOTE_MODE    = 2;
+    private static final int REMOTE_MODE = 2;
     private int startupMode;
 
     // This indicates whether we are really starting a server or not
@@ -101,15 +102,15 @@ public class HotSpotAgent {
         // of forced exit. For remote server, shutdown hook is added by
         // DebugServer.
         Runtime.getRuntime().addShutdownHook(new java.lang.Thread(
-        new Runnable() {
-            public void run() {
-                synchronized (HotSpotAgent.this) {
-                    if (!isServer) {
-                        detach();
+                new Runnable() {
+                    public void run() {
+                        synchronized (HotSpotAgent.this) {
+                            if (!isServer) {
+                                detach();
+                            }
+                        }
                     }
-                }
-            }
-        }));
+                }));
     }
 
     //--------------------------------------------------------------------------------
@@ -128,9 +129,11 @@ public class HotSpotAgent {
     // Client-side operations
     //
 
-    /** This attaches to a process running on the local machine. */
+    /**
+     * This attaches to a process running on the local machine.
+     */
     public synchronized void attach(int processID)
-    throws DebuggerException {
+            throws DebuggerException {
         if (debugger != null) {
             throw new DebuggerException("Already attached");
         }
@@ -140,9 +143,11 @@ public class HotSpotAgent {
         go();
     }
 
-    /** This opens a core file on the local machine */
+    /**
+     * This opens a core file on the local machine
+     */
     public synchronized void attach(String javaExecutableName, String coreFileName)
-    throws DebuggerException {
+            throws DebuggerException {
         if (debugger != null) {
             throw new DebuggerException("Already attached");
         }
@@ -156,20 +161,24 @@ public class HotSpotAgent {
         go();
     }
 
-    /** This uses a JVMDebugger that is already attached to the core or process */
+    /**
+     * This uses a JVMDebugger that is already attached to the core or process
+     */
     public synchronized void attach(JVMDebugger d)
-    throws DebuggerException {
+            throws DebuggerException {
         debugger = d;
         isServer = false;
         go();
     }
 
-    /** This attaches to a "debug server" on a remote machine; this
-      remote server has already attached to a process or opened a
-      core file and is waiting for RMI calls on the Debugger object to
-      come in. */
+    /**
+     * This attaches to a "debug server" on a remote machine; this
+     * remote server has already attached to a process or opened a
+     * core file and is waiting for RMI calls on the Debugger object to
+     * come in.
+     */
     public synchronized void attach(String remoteServerID)
-    throws DebuggerException {
+            throws DebuggerException {
         if (debugger != null) {
             throw new DebuggerException("Already attached to a process");
         }
@@ -183,8 +192,10 @@ public class HotSpotAgent {
         go();
     }
 
-    /** This should only be called by the user on the client machine,
-      not the server machine */
+    /**
+     * This should only be called by the user on the client machine,
+     * not the server machine
+     */
     public synchronized boolean detach() throws DebuggerException {
         if (isServer) {
             throw new DebuggerException("Should not call detach() for server configuration");
@@ -196,10 +207,12 @@ public class HotSpotAgent {
     // Server-side operations
     //
 
-    /** This attaches to a process running on the local machine and
-      starts a debug server, allowing remote machines to connect and
-      examine this process. Uses specified name to uniquely identify a
-      specific debuggee on the server */
+    /**
+     * This attaches to a process running on the local machine and
+     * starts a debug server, allowing remote machines to connect and
+     * examine this process. Uses specified name to uniquely identify a
+     * specific debuggee on the server
+     */
     public synchronized void startServer(int processID, String uniqueID) {
         if (debugger != null) {
             throw new DebuggerException("Already attached");
@@ -211,21 +224,25 @@ public class HotSpotAgent {
         go();
     }
 
-    /** This attaches to a process running on the local machine and
-      starts a debug server, allowing remote machines to connect and
-      examine this process. */
+    /**
+     * This attaches to a process running on the local machine and
+     * starts a debug server, allowing remote machines to connect and
+     * examine this process.
+     */
     public synchronized void startServer(int processID)
-    throws DebuggerException {
+            throws DebuggerException {
         startServer(processID, null);
     }
 
-    /** This opens a core file on the local machine and starts a debug
-      server, allowing remote machines to connect and examine this
-      core file. Uses supplied uniqueID to uniquely identify a specific
-      debugee */
+    /**
+     * This opens a core file on the local machine and starts a debug
+     * server, allowing remote machines to connect and examine this
+     * core file. Uses supplied uniqueID to uniquely identify a specific
+     * debugee
+     */
     public synchronized void startServer(String javaExecutableName,
-    String coreFileName,
-    String uniqueID) {
+                                         String coreFileName,
+                                         String uniqueID) {
         if (debugger != null) {
             throw new DebuggerException("Already attached");
         }
@@ -240,16 +257,20 @@ public class HotSpotAgent {
         go();
     }
 
-    /** This opens a core file on the local machine and starts a debug
-      server, allowing remote machines to connect and examine this
-      core file. */
+    /**
+     * This opens a core file on the local machine and starts a debug
+     * server, allowing remote machines to connect and examine this
+     * core file.
+     */
     public synchronized void startServer(String javaExecutableName, String coreFileName)
-    throws DebuggerException {
+            throws DebuggerException {
         startServer(javaExecutableName, coreFileName, null);
     }
 
-    /** This may only be called on the server side after startServer()
-      has been called */
+    /**
+     * This may only be called on the server side after startServer()
+     * has been called
+     */
     public synchronized boolean shutdownServer() throws DebuggerException {
         if (!isServer) {
             throw new DebuggerException("Should not call shutdownServer() for client configuration");
@@ -277,8 +298,7 @@ public class HotSpotAgent {
         if (isServer) {
             try {
                 RMIHelper.unbind(serverID);
-            }
-            catch (DebuggerException de) {
+            } catch (DebuggerException de) {
                 ex = de;
             }
             dbg = debugger;
@@ -295,7 +315,7 @@ public class HotSpotAgent {
         machDesc = null;
         db = null;
         if (ex != null) {
-            throw(ex);
+            throw (ex);
         }
         return retval;
     }
@@ -324,10 +344,10 @@ public class HotSpotAgent {
             } else {
                 // Otherwise, os, cpu are those of our current platform:
                 try {
-                    os  = PlatformInfo.getOS();
+                    os = PlatformInfo.getOS();
                     cpu = PlatformInfo.getCPU();
                 } catch (UnsupportedPlatformException e) {
-                   throw new DebuggerException(e);
+                    throw new DebuggerException(e);
                 }
                 if (os.equals("solaris")) {
                     setupDebuggerSolaris();
@@ -349,8 +369,7 @@ public class HotSpotAgent {
                 RemoteDebuggerServer remote = null;
                 try {
                     remote = new RemoteDebuggerServer(debugger);
-                }
-                catch (RemoteException rem) {
+                } catch (RemoteException rem) {
                     throw new DebuggerException(rem);
                 }
                 RMIHelper.rebind(serverID, remote);
@@ -385,43 +404,42 @@ public class HotSpotAgent {
         try {
             if (os.equals("solaris")) {
                 db = new HotSpotTypeDataBase(machDesc,
-                new HotSpotSolarisVtblAccess(debugger, jvmLibNames),
-                debugger, jvmLibNames);
+                        new HotSpotSolarisVtblAccess(debugger, jvmLibNames),
+                        debugger, jvmLibNames);
             } else if (os.equals("win32")) {
                 db = new HotSpotTypeDataBase(machDesc,
-                new Win32VtblAccess(debugger, jvmLibNames),
-                debugger, jvmLibNames);
+                        new Win32VtblAccess(debugger, jvmLibNames),
+                        debugger, jvmLibNames);
             } else if (os.equals("linux")) {
                 db = new HotSpotTypeDataBase(machDesc,
-                new LinuxVtblAccess(debugger, jvmLibNames),
-                debugger, jvmLibNames);
+                        new LinuxVtblAccess(debugger, jvmLibNames),
+                        debugger, jvmLibNames);
             } else if (os.equals("bsd")) {
                 db = new HotSpotTypeDataBase(machDesc,
-                new BsdVtblAccess(debugger, jvmLibNames),
-                debugger, jvmLibNames);
+                        new BsdVtblAccess(debugger, jvmLibNames),
+                        debugger, jvmLibNames);
             } else if (os.equals("darwin")) {
                 db = new HotSpotTypeDataBase(machDesc,
-                new BsdVtblAccess(debugger, jvmLibNames),
-                debugger, jvmLibNames);
+                        new BsdVtblAccess(debugger, jvmLibNames),
+                        debugger, jvmLibNames);
             } else {
                 throw new DebuggerException("OS \"" + os + "\" not yet supported (no VtblAccess yet)");
             }
-        }
-        catch (NoSuchSymbolException e) {
+        } catch (NoSuchSymbolException e) {
             throw new DebuggerException("Doesn't appear to be a HotSpot VM (could not find symbol \"" +
-            e.getSymbol() + "\" in remote process)");
+                    e.getSymbol() + "\" in remote process)");
         }
 
         if (startupMode != REMOTE_MODE) {
             // Configure the debugger with the primitive type sizes just obtained from the VM
             debugger.configureJavaPrimitiveTypeSizes(db.getJBooleanType().getSize(),
-            db.getJByteType().getSize(),
-            db.getJCharType().getSize(),
-            db.getJDoubleType().getSize(),
-            db.getJFloatType().getSize(),
-            db.getJIntType().getSize(),
-            db.getJLongType().getSize(),
-            db.getJShortType().getSize());
+                    db.getJByteType().getSize(),
+                    db.getJCharType().getSize(),
+                    db.getJDoubleType().getSize(),
+                    db.getJFloatType().getSize(),
+                    db.getJIntType().getSize(),
+                    db.getJLongType().getSize(),
+                    db.getJShortType().getSize());
         }
 
         if (!isServer) {
@@ -493,7 +511,7 @@ public class HotSpotAgent {
             int addressSize = dbg.getRemoteProcessAddressSize();
             if (addressSize == -1) {
                 throw new DebuggerException("Error occurred while trying to determine the remote process's " +
-                                            "address size");
+                        "address size");
             }
 
             if (addressSize == 32) {
@@ -515,7 +533,7 @@ public class HotSpotAgent {
 
     private void connectRemoteDebugger() throws DebuggerException {
         RemoteDebugger remote =
-        (RemoteDebugger) RMIHelper.lookup(debugServerID);
+                (RemoteDebugger) RMIHelper.lookup(debugServerID);
         debugger = new RemoteDebuggerClient(remote);
         machDesc = ((RemoteDebuggerClient) debugger).getMachineDescription();
         os = debugger.getOS();
@@ -540,7 +558,7 @@ public class HotSpotAgent {
     }
 
     private void setupJVMLibNamesSolaris() {
-        jvmLibNames = new String[] { "libjvm.so" };
+        jvmLibNames = new String[]{"libjvm.so"};
     }
 
     //
@@ -572,7 +590,7 @@ public class HotSpotAgent {
     }
 
     private void setupJVMLibNamesWin32() {
-        jvmLibNames = new String[] { "jvm.dll" };
+        jvmLibNames = new String[]{"jvm.dll"};
     }
 
     //
@@ -589,30 +607,30 @@ public class HotSpotAgent {
         } else if (cpu.equals("amd64")) {
             machDesc = new MachineDescriptionAMD64();
         } else if (cpu.equals("sparc")) {
-            if (LinuxDebuggerLocal.getAddressSize()==8) {
-                    machDesc = new MachineDescriptionSPARC64Bit();
+            if (LinuxDebuggerLocal.getAddressSize() == 8) {
+                machDesc = new MachineDescriptionSPARC64Bit();
             } else {
-                    machDesc = new MachineDescriptionSPARC32Bit();
+                machDesc = new MachineDescriptionSPARC32Bit();
             }
         } else {
-          try {
-            machDesc = (MachineDescription)
-              Class.forName("sun.jvm.hotspot.debugger.MachineDescription" +
-                            cpu.toUpperCase()).newInstance();
-          } catch (Exception e) {
-            throw new DebuggerException("Linux not supported on machine type " + cpu);
-          }
+            try {
+                machDesc = (MachineDescription)
+                        Class.forName("sun.jvm.hotspot.debugger.MachineDescription" +
+                                cpu.toUpperCase()).newInstance();
+            } catch (Exception e) {
+                throw new DebuggerException("Linux not supported on machine type " + cpu);
+            }
         }
 
         LinuxDebuggerLocal dbg =
-        new LinuxDebuggerLocal(machDesc, !isServer);
+                new LinuxDebuggerLocal(machDesc, !isServer);
         debugger = dbg;
 
         attachDebugger();
     }
 
     private void setupJVMLibNamesLinux() {
-        jvmLibNames = new String[] { "libjvm.so" };
+        jvmLibNames = new String[]{"libjvm.so"};
     }
 
     //
@@ -637,7 +655,7 @@ public class HotSpotAgent {
     }
 
     private void setupJVMLibNamesBsd() {
-        jvmLibNames = new String[] { "libjvm.so" };
+        jvmLibNames = new String[]{"libjvm.so"};
     }
 
     //
@@ -660,12 +678,14 @@ public class HotSpotAgent {
     }
 
     private void setupJVMLibNamesDarwin() {
-        jvmLibNames = new String[] { "libjvm.dylib" };
+        jvmLibNames = new String[]{"libjvm.dylib"};
     }
 
-    /** Convenience routine which should be called by per-platform
-      debugger setup. Should not be called when startupMode is
-      REMOTE_MODE. */
+    /**
+     * Convenience routine which should be called by per-platform
+     * debugger setup. Should not be called when startupMode is
+     * REMOTE_MODE.
+     */
     private void attachDebugger() {
         if (startupMode == PROCESS_MODE) {
             debugger.attach(pid);

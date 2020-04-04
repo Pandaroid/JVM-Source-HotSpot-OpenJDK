@@ -30,16 +30,13 @@ import javax.swing.KeyStroke;
 // Referenced classes of package com.sun.java.swing.action:
 //            DelegateAction, ActionManager
 
-public class FinishAction extends DelegateAction
-{
+public class FinishAction extends DelegateAction {
 
-    public FinishAction()
-    {
+    public FinishAction() {
         this(VALUE_SMALL_ICON);
     }
 
-    public FinishAction(String iconPath)
-    {
+    public FinishAction(String iconPath) {
         super("Finish", ActionManager.getIcon(iconPath));
         putValue("ActionCommandKey", "finish-command");
         putValue("ShortDescription", "Finish the activity");

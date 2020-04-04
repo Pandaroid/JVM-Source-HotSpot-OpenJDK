@@ -26,6 +26,7 @@ package sun.jvm.hotspot.debugger.posix.elf;
 
 import java.io.*;
 import java.util.*;
+
 import sun.jvm.hotspot.utilities.memo.*;
 import sun.jvm.hotspot.debugger.DataSource;
 import sun.jvm.hotspot.debugger.RandomAccessFileDataSource;
@@ -73,19 +74,21 @@ public class ELFFileParser {
             int bytesRead = readBytes(ident);
             if (bytesRead != ident.length) {
                 throw new ELFException("Error reading elf header (read " +
-                            bytesRead + "bytes, expected to " +
-                            "read " + ident.length + "bytes).");
+                        bytesRead + "bytes, expected to " +
+                        "read " + ident.length + "bytes).");
             }
 
             // Check the magic number before we continue reading the file.
             if (!Arrays.equals(getMagicNumber(), ELF_MAGIC_NUMBER)) {
-                    throw new ELFException("Bad magic number for file.");
+                throw new ELFException("Bad magic number for file.");
             }
 
             header = new ELFHeaderImpl();
         }
 
-        public ELFHeader getHeader()     { return header; }
+        public ELFHeader getHeader() {
+            return header;
+        }
 
         public byte[] getMagicNumber() {
             byte magicNumber[] = new byte[4];
@@ -96,65 +99,111 @@ public class ELFFileParser {
             return magicNumber;
         }
 
-        public byte getObjectSize()         { return ident[NDX_OBJECT_SIZE]; }
-        public byte getEncoding()           { return ident[NDX_ENCODING]; }
-        public byte getVersion()            { return ident[NDX_VERSION]; }
+        public byte getObjectSize() {
+            return ident[NDX_OBJECT_SIZE];
+        }
+
+        public byte getEncoding() {
+            return ident[NDX_ENCODING];
+        }
+
+        public byte getVersion() {
+            return ident[NDX_VERSION];
+        }
 
 
         /**
          * Implementation of the ELFHeader interface.
          */
         class ELFHeaderImpl implements ELFHeader {
-            /** Marks the file as an object file and provide machine-independent
-             * data so the contents may be decoded and interpreted. */
+            /**
+             * Marks the file as an object file and provide machine-independent
+             * data so the contents may be decoded and interpreted.
+             */
             private byte ident[] = new byte[16];        // unsigned char
-            /** Identifies the object file type. */
+            /**
+             * Identifies the object file type.
+             */
             private short file_type;                    // Elf32_Half
-            /** The required architecture. */
+            /**
+             * The required architecture.
+             */
             private short arch;                         // Elf32_Half
-            /** Version */
+            /**
+             * Version
+             */
             private int version;                        // Elf32_Word
-            /** Virtual address to which the system first transfers control.
-             * If there is no entry point for the file the value is 0. */
+            /**
+             * Virtual address to which the system first transfers control.
+             * If there is no entry point for the file the value is 0.
+             */
             private int entry_point;                    // Elf32_Addr
-            /** Program header table offset in bytes.  If there is no program
-             * header table the value is 0. */
+            /**
+             * Program header table offset in bytes.  If there is no program
+             * header table the value is 0.
+             */
             private int ph_offset;                      // Elf32_Off
-            /** Section header table offset in bytes.  If there is no section
-             * header table the value is 0. */
+            /**
+             * Section header table offset in bytes.  If there is no section
+             * header table the value is 0.
+             */
             private int sh_offset;                      // Elf32_Off
-            /** Processor specific flags. */
+            /**
+             * Processor specific flags.
+             */
             private int flags;                          // Elf32_Word
-            /** ELF header size in bytes. */
+            /**
+             * ELF header size in bytes.
+             */
             private short eh_size;                      // Elf32_Half
-            /** Size of one entry in the file's program header table in bytes.
-             * All entries are the same size. */
+            /**
+             * Size of one entry in the file's program header table in bytes.
+             * All entries are the same size.
+             */
             private short ph_entry_size;                // Elf32_Half
-            /** Number of entries in the program header table, 0 if no
-             * entries. */
+            /**
+             * Number of entries in the program header table, 0 if no
+             * entries.
+             */
             private short num_ph;                       // Elf32_Half
-            /** Section header entry size in bytes. */
+            /**
+             * Section header entry size in bytes.
+             */
             private short sh_entry_size;                // Elf32_Half
-            /** Number of entries in the section header table, 0 if no
-             * entries. */
+            /**
+             * Number of entries in the section header table, 0 if no
+             * entries.
+             */
             private short num_sh;                       // Elf32_Half
-            /** Index into the section header table associated with the section
+            /**
+             * Index into the section header table associated with the section
              * name string table.  SH_UNDEF if there is no section name string
-             * table. */
+             * table.
+             */
             private short sh_string_ndx;                // Elf32_Half
 
-            /** MemoizedObject array of section headers associated with this
-             * ELF file. */
+            /**
+             * MemoizedObject array of section headers associated with this
+             * ELF file.
+             */
             private MemoizedObject[] sectionHeaders;
-            /** MemoizedObject array of program headers associated with this
-             * ELF file. */
+            /**
+             * MemoizedObject array of program headers associated with this
+             * ELF file.
+             */
             private MemoizedObject[] programHeaders;
 
-            /** Used to cache symbol table lookup. */
+            /**
+             * Used to cache symbol table lookup.
+             */
             private ELFSectionHeader symbolTableSection;
-            /** Used to cache dynamic symbol table lookup. */
+            /**
+             * Used to cache dynamic symbol table lookup.
+             */
             private ELFSectionHeader dynamicSymbolTableSection;
-            /** Used to cache hash table lookup. */
+            /**
+             * Used to cache hash table lookup.
+             */
             private ELFHashTable hashTable;
 
             /**
@@ -180,7 +229,7 @@ public class ELFFileParser {
                 sectionHeaders = new MemoizedObject[num_sh];
                 for (int i = 0; i < num_sh; i++) {
                     final long sectionHeaderOffset =
-                            (long)(sh_offset + (i * sh_entry_size));
+                            (long) (sh_offset + (i * sh_entry_size));
                     sectionHeaders[i] = new MemoizedObject() {
                         public Object computeValue() {
                             return new ELFSectionHeaderImpl(sectionHeaderOffset);
@@ -201,10 +250,21 @@ public class ELFFileParser {
 //                }
             }
 
-            public short getFileType()                 { return file_type; }
-            public short getArch()                     { return arch; }
-            public short getSectionHeaderSize()        { return sh_entry_size; }
-            public short getNumberOfSectionHeaders()   { return num_sh; }
+            public short getFileType() {
+                return file_type;
+            }
+
+            public short getArch() {
+                return arch;
+            }
+
+            public short getSectionHeaderSize() {
+                return sh_entry_size;
+            }
+
+            public short getNumberOfSectionHeaders() {
+                return num_sh;
+            }
 
 //            public short getProgramHeaderSize()      { return ph_entry_size; }
 //            public short getNumberOfProgramHeaders() { return num_ph; }
@@ -212,9 +272,10 @@ public class ELFFileParser {
 
             /**
              * Returns the section header at the specified index.  The section
-             * header at index 0 is defined as being a undefined section. */
+             * header at index 0 is defined as being a undefined section.
+             */
             public ELFSectionHeader getSectionHeader(int index) {
-                return (ELFSectionHeader)sectionHeaders[index].getValue();
+                return (ELFSectionHeader) sectionHeaders[index].getValue();
             }
 
             public ELFStringTable getSectionHeaderStringTable() {
@@ -246,7 +307,8 @@ public class ELFFileParser {
 
             /**
              * The ELFHashTable does not currently work.  This method will
-             * always return null. */
+             * always return null.
+             */
             public ELFHashTable getHashTable() {
 //                if (hashTable != null) {
 //                    return hashTable;
@@ -348,7 +410,7 @@ public class ELFFileParser {
                         symbol = sh.getELFSymbol(i);
                         value = symbol.getValue();
                         if (address >= value && address < value + symbol.getSize()) {
-                           return symbol;
+                            return symbol;
                         }
                     }
                 }
@@ -361,7 +423,7 @@ public class ELFFileParser {
                         symbol = sh.getELFSymbol(i);
                         value = symbol.getValue();
                         if (address >= value && address < value + symbol.getSize()) {
-                           return symbol;
+                            return symbol;
                         }
                     }
                 }
@@ -378,35 +440,61 @@ public class ELFFileParser {
          * Implementation of the ELFSectionHeader interface.
          */
         class ELFSectionHeaderImpl implements ELFSectionHeader {
-            /** Index into the section header string table which gives the
-             * name of the section. */
+            /**
+             * Index into the section header string table which gives the
+             * name of the section.
+             */
             private int name_ndx;                     // Elf32_Word
-            /** Section content and semantics. */
+            /**
+             * Section content and semantics.
+             */
             private int type;                         // Elf32_Word
-            /** Flags. */
+            /**
+             * Flags.
+             */
             private int flags;                        // Elf32_Word
-            /** If the section will be in the memory image of a process this
+            /**
+             * If the section will be in the memory image of a process this
              * will be the address at which the first byte of section will be
-             * loaded.  Otherwise, this value is 0. */
+             * loaded.  Otherwise, this value is 0.
+             */
             private int address;                      // Elf32_Addr
-            /** Offset from beginning of file to first byte of the section. */
+            /**
+             * Offset from beginning of file to first byte of the section.
+             */
             private int section_offset;               // Elf32_Off
-            /** Size in bytes of the section.  TYPE_NOBITS is a special case. */
+            /**
+             * Size in bytes of the section.  TYPE_NOBITS is a special case.
+             */
             private int size;                         // Elf32_Word
-            /** Section header table index link. */
+            /**
+             * Section header table index link.
+             */
             private int link;                         // Elf32_Word
-            /** Extra information determined by the section type. */
+            /**
+             * Extra information determined by the section type.
+             */
             private int info;                         // Elf32_Word
-            /** Address alignment constraints for the section. */
+            /**
+             * Address alignment constraints for the section.
+             */
             private int address_alignment;            // Elf32_Word
-            /** Size of a fixed-size entry, 0 if none. */
+            /**
+             * Size of a fixed-size entry, 0 if none.
+             */
             private int entry_size;                   // Elf32_Word
 
-            /** Memoized symbol table.  */
+            /**
+             * Memoized symbol table.
+             */
             private MemoizedObject[] symbols;
-            /** Memoized string table. */
+            /**
+             * Memoized string table.
+             */
             private MemoizedObject stringTable;
-            /** Memoized hash table. */
+            /**
+             * Memoized hash table.
+             */
             private MemoizedObject hashTable;
 
             /**
@@ -440,7 +528,7 @@ public class ELFFileParser {
                                     (i * entry_size);
                             symbols[i] = new MemoizedObject() {
                                 public Object computeValue() {
-                                    return new ELFSymbolImpl(symbolOffset,type);
+                                    return new ELFSymbolImpl(symbolOffset, type);
                                 }
                             };
                         }
@@ -452,7 +540,7 @@ public class ELFFileParser {
                         stringTable = new MemoizedObject() {
                             public Object computeValue() {
                                 return new ELFStringTableImpl(strTableOffset,
-                                                           strTableSize);
+                                        strTableSize);
                             }
                         };
                         break;
@@ -464,7 +552,7 @@ public class ELFFileParser {
                         hashTable = new MemoizedObject() {
                             public Object computeValue() {
                                 return new ELFHashTableImpl(hashTableOffset,
-                                                         hashTableSize);
+                                        hashTableSize);
                             }
                         };
                         break;
@@ -496,24 +584,26 @@ public class ELFFileParser {
 
             /**
              * Returns the ELFSymbol at the specified index.  Index 0 is
-             * reserved for the undefined ELF symbol. */
+             * reserved for the undefined ELF symbol.
+             */
             public ELFSymbol getELFSymbol(int index) {
-                return (ELFSymbol)symbols[index].getValue();
+                return (ELFSymbol) symbols[index].getValue();
             }
 
             public ELFStringTable getStringTable() {
                 if (stringTable != null) {
-                    return (ELFStringTable)stringTable.getValue();
+                    return (ELFStringTable) stringTable.getValue();
                 }
                 return null;
             }
 
             /**
              * The ELFHashTable does not currently work.  This method will
-             * always return null. */
+             * always return null.
+             */
             public ELFHashTable getHashTable() {
                 if (hashTable != null) {
-                    return (ELFHashTable)hashTable.getValue();
+                    return (ELFHashTable) hashTable.getValue();
                 }
                 return null;
             }
@@ -619,28 +709,42 @@ public class ELFFileParser {
          * Implementation of the ELFSymbol interface.
          */
         class ELFSymbolImpl implements ELFSymbol {
-            /** Index into the symbol string table that holds the character
+            /**
+             * Index into the symbol string table that holds the character
              * representation of the symbols.  0 means the symbol has no
-             * character name. */
+             * character name.
+             */
             private int name_ndx;                       // Elf32_Word
-            /** Value of the associated symbol.  This may be an address or
-             * an absolute value. */
+            /**
+             * Value of the associated symbol.  This may be an address or
+             * an absolute value.
+             */
             private int value;                          // Elf32_Addr
-            /** Size of the symbol.  0 if the symbol has no size or the size
-             * is unknown. */
+            /**
+             * Size of the symbol.  0 if the symbol has no size or the size
+             * is unknown.
+             */
             private int size;                           // Elf32_Word
-            /** Specifies the symbol type and beinding attributes. */
+            /**
+             * Specifies the symbol type and beinding attributes.
+             */
             private byte info;                          // unsigned char
-            /** Currently holds the value of 0 and has no meaning. */
+            /**
+             * Currently holds the value of 0 and has no meaning.
+             */
             private byte other;                         // unsigned char
-            /** Index to the associated section header.   This value will need
+            /**
+             * Index to the associated section header.   This value will need
              * to be read as an unsigned short if we compare it to
-             * ELFSectionHeader.NDX_LORESERVE and ELFSectionHeader.NDX_HIRESERVE. */
+             * ELFSectionHeader.NDX_LORESERVE and ELFSectionHeader.NDX_HIRESERVE.
+             */
             private short section_header_ndx;             // Elf32_Half
 
             private int section_type;
 
-            /** Offset from the beginning of the file to this symbol. */
+            /**
+             * Offset from the beginning of the file to this symbol.
+             */
             private long offset;
 
             ELFSymbolImpl(long offset, int section_type) throws ELFException {
@@ -675,9 +779,17 @@ public class ELFFileParser {
                 }
             }
 
-            public int getBinding()             { return info >> 4; }
-            public int getType()                { return info & 0x0F; }
-            public long getOffset()             { return offset; }
+            public int getBinding() {
+                return info >> 4;
+            }
+
+            public int getType() {
+                return info & 0x0F;
+            }
+
+            public long getOffset() {
+                return offset;
+            }
 
             public String getName() {
                 // Check to make sure this symbol has a name.
@@ -710,7 +822,9 @@ public class ELFFileParser {
          * Implementation of the ELFStringTable interface.
          */
         class ELFStringTableImpl implements ELFStringTable {
-            /** The string table data. */
+            /**
+             * The string table data.
+             */
             private byte data[];
             private int numStrings;
 
@@ -723,8 +837,8 @@ public class ELFFileParser {
                 int bytesRead = readBytes(data);
                 if (bytesRead != length) {
                     throw new ELFException("Error reading string table (read " +
-                                           bytesRead + "bytes, expected to " +
-                                           "read " + data.length + "bytes).");
+                            bytesRead + "bytes, expected to " +
+                            "read " + data.length + "bytes).");
                 }
 
                 // Count the strings.
@@ -751,7 +865,9 @@ public class ELFFileParser {
         }
 
 
-        /** Implementation of the ELFHashTable. */
+        /**
+         * Implementation of the ELFHashTable.
+         */
         class ELFHashTableImpl implements ELFHashTable {
             private int num_buckets;
             private int num_chains;
@@ -782,8 +898,8 @@ public class ELFFileParser {
                 int actual = num_buckets * 4 + num_chains * 4 + 8;
                 if (length != actual) {
                     throw new ELFException("Error reading string table (read " +
-                                           actual + "bytes, expected to " +
-                                           "read " + length + "bytes).");
+                            actual + "bytes, expected to " +
+                            "read " + length + "bytes).");
                 }
             }
 
@@ -791,7 +907,8 @@ public class ELFFileParser {
              * This method doesn't work every time and is unreliable.  Use
              * ELFSection.getELFSymbol(String) to retrieve symbols by name.
              * NOTE: since this method is currently broken it will always
-             * return null. */
+             * return null.
+             */
             public ELFSymbol getSymbol(String symbolName) {
 //                if (symbolName == null) {
 //                    return null;
@@ -923,20 +1040,22 @@ public class ELFFileParser {
             }
         }
 
-        /** Signed byte utility functions used for converting from big-endian
-         * (MSB) to little-endian (LSB). */
+        /**
+         * Signed byte utility functions used for converting from big-endian
+         * (MSB) to little-endian (LSB).
+         */
         short byteSwap(short arg) {
-          return (short) ((arg << 8) | ((arg >>> 8) & 0xFF));
+            return (short) ((arg << 8) | ((arg >>> 8) & 0xFF));
         }
 
         int byteSwap(int arg) {
             return (((int) byteSwap((short) arg)) << 16) |
-                   (((int) (byteSwap((short) (arg >>> 16)))) & 0xFFFF);
+                    (((int) (byteSwap((short) (arg >>> 16)))) & 0xFFFF);
         }
 
         long byteSwap(long arg) {
             return ((((long) byteSwap((int) arg)) << 32) |
-                   (((long) byteSwap((int) (arg >>> 32))) & 0xFFFFFFFF));
+                    (((long) byteSwap((int) (arg >>> 32))) & 0xFFFFFFFF));
         }
 
 
@@ -990,45 +1109,53 @@ public class ELFFileParser {
             }
         }
 
-        /** Returns the unsigned value of the byte. */
+        /**
+         * Returns the unsigned value of the byte.
+         */
         short unsignedByte(byte arg) {
-            return (short)(arg & 0x00FF);
+            return (short) (arg & 0x00FF);
         }
 
-        /** Returns a big-endian unsigned representation of the short. */
+        /**
+         * Returns a big-endian unsigned representation of the short.
+         */
         int unsignedByte(short arg) {
             int val;
             if (arg >= 0) {
                 val = arg;
             } else {
-                val = (int)(((int)unsignedByte((byte)(arg >>> 8)) << 8) |
-                            ((byte)arg));
+                val = (int) (((int) unsignedByte((byte) (arg >>> 8)) << 8) |
+                        ((byte) arg));
             }
             return val;
         }
 
-        /** Returns a big-endian unsigned representation of the int. */
+        /**
+         * Returns a big-endian unsigned representation of the int.
+         */
         long unsignedByte(int arg) {
             long val;
             if (arg >= 0) {
                 val = arg;
             } else {
-                val = (long)(((long)unsignedByte((short)(arg >>> 16)) << 16) |
-                             ((short)arg));
+                val = (long) (((long) unsignedByte((short) (arg >>> 16)) << 16) |
+                        ((short) arg));
             }
             return val;
         }
 
-        /** Unsigned byte utility functions used for converting from big-endian
-         * (MSB) to little-endian (LSB). */
+        /**
+         * Unsigned byte utility functions used for converting from big-endian
+         * (MSB) to little-endian (LSB).
+         */
         int unsignedByteSwap(short arg) {
-            return (int)(((int)unsignedByte((byte)arg)) << 8) |
-                         ((int)unsignedByte((byte)(arg >>> 8)));
+            return (int) (((int) unsignedByte((byte) arg)) << 8) |
+                    ((int) unsignedByte((byte) (arg >>> 8)));
         }
 
         long unsignedByteSwap(int arg) {
-            return (long)(((long)unsignedByteSwap((short)arg)) << 16) |
-                          ((long)unsignedByteSwap((short)(arg >>> 16)));
+            return (long) (((long) unsignedByteSwap((short) arg)) << 16) |
+                    ((long) unsignedByteSwap((short) (arg >>> 16)));
         }
     }
 
@@ -1046,10 +1173,10 @@ public class ELFFileParser {
 
         System.out.println("ELF object size: " +
                 ((elfFile.getObjectSize() == 0) ? "Invalid Object Size" :
-                (elfFile.getObjectSize() == 1) ? "32-bit" : "64-bit"));
+                        (elfFile.getObjectSize() == 1) ? "32-bit" : "64-bit"));
         System.out.println("ELF data encoding: " +
                 ((elfFile.getEncoding() == 0) ? "Invalid Data Encoding" :
-                (elfFile.getEncoding() == 1) ? "LSB" : "MSB"));
+                        (elfFile.getEncoding() == 1) ? "LSB" : "MSB"));
 
         int h = elfHeader.getNumberOfSectionHeaders();
         System.out.println("--> Start: reading " + h + " section headers.");
@@ -1061,7 +1188,7 @@ public class ELFFileParser {
             int num = 0;
             if ((num = sh.getNumberOfSymbols()) != 0) {
                 System.out.println("------> Start: reading " + num + " symbols.");
-                for (int j = 0; j < num ; j++) {
+                for (int j = 0; j < num; j++) {
                     ELFSymbol sym = sh.getELFSymbol(j);
                     //String name = sym.getName();
                     //if (name != null) {

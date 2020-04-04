@@ -28,10 +28,12 @@ import sun.jvm.hotspot.debugger.*;
 
 class LinuxThread implements ThreadProxy {
     private LinuxDebugger debugger;
-    private int           lwp_id;
+    private int lwp_id;
 
-    /** The address argument must be the address of the _thread_id in the
-        OSThread. It's value is result ::gettid() call. */
+    /**
+     * The address argument must be the address of the _thread_id in the
+     * OSThread. It's value is result ::gettid() call.
+     */
     LinuxThread(LinuxDebugger debugger, Address addr) {
         this.debugger = debugger;
         // FIXME: size of data fetched here should be configurable.
@@ -75,7 +77,7 @@ class LinuxThread implements ThreadProxy {
     }
 
     public void setContext(ThreadContext context)
-      throws IllegalThreadStateException, DebuggerException {
+            throws IllegalThreadStateException, DebuggerException {
         throw new DebuggerException("Unimplemented");
     }
 }

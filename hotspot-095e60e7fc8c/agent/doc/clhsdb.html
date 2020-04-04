@@ -1,33 +1,33 @@
 <html>
 <head>
-<title>
-Command line HSDB
-</title>
+    <title>
+        Command line HSDB
+    </title>
 </head>
 <body>
 
 <h1>Command line HSDB</h1>
 <p>
-When debugging remote core dumps it is easier to work with command line tools instead of
-GUI tools. Command line HSDB (CLHSDB) tool is alternative to SA GUI tool HSDB.
+    When debugging remote core dumps it is easier to work with command line tools instead of
+    GUI tools. Command line HSDB (CLHSDB) tool is alternative to SA GUI tool HSDB.
 </p>
 
 <p>
-There is also JavaScript based SA command line interface called <a href="jsdb.html">jsdb</a>.
-But, CLHSDB supports Unix shell-like (or dbx/gdb-like) command line interface with
-support for output redirection/appending (familiar &gt;, &gt;&gt;), command history and so on.
-Each CLHSDB command can have zero or more arguments and optionally end with output redirection
-(or append) to a file. Commands may be stored in a file and run using <b>source</b> command.
-<b>help</b> command prints usage message for all supported commands (or a specific command)
+    There is also JavaScript based SA command line interface called <a href="jsdb.html">jsdb</a>.
+    But, CLHSDB supports Unix shell-like (or dbx/gdb-like) command line interface with
+    support for output redirection/appending (familiar &gt;, &gt;&gt;), command history and so on.
+    Each CLHSDB command can have zero or more arguments and optionally end with output redirection
+    (or append) to a file. Commands may be stored in a file and run using <b>source</b> command.
+    <b>help</b> command prints usage message for all supported commands (or a specific command)
 </p>
 
 <h3>Shell/batch scripts to run command line HSDB</h3>
 
 <ul>
-<li>clhsdbproc.sh
-<li>clhsdbproc64.sh
-<li>clhsdbwindbg.bat
-<li>clhsdbwindbg64.bat
+    <li>clhsdbproc.sh
+    <li>clhsdbproc64.sh
+    <li>clhsdbwindbg.bat
+    <li>clhsdbwindbg64.bat
 </ul>
 
 <h3>Annotated output of CLHSDB help command</h3>
@@ -41,7 +41,8 @@ Available commands:
   class name <font color="red">find a Java class from debuggee and print oop</font>
   classes <font color="red">print all loaded Java classes with Klass*</font>
   detach <font color="red">detach SA from current target</font>
-  dis address [ length ]  <font color="red">disassemble (sparc/x86) specified number of instructions from given address</font>
+  dis address [ length ]  <font
+        color="red">disassemble (sparc/x86) specified number of instructions from given address</font>
   dissemble address <font color="red">disassemble nmethod</font>
   dumpcfg -a | id <font color="red">Dump the PhaseCFG for every compiler thread that has one live</font>
   dumpclass { address | name } [ directory ] <font color="red">dump .class file for given Klass* or class name</font>
@@ -52,7 +53,8 @@ Available commands:
   dumpreplaydata &lt;address&gt; | -a | &lt;thread_id&gt; [&gt;replay.txt] <font color="red">dump replay data into a file</font>
   echo [ true | false ] <font color="red">turn on/off command echo mode</font>
   examine [ address/count ] | [ address,address] <font color="red">show contents of memory from given address</font>
-  field [ type [ name fieldtype isStatic offset address ] ] <font color="red">print info about a field of HotSpot type</font>
+  field [ type [ name fieldtype isStatic offset address ] ] <font
+        color="red">print info about a field of HotSpot type</font>
   findpc address <font color="red">print info. about pointer location</font>
   flags [ flag ] <font color="red">show all -XX flag name value pairs. or just show given flag</font>
   help [ command ] <font color="red">print help message for all commands or just given command</font>
@@ -71,7 +73,8 @@ Available commands:
   print expression <font color="red">print given Klass*, Method* or arbitrary address</font>
   printas type expression <font color="red">print given address as given HotSpot type. eg. print JavaThread &lt;address&gt;</font>
   printmdo -a | expression <font color="red">print method data oop</font>
-  printstatics [ type ] <font color="red">print static fields of given HotSpot type (or all types if none specified)</font>
+  printstatics [ type ] <font
+        color="red">print static fields of given HotSpot type (or all types if none specified)</font>
   pstack [-v] <font color="red">show mixed mode stack trace for all Java, non-Java threads. -v is verbose mode</font>
   quit <font color="red">quit CLHSDB tool</font>
   reattach <font color="red">detach and re-attach SA to current target</font>
@@ -97,11 +100,11 @@ Available commands:
 <h3>JavaScript integration</h3>
 
 <p>Few CLHSDB commands are already implemented in JavaScript. It is possible to extend CLHSDB command set
-by implementing more commands in a JavaScript file and by loading it by <b>jsload</b> command. <b>jseval</b>
-command may be used to evaluate arbitrary JavaScript expression from a string. Any JavaScript function
-may be exposed as a CLHSDB command by registering it using JavaScript <b><code>registerCommand</code></b>
-function. This function accepts command name, usage and name of the JavaScript implementation function
-as arguments.
+    by implementing more commands in a JavaScript file and by loading it by <b>jsload</b> command. <b>jseval</b>
+    command may be used to evaluate arbitrary JavaScript expression from a string. Any JavaScript function
+    may be exposed as a CLHSDB command by registering it using JavaScript <b><code>registerCommand</code></b>
+    function. This function accepts command name, usage and name of the JavaScript implementation function
+    as arguments.
 </p>
 
 <h3>Simple CLHSDB command implemented in JavaScript</h3>
@@ -129,9 +132,9 @@ hsdb&gt; jsload test.js
 
 <h3>Compilation Replay</h3>
 <p>
-When a java process crashes in compiled method, usually a core file is saved.
-The replay function can reproduce the compiling process in the core.
-<a href="cireplay.html">cireplay.html</a>
+    When a java process crashes in compiled method, usually a core file is saved.
+    The replay function can reproduce the compiling process in the core.
+    <a href="cireplay.html">cireplay.html</a>
 
 </body>
 </html>

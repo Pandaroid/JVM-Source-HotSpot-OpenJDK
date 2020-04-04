@@ -47,27 +47,29 @@ import sun.jvm.hotspot.runtime.Threads;
 import sun.jvm.hotspot.runtime.VM;
 import sun.jvm.hotspot.utilities.PlatformInfo;
 
-/** <P> An implementation of the JVMDebugger interface. The basic debug
-    facilities are implemented through ptrace interface in the JNI code
-    (libsaproc.so). Library maps and symbol table management are done in
-    JNI. </P>
-
-    <P> <B>NOTE</B> that since we have the notion of fetching "Java
-    primitive types" from the remote process (which might have
-    different sizes than we expect) we have a bootstrapping
-    problem. We need to know the sizes of these types before we can
-    fetch them. The current implementation solves this problem by
-    requiring that it be configured with these type sizes before they
-    can be fetched. The readJ(Type) routines here will throw a
-    RuntimeException if they are called before the debugger is
-    configured with the Java primitive type sizes. </P> */
+/**
+ * <P> An implementation of the JVMDebugger interface. The basic debug
+ * facilities are implemented through ptrace interface in the JNI code
+ * (libsaproc.so). Library maps and symbol table management are done in
+ * JNI. </P>
+ *
+ * <P> <B>NOTE</B> that since we have the notion of fetching "Java
+ * primitive types" from the remote process (which might have
+ * different sizes than we expect) we have a bootstrapping
+ * problem. We need to know the sizes of these types before we can
+ * fetch them. The current implementation solves this problem by
+ * requiring that it be configured with these type sizes before they
+ * can be fetched. The readJ(Type) routines here will throw a
+ * RuntimeException if they are called before the debugger is
+ * configured with the Java primitive type sizes. </P>
+ */
 
 public class BsdDebuggerLocal extends DebuggerBase implements BsdDebugger {
     private boolean useGCC32ABI;
     private boolean attached;
-    private long    p_ps_prochandle;      // native debugger handle
-    private long    symbolicator;         // macosx symbolicator handle
-    private long    task;                 // macosx task handle
+    private long p_ps_prochandle;      // native debugger handle
+    private long symbolicator;         // macosx symbolicator handle
+    private long task;                 // macosx task handle
     private boolean isCore;
     private boolean isDarwin;             // variant for bsd
 
@@ -80,36 +82,44 @@ public class BsdDebuggerLocal extends DebuggerBase implements BsdDebugger {
 
     // called by native method lookupByAddress0
     private ClosestSymbol createClosestSymbol(String name, long offset) {
-       return new ClosestSymbol(name, offset);
+        return new ClosestSymbol(name, offset);
     }
 
     // called by native method attach0
     private LoadObject createLoadObject(String fileName, long textsize,
                                         long base) {
-       File f = new File(fileName);
-       Address baseAddr = newAddress(base);
-       return new SharedObject(this, fileName, f.length(), baseAddr);
+        File f = new File(fileName);
+        Address baseAddr = newAddress(base);
+        return new SharedObject(this, fileName, f.length(), baseAddr);
     }
 
     // native methods
 
     private native static void init0()
-                                throws DebuggerException;
+            throws DebuggerException;
+
     private native void attach0(int pid)
-                                throws DebuggerException;
+            throws DebuggerException;
+
     private native void attach0(String execName, String coreName)
-                                throws DebuggerException;
+            throws DebuggerException;
+
     private native void detach0()
-                                throws DebuggerException;
+            throws DebuggerException;
+
     private native long lookupByName0(String objectName, String symbol)
-                                throws DebuggerException;
+            throws DebuggerException;
+
     private native ClosestSymbol lookupByAddress0(long address)
-                                throws DebuggerException;
+            throws DebuggerException;
+
     private native long[] getThreadIntegerRegisterSet0(long unique_thread_id)
-                                throws DebuggerException;
+            throws DebuggerException;
+
     private native byte[] readBytesFromProcess0(long address, long numBytes)
-                                throws DebuggerException;
-    public native static int  getAddressSize() ;
+            throws DebuggerException;
+
+    public native static int getAddressSize();
 
     // Note on Bsd threads are really processes. When target process is
     // attached by a serviceability agent thread, only that thread can do
@@ -122,56 +132,58 @@ public class BsdDebuggerLocal extends DebuggerBase implements BsdDebugger {
     // all JNI functions that are making ptrace calls.
 
     interface WorkerThreadTask {
-       public void doit(BsdDebuggerLocal debugger) throws DebuggerException;
+        public void doit(BsdDebuggerLocal debugger) throws DebuggerException;
     }
 
     class BsdDebuggerLocalWorkerThread extends Thread {
-       BsdDebuggerLocal debugger;
-       WorkerThreadTask task;
-       DebuggerException lastException;
+        BsdDebuggerLocal debugger;
+        WorkerThreadTask task;
+        DebuggerException lastException;
 
-       public BsdDebuggerLocalWorkerThread(BsdDebuggerLocal debugger) {
-         this.debugger = debugger;
-         setDaemon(true);
-       }
+        public BsdDebuggerLocalWorkerThread(BsdDebuggerLocal debugger) {
+            this.debugger = debugger;
+            setDaemon(true);
+        }
 
-       public void run() {
-          synchronized (workerThread) {
-             for (;;) {
-                if (task != null) {
-                   lastException = null;
-                   try {
-                      task.doit(debugger);
-                   } catch (DebuggerException exp) {
-                      lastException = exp;
-                   }
-                   task = null;
-                   workerThread.notifyAll();
+        public void run() {
+            synchronized (workerThread) {
+                for (; ; ) {
+                    if (task != null) {
+                        lastException = null;
+                        try {
+                            task.doit(debugger);
+                        } catch (DebuggerException exp) {
+                            lastException = exp;
+                        }
+                        task = null;
+                        workerThread.notifyAll();
+                    }
+
+                    try {
+                        workerThread.wait();
+                    } catch (InterruptedException x) {
+                    }
                 }
+            }
+        }
 
-                try {
-                   workerThread.wait();
-                } catch (InterruptedException x) {}
-             }
-          }
-       }
-
-       public WorkerThreadTask execute(WorkerThreadTask task) throws DebuggerException {
-          synchronized (workerThread) {
-             this.task = task;
-             workerThread.notifyAll();
-             while (this.task != null) {
-                try {
-                   workerThread.wait();
-                } catch (InterruptedException x) {}
-             }
-             if (lastException != null) {
-                throw new DebuggerException(lastException);
-             } else {
-                return task;
-             }
-          }
-       }
+        public WorkerThreadTask execute(WorkerThreadTask task) throws DebuggerException {
+            synchronized (workerThread) {
+                this.task = task;
+                workerThread.notifyAll();
+                while (this.task != null) {
+                    try {
+                        workerThread.wait();
+                    } catch (InterruptedException x) {
+                    }
+                }
+                if (lastException != null) {
+                    throw new DebuggerException(lastException);
+                } else {
+                    return task;
+                }
+            }
+        }
     }
 
     private BsdDebuggerLocalWorkerThread workerThread = null;
@@ -180,28 +192,30 @@ public class BsdDebuggerLocal extends DebuggerBase implements BsdDebugger {
     // Implementation of Debugger interface
     //
 
-    /** <P> machDesc may not be null. </P>
-
-    <P> useCache should be set to true if debugging is being done
-    locally, and to false if the debugger is being created for the
-    purpose of supporting remote debugging. </P> */
+    /**
+     * <P> machDesc may not be null. </P>
+     *
+     * <P> useCache should be set to true if debugging is being done
+     * locally, and to false if the debugger is being created for the
+     * purpose of supporting remote debugging. </P>
+     */
     public BsdDebuggerLocal(MachineDescription machDesc,
-                              boolean useCache) throws DebuggerException {
+                            boolean useCache) throws DebuggerException {
         this.machDesc = machDesc;
         utils = new DebuggerUtilities(machDesc.getAddressSize(),
-                                      machDesc.isBigEndian()) {
-           public void checkAlignment(long address, long alignment) {
-             // Need to override default checkAlignment because we need to
-             // relax alignment constraints on Bsd/x86
-             if ( (address % alignment != 0)
-                &&(alignment != 8 || address % 4 != 0)) {
-                throw new UnalignedAddressException(
-                        "Trying to read at address: "
-                      + addressValueToString(address)
-                      + " with alignment: " + alignment,
-                        address);
-             }
-           }
+                machDesc.isBigEndian()) {
+            public void checkAlignment(long address, long alignment) {
+                // Need to override default checkAlignment because we need to
+                // relax alignment constraints on Bsd/x86
+                if ((address % alignment != 0)
+                        && (alignment != 8 || address % 4 != 0)) {
+                    throw new UnalignedAddressException(
+                            "Trying to read at address: "
+                                    + addressValueToString(address)
+                                    + " with alignment: " + alignment,
+                            address);
+                }
+            }
         };
 
         if (useCache) {
@@ -217,9 +231,9 @@ public class BsdDebuggerLocal extends DebuggerBase implements BsdDebugger {
             // size must be adjusted to be the hardware's page size.
             // (FIXME: should pick this up from the debugger.)
             if (getCPU().equals("ia64")) {
-              initCache(16384, parseCacheNumPagesProperty(1024));
+                initCache(16384, parseCacheNumPagesProperty(1024));
             } else {
-              initCache(4096, parseCacheNumPagesProperty(4096));
+                initCache(4096, parseCacheNumPagesProperty(4096));
             }
         }
 
@@ -228,12 +242,16 @@ public class BsdDebuggerLocal extends DebuggerBase implements BsdDebugger {
         workerThread.start();
     }
 
-    /** From the Debugger interface via JVMDebugger */
+    /**
+     * From the Debugger interface via JVMDebugger
+     */
     public boolean hasProcessList() throws DebuggerException {
         return false;
     }
 
-    /** From the Debugger interface via JVMDebugger */
+    /**
+     * From the Debugger interface via JVMDebugger
+     */
     public List getProcessList() throws DebuggerException {
         throw new DebuggerException("getProcessList not implemented yet");
     }
@@ -249,7 +267,7 @@ public class BsdDebuggerLocal extends DebuggerBase implements BsdDebugger {
     }
 
     private void requireAttach() {
-        if (! attached) {
+        if (!attached) {
             throw new RuntimeException("not attached to a process or a core!");
         }
     }
@@ -267,19 +285,22 @@ public class BsdDebuggerLocal extends DebuggerBase implements BsdDebugger {
         }
     }
 
-    /** From the Debugger interface via JVMDebugger */
+    /**
+     * From the Debugger interface via JVMDebugger
+     */
     public synchronized void attach(int processID) throws DebuggerException {
         checkAttached();
         threadList = new ArrayList();
         loadObjectList = new ArrayList();
         class AttachTask implements WorkerThreadTask {
-           int pid;
-           public void doit(BsdDebuggerLocal debugger) {
-              debugger.attach0(pid);
-              debugger.attached = true;
-              debugger.isCore = false;
-              findABIVersion();
-           }
+            int pid;
+
+            public void doit(BsdDebuggerLocal debugger) {
+                debugger.attach0(pid);
+                debugger.attached = true;
+                debugger.isCore = false;
+                findABIVersion();
+            }
         }
 
         AttachTask task = new AttachTask();
@@ -287,7 +308,9 @@ public class BsdDebuggerLocal extends DebuggerBase implements BsdDebugger {
         workerThread.execute(task);
     }
 
-    /** From the Debugger interface via JVMDebugger */
+    /**
+     * From the Debugger interface via JVMDebugger
+     */
     public synchronized void attach(String execName, String coreName) {
         checkAttached();
         threadList = new ArrayList();
@@ -298,7 +321,9 @@ public class BsdDebuggerLocal extends DebuggerBase implements BsdDebugger {
         findABIVersion();
     }
 
-    /** From the Debugger interface via JVMDebugger */
+    /**
+     * From the Debugger interface via JVMDebugger
+     */
     public synchronized boolean detach() {
         if (!attached) {
             return false;
@@ -328,7 +353,9 @@ public class BsdDebuggerLocal extends DebuggerBase implements BsdDebugger {
         }
     }
 
-    /** From the Debugger interface via JVMDebugger */
+    /**
+     * From the Debugger interface via JVMDebugger
+     */
     public Address parseAddress(String addressString)
             throws NumberFormatException {
         long addr = utils.scanAddress(addressString);
@@ -338,12 +365,16 @@ public class BsdDebuggerLocal extends DebuggerBase implements BsdDebugger {
         return new BsdAddress(this, addr);
     }
 
-    /** From the Debugger interface via JVMDebugger */
+    /**
+     * From the Debugger interface via JVMDebugger
+     */
     public String getOS() {
         return PlatformInfo.getOS();
     }
 
-    /** From the Debugger interface via JVMDebugger */
+    /**
+     * From the Debugger interface via JVMDebugger
+     */
     public String getCPU() {
         return PlatformInfo.getCPU();
     }
@@ -369,7 +400,9 @@ public class BsdDebuggerLocal extends DebuggerBase implements BsdDebugger {
         }
     }
 
-    /** From the SymbolLookup interface via Debugger and JVMDebugger */
+    /**
+     * From the SymbolLookup interface via Debugger and JVMDebugger
+     */
     public synchronized Address lookup(String objectName, String symbol) {
         requireAttach();
         if (!attached) {
@@ -379,7 +412,7 @@ public class BsdDebuggerLocal extends DebuggerBase implements BsdDebugger {
         if (isCore) {
             // MacOSX symbol with "_" as leading
             long addr = lookupByName0(objectName, isDarwin ? "_" + symbol : symbol);
-            return (addr == 0)? null : new BsdAddress(this, handleGCC32ABI(addr, symbol));
+            return (addr == 0) ? null : new BsdAddress(this, handleGCC32ABI(addr, symbol));
         } else {
             class LookupByNameTask implements WorkerThreadTask {
                 String objectName, symbol;
@@ -399,7 +432,9 @@ public class BsdDebuggerLocal extends DebuggerBase implements BsdDebugger {
         }
     }
 
-    /** From the SymbolLookup interface via Debugger and JVMDebugger */
+    /**
+     * From the SymbolLookup interface via Debugger and JVMDebugger
+     */
     public synchronized OopHandle lookupOop(String objectName, String symbol) {
         Address addr = lookup(objectName, symbol);
         if (addr == null) {
@@ -408,7 +443,9 @@ public class BsdDebuggerLocal extends DebuggerBase implements BsdDebugger {
         return addr.addOffsetToAsOopHandle(0);
     }
 
-    /** From the Debugger interface */
+    /**
+     * From the Debugger interface
+     */
     public MachineDescription getMachineDescription() {
         return machDesc;
     }
@@ -417,7 +454,9 @@ public class BsdDebuggerLocal extends DebuggerBase implements BsdDebugger {
     // Implementation of ThreadAccess interface
     //
 
-    /** From the ThreadAccess interface via Debugger and JVMDebugger */
+    /**
+     * From the ThreadAccess interface via Debugger and JVMDebugger
+     */
     public ThreadProxy getThreadForIdentifierAddress(Address threadIdAddr, Address uniqueThreadIdAddr) {
         return new BsdThread(this, threadIdAddr, uniqueThreadIdAddr);
     }
@@ -427,7 +466,9 @@ public class BsdDebuggerLocal extends DebuggerBase implements BsdDebugger {
         throw new RuntimeException("unimplemented");
     }
 
-    /** From the ThreadAccess interface via Debugger and JVMDebugger */
+    /**
+     * From the ThreadAccess interface via Debugger and JVMDebugger
+     */
     public ThreadProxy getThreadForThreadId(long id) {
         return new BsdThread(this, id);
     }
@@ -437,17 +478,22 @@ public class BsdDebuggerLocal extends DebuggerBase implements BsdDebugger {
     // These must not be called until the MachineDescription has been set up.
     //
 
-    /** From the BsdDebugger interface */
+    /**
+     * From the BsdDebugger interface
+     */
     public String addressValueToString(long address) {
         return utils.addressValueToString(address);
     }
 
-    /** From the BsdDebugger interface */
+    /**
+     * From the BsdDebugger interface
+     */
     public BsdAddress readAddress(long address)
             throws UnmappedAddressException, UnalignedAddressException {
         long value = readAddressValue(address);
         return (value == 0 ? null : new BsdAddress(this, value));
     }
+
     public BsdAddress readCompOopAddress(long address)
             throws UnmappedAddressException, UnalignedAddressException {
         long value = readCompOopAddressValue(address);
@@ -460,16 +506,19 @@ public class BsdDebuggerLocal extends DebuggerBase implements BsdDebugger {
         return (value == 0 ? null : new BsdAddress(this, value));
     }
 
-    /** From the BsdDebugger interface */
+    /**
+     * From the BsdDebugger interface
+     */
     public BsdOopHandle readOopHandle(long address)
             throws UnmappedAddressException, UnalignedAddressException,
-                NotInHeapException {
+            NotInHeapException {
         long value = readAddressValue(address);
         return (value == 0 ? null : new BsdOopHandle(this, value));
     }
+
     public BsdOopHandle readCompOopHandle(long address)
             throws UnmappedAddressException, UnalignedAddressException,
-                NotInHeapException {
+            NotInHeapException {
         long value = readCompOopAddressValue(address);
         return (value == 0 ? null : new BsdOopHandle(this, value));
     }
@@ -479,7 +528,7 @@ public class BsdDebuggerLocal extends DebuggerBase implements BsdDebugger {
     //
 
     public synchronized long[] getThreadIntegerRegisterSet(long unique_thread_id)
-                                            throws DebuggerException {
+            throws DebuggerException {
         requireAttach();
         if (isCore) {
             return getThreadIntegerRegisterSet0(unique_thread_id);
@@ -487,6 +536,7 @@ public class BsdDebuggerLocal extends DebuggerBase implements BsdDebugger {
             class GetThreadIntegerRegisterSetTask implements WorkerThreadTask {
                 long unique_thread_id;
                 long[] result;
+
                 public void doit(BsdDebuggerLocal debugger) {
                     result = debugger.getThreadIntegerRegisterSet0(unique_thread_id);
                 }
@@ -499,9 +549,11 @@ public class BsdDebuggerLocal extends DebuggerBase implements BsdDebugger {
         }
     }
 
-    /** Need to override this to relax alignment checks on x86. */
+    /**
+     * Need to override this to relax alignment checks on x86.
+     */
     public long readCInteger(long address, long numBytes, boolean isUnsigned)
-        throws UnmappedAddressException, UnalignedAddressException {
+            throws UnmappedAddressException, UnalignedAddressException {
         // Only slightly relaxed semantics -- this is a hack, but is
         // necessary on x86 where it seems the compiler is
         // putting some global 64-bit data on 32-bit boundaries
@@ -517,7 +569,7 @@ public class BsdDebuggerLocal extends DebuggerBase implements BsdDebugger {
     // Overridden from DebuggerBase because we need to relax alignment
     // constraints on x86
     public long readJLong(long address)
-        throws UnmappedAddressException, UnalignedAddressException {
+            throws UnmappedAddressException, UnalignedAddressException {
         utils.checkAlignment(address, jintSize);
         byte[] data = readBytes(address, jlongSize);
         return utils.dataToJLong(data, jlongSize);
@@ -527,75 +579,88 @@ public class BsdDebuggerLocal extends DebuggerBase implements BsdDebugger {
     // Address access. Can not be package private, but should only be
     // accessed by the architecture-specific subpackages.
 
-    /** From the BsdDebugger interface */
+    /**
+     * From the BsdDebugger interface
+     */
     public long getAddressValue(Address addr) {
-      if (addr == null) return 0;
-      return ((BsdAddress) addr).getValue();
+        if (addr == null) return 0;
+        return ((BsdAddress) addr).getValue();
     }
 
-    /** From the BsdDebugger interface */
+    /**
+     * From the BsdDebugger interface
+     */
     public Address newAddress(long value) {
-      if (value == 0) return null;
-      return new BsdAddress(this, value);
+        if (value == 0) return null;
+        return new BsdAddress(this, value);
     }
 
-    /** From the BsdCDebugger interface */
+    /**
+     * From the BsdCDebugger interface
+     */
     public List/*<ThreadProxy>*/ getThreadList() {
-      requireAttach();
-      return threadList;
+        requireAttach();
+        return threadList;
     }
 
-    /** From the BsdCDebugger interface */
+    /**
+     * From the BsdCDebugger interface
+     */
     public List/*<LoadObject>*/ getLoadObjectList() {
-      requireAttach();
-      return loadObjectList;
+        requireAttach();
+        return loadObjectList;
     }
 
-    /** From the BsdCDebugger interface */
+    /**
+     * From the BsdCDebugger interface
+     */
     public synchronized ClosestSymbol lookup(long addr) {
-       requireAttach();
-       if (isCore) {
-          return lookupByAddress0(addr);
-       } else {
-          class LookupByAddressTask implements WorkerThreadTask {
-             long addr;
-             ClosestSymbol result;
+        requireAttach();
+        if (isCore) {
+            return lookupByAddress0(addr);
+        } else {
+            class LookupByAddressTask implements WorkerThreadTask {
+                long addr;
+                ClosestSymbol result;
 
-             public void doit(BsdDebuggerLocal debugger) {
-                 result = debugger.lookupByAddress0(addr);
-             }
-          }
+                public void doit(BsdDebuggerLocal debugger) {
+                    result = debugger.lookupByAddress0(addr);
+                }
+            }
 
-          LookupByAddressTask task = new LookupByAddressTask();
-          task.addr = addr;
-          workerThread.execute(task);
-          return task.result;
-       }
+            LookupByAddressTask task = new LookupByAddressTask();
+            task.addr = addr;
+            workerThread.execute(task);
+            return task.result;
+        }
     }
 
     public CDebugger getCDebugger() {
-      if (cdbg == null) {
-         String cpu = getCPU();
-         if (cpu.equals("ia64") ) {
-            // IA-64 is not supported because of stack-walking issues
-            return null;
-         }
-         cdbg = new BsdCDebugger(this);
-      }
-      return cdbg;
+        if (cdbg == null) {
+            String cpu = getCPU();
+            if (cpu.equals("ia64")) {
+                // IA-64 is not supported because of stack-walking issues
+                return null;
+            }
+            cdbg = new BsdCDebugger(this);
+        }
+        return cdbg;
     }
 
-    /** This reads bytes from the remote process. */
+    /**
+     * This reads bytes from the remote process.
+     */
     public synchronized ReadResult readBytesFromProcess(long address,
-            long numBytes) throws UnmappedAddressException, DebuggerException {
+                                                        long numBytes) throws UnmappedAddressException, DebuggerException {
         requireAttach();
         if (isCore) {
             byte[] res = readBytesFromProcess0(address, numBytes);
-            return (res != null)? new ReadResult(res) : new ReadResult(address);
+            return (res != null) ? new ReadResult(res) : new ReadResult(address);
         } else {
             class ReadBytesFromProcessTask implements WorkerThreadTask {
                 long address, numBytes;
                 ReadResult result;
+
                 public void doit(BsdDebuggerLocal debugger) {
                     byte[] res = debugger.readBytesFromProcess0(address, numBytes);
                     if (res != null)
@@ -614,15 +679,17 @@ public class BsdDebuggerLocal extends DebuggerBase implements BsdDebugger {
     }
 
     public void writeBytesToProcess(long address, long numBytes, byte[] data)
-        throws UnmappedAddressException, DebuggerException {
+            throws UnmappedAddressException, DebuggerException {
         // FIXME
         throw new DebuggerException("Unimplemented");
     }
 
-    /** this functions used for core file reading and called from native attach0,
-        it returns an array of long integers as
-        [thread_id, stack_start, stack_end, thread_id, stack_start, stack_end, ....] for
-        all java threads recorded in Threads. Also adds the ThreadProxy to threadList */
+    /**
+     * this functions used for core file reading and called from native attach0,
+     * it returns an array of long integers as
+     * [thread_id, stack_start, stack_end, thread_id, stack_start, stack_end, ....] for
+     * all java threads recorded in Threads. Also adds the ThreadProxy to threadList
+     */
     public long[] getJavaThreadsInfo() {
         requireAttach();
         Threads threads = VM.getVM().getThreads();
@@ -634,7 +701,7 @@ public class BsdDebuggerLocal extends DebuggerBase implements BsdDebugger {
         while (t != null) {
             end = t.getStackBaseValue();
             beg = end - t.getStackSize();
-            BsdThread bsdt = (BsdThread)t.getThreadProxy();
+            BsdThread bsdt = (BsdThread) t.getThreadProxy();
             long uid = bsdt.getUniqueThreadId();
             if (threadList != null) threadList.add(bsdt);
             result[i] = uid;

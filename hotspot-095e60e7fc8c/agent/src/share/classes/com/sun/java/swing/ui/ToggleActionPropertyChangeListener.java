@@ -30,20 +30,16 @@ import java.beans.PropertyChangeListener;
 import javax.swing.AbstractButton;
 
 public class ToggleActionPropertyChangeListener
-    implements PropertyChangeListener
-{
+        implements PropertyChangeListener {
 
-    public ToggleActionPropertyChangeListener(AbstractButton button)
-    {
+    public ToggleActionPropertyChangeListener(AbstractButton button) {
         this.button = button;
     }
 
-    public void propertyChange(PropertyChangeEvent evt)
-    {
+    public void propertyChange(PropertyChangeEvent evt) {
         String propertyName = evt.getPropertyName();
-        if(propertyName.equals("selected"))
-        {
-            Boolean selected = (Boolean)evt.getNewValue();
+        if (propertyName.equals("selected")) {
+            Boolean selected = (Boolean) evt.getNewValue();
             button.setSelected(selected.booleanValue());
         }
     }

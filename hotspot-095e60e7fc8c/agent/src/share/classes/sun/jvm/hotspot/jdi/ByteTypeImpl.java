@@ -37,6 +37,6 @@ public class ByteTypeImpl extends PrimitiveTypeImpl implements ByteType {
     }
 
     PrimitiveValue convert(PrimitiveValue value) throws InvalidTypeException {
-        return vm.mirrorOf(((PrimitiveValueImpl)value).checkedByteValue());
+        return vm.mirrorOf(((PrimitiveValueImpl) value).checkedByteValue());
     }
 }

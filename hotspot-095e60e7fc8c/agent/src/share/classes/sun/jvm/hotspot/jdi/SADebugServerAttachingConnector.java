@@ -44,7 +44,7 @@ public class SADebugServerAttachingConnector extends ConnectorImpl implements At
     }
 
     public SADebugServerAttachingConnector() {
-         // fixme jjh  create resources for the these strings,
+        // fixme jjh  create resources for the these strings,
         addStringArgument(
                 ARG_DEBUG_SERVER_NAME,
                 "Debug Server",                      //getString("sa.debugServer.label"),
@@ -52,37 +52,37 @@ public class SADebugServerAttachingConnector extends ConnectorImpl implements At
                 "",
                 true);
         transport = new Transport() {
-                   public String name() {
-                       return "RMI";
-                   }
-                 };
+            public String name() {
+                return "RMI";
+            }
+        };
     }
 
     private VirtualMachine createVirtualMachine(Class vmImplClass,
                                                 String debugServerName)
-        throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+            throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         java.lang.reflect.Method connectByServerMethod =
-                            vmImplClass.getMethod(
-                                   "createVirtualMachineForServer",
-                                   new Class[] {
-                                       VirtualMachineManager.class,
-                                       String.class,
-                                       Integer.TYPE
-                                   });
+                vmImplClass.getMethod(
+                        "createVirtualMachineForServer",
+                        new Class[]{
+                                VirtualMachineManager.class,
+                                String.class,
+                                Integer.TYPE
+                        });
         return (VirtualMachine) connectByServerMethod.invoke(null,
-                                   new Object[] {
-                                       Bootstrap.virtualMachineManager(),
-                                       debugServerName,
-                                       new Integer(0)
-                                   });
+                new Object[]{
+                        Bootstrap.virtualMachineManager(),
+                        debugServerName,
+                        new Integer(0)
+                });
     }
 
     public VirtualMachine attach(Map arguments) throws IOException,
-                                      IllegalConnectorArgumentsException {
+            IllegalConnectorArgumentsException {
         String debugServerName = argument(ARG_DEBUG_SERVER_NAME, arguments).value();
         if (debugServerName == null || debugServerName.equals("")) {
             throw new IllegalConnectorArgumentsException("debugServerName should be non-null and non-empty",
-                                                         ARG_DEBUG_SERVER_NAME);
+                    ARG_DEBUG_SERVER_NAME);
         }
         VirtualMachine myVM;
         try {

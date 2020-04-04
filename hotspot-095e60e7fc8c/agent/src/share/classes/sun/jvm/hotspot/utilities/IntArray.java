@@ -10,33 +10,33 @@ import sun.jvm.hotspot.types.TypeDataBase;
 import sun.jvm.hotspot.types.WrongTypeException;
 
 public class IntArray extends GenericArray {
-  static {
-    VM.registerVMInitializedObserver(new Observer() {
-      public void update(Observable o, Object data) {
-        initialize(VM.getVM().getTypeDataBase());
-      }
-    });
-  }
+    static {
+        VM.registerVMInitializedObserver(new Observer() {
+            public void update(Observable o, Object data) {
+                initialize(VM.getVM().getTypeDataBase());
+            }
+        });
+    }
 
-  private static synchronized void initialize(TypeDataBase db) throws WrongTypeException {
-    elemType = db.lookupType("int");
+    private static synchronized void initialize(TypeDataBase db) throws WrongTypeException {
+        elemType = db.lookupType("int");
 
-    Type type = db.lookupType("Array<int>");
-    dataFieldOffset = type.getAddressField("_data").getOffset();
-  }
+        Type type = db.lookupType("Array<int>");
+        dataFieldOffset = type.getAddressField("_data").getOffset();
+    }
 
-  private static long dataFieldOffset;
-  protected static Type elemType;
+    private static long dataFieldOffset;
+    protected static Type elemType;
 
-  public IntArray(Address addr) {
-    super(addr, dataFieldOffset);
-  }
+    public IntArray(Address addr) {
+        super(addr, dataFieldOffset);
+    }
 
-  public int at(int i) {
-    return (int)getIntegerAt(i);
-  }
+    public int at(int i) {
+        return (int) getIntegerAt(i);
+    }
 
-  public Type getElemType() {
-    return elemType;
-  }
+    public Type getElemType() {
+        return elemType;
+    }
 }

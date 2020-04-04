@@ -26,40 +26,44 @@ package sun.jvm.hotspot.code;
 
 import java.io.*;
 
-/** A ConstantIntValue describes a constant int; i.e., the
-    corresponding logical entity is either a source constant or its
-    computation has been constant-folded. */
+/**
+ * A ConstantIntValue describes a constant int; i.e., the
+ * corresponding logical entity is either a source constant or its
+ * computation has been constant-folded.
+ */
 
 public class ConstantIntValue extends ScopeValue {
-  private int value;
+    private int value;
 
-  public ConstantIntValue(int value) {
-    this.value = value;
-  }
+    public ConstantIntValue(int value) {
+        this.value = value;
+    }
 
-  public boolean isConstantInt() {
-    return true;
-  }
+    public boolean isConstantInt() {
+        return true;
+    }
 
-  public int getValue() {
-    return value;
-  }
+    public int getValue() {
+        return value;
+    }
 
-  /** Serialization of debugging information */
-  ConstantIntValue(DebugInfoReadStream stream) {
-    value = stream.readSignedInt();
-  }
+    /**
+     * Serialization of debugging information
+     */
+    ConstantIntValue(DebugInfoReadStream stream) {
+        value = stream.readSignedInt();
+    }
 
-  // FIXME: not yet implementable
-  // void write_on(DebugInfoWriteStream* stream);
+    // FIXME: not yet implementable
+    // void write_on(DebugInfoWriteStream* stream);
 
-  // Printing
+    // Printing
 
-  public void print() {
-    printOn(System.out);
-  }
+    public void print() {
+        printOn(System.out);
+    }
 
-  public void printOn(PrintStream tty) {
-    tty.print(value);
-  }
+    public void printOn(PrintStream tty) {
+        tty.print(value);
+    }
 }

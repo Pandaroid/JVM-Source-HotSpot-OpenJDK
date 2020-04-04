@@ -53,10 +53,10 @@ public class G1HeapRegionTable extends VMObject {
 
     static {
         VM.registerVMInitializedObserver(new Observer() {
-                public void update(Observable o, Object data) {
-                    initialize(VM.getVM().getTypeDataBase());
-                }
-            });
+            public void update(Observable o, Object data) {
+                initialize(VM.getVM().getTypeDataBase());
+            }
+        });
     }
 
     static private synchronized void initialize(TypeDataBase db) {
@@ -75,7 +75,7 @@ public class G1HeapRegionTable extends VMObject {
         long offset = index * VM.getVM().getAddressSize();
         Address regionAddr = arrayAddr.getAddressAt(offset);
         return (HeapRegion) VMObjectFactory.newObject(HeapRegion.class,
-                                                      regionAddr);
+                regionAddr);
     }
 
     public long length() {
@@ -96,27 +96,31 @@ public class G1HeapRegionTable extends VMObject {
         private HeapRegion next;
 
         public HeapRegion positionToNext() {
-          HeapRegion result = next;
-          while (index < length && at(index) == null) {
-            index++;
-          }
-          if (index < length) {
-            next = at(index);
-            index++; // restart search at next element
-          } else {
-            next = null;
-          }
-          return result;
+            HeapRegion result = next;
+            while (index < length && at(index) == null) {
+                index++;
+            }
+            if (index < length) {
+                next = at(index);
+                index++; // restart search at next element
+            } else {
+                next = null;
+            }
+            return result;
         }
 
         @Override
-        public boolean hasNext() { return next != null;     }
+        public boolean hasNext() {
+            return next != null;
+        }
 
         @Override
-        public HeapRegion next() { return positionToNext(); }
+        public HeapRegion next() {
+            return positionToNext();
+        }
 
         @Override
-        public void remove()     { /* not supported */      }
+        public void remove() { /* not supported */ }
 
         HeapRegionIterator(long totalLength) {
             index = 0;

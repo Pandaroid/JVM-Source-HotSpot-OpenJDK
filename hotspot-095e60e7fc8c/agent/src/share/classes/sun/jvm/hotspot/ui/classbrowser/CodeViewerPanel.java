@@ -29,6 +29,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.text.*;
+
 import sun.jvm.hotspot.ui.*;
 import sun.jvm.hotspot.code.*;
 import sun.jvm.hotspot.debugger.*;
@@ -36,30 +37,30 @@ import sun.jvm.hotspot.oops.*;
 import sun.jvm.hotspot.runtime.*;
 
 public class CodeViewerPanel extends JPanel {
-    protected SAEditorPane   contentEditor;
+    protected SAEditorPane contentEditor;
     protected HistoryComboBox address;
-    protected HTMLGenerator  htmlGen;
-    protected JScrollPane    scrollPane;
+    protected HTMLGenerator htmlGen;
+    protected JScrollPane scrollPane;
 
     public CodeViewerPanel() {
         htmlGen = new HTMLGenerator();
         contentEditor = new SAEditorPane();
 
         HyperlinkListener hyperListener = new HyperlinkListener() {
-                public void hyperlinkUpdate(HyperlinkEvent e) {
-                    if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                        String description = e.getDescription();
-                        int equalToIndex = description.indexOf('=');
-                        if (equalToIndex != -1) {
-                            String item = description.substring(0, equalToIndex);
-                            if (item.equals("pc") || item.equals("klass") || item.equals("method")) {
-                                address.setText(description.substring(equalToIndex + 1));
-                            }
+            public void hyperlinkUpdate(HyperlinkEvent e) {
+                if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                    String description = e.getDescription();
+                    int equalToIndex = description.indexOf('=');
+                    if (equalToIndex != -1) {
+                        String item = description.substring(0, equalToIndex);
+                        if (item.equals("pc") || item.equals("klass") || item.equals("method")) {
+                            address.setText(description.substring(equalToIndex + 1));
                         }
-                        contentEditor.setText(htmlGen.genHTMLForHyperlink(description));
                     }
+                    contentEditor.setText(htmlGen.genHTMLForHyperlink(description));
                 }
-            };
+            }
+        };
 
 
         setLayout(new BorderLayout());
@@ -81,10 +82,10 @@ public class CodeViewerPanel extends JPanel {
         add(bottomPanel, BorderLayout.CENTER);
 
         address.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    viewAddress();
-                }
-            });
+            public void actionPerformed(ActionEvent e) {
+                viewAddress();
+            }
+        });
 
     }
 

@@ -34,56 +34,56 @@ package sun.jvm.hotspot.utilities.soql;
  * set is fixed.
  */
 public interface ScriptObject {
-  // special sentinel to denote no-result -- so that
-  // null could be used as proper value
-  public static final Object UNDEFINED = new Object();
-  // empty object array
-  public static final Object[] EMPTY_ARRAY = new Object[0];
+    // special sentinel to denote no-result -- so that
+    // null could be used as proper value
+    public static final Object UNDEFINED = new Object();
+    // empty object array
+    public static final Object[] EMPTY_ARRAY = new Object[0];
 
-  /*
-   * Returns all property names supported by this object.
-   * Property "name" is either a String or an Integer".
-   */
-  public Object[] getIds();
+    /*
+     * Returns all property names supported by this object.
+     * Property "name" is either a String or an Integer".
+     */
+    public Object[] getIds();
 
-  /**
-   * Get the value of the named property.
-   */
-  public Object get(String name);
+    /**
+     * Get the value of the named property.
+     */
+    public Object get(String name);
 
-  /**
-   * Get the value of the "indexed" property.
-   * Returns UNDEFINED if the property does not exist.
-   */
-  public Object get(int index);
+    /**
+     * Get the value of the "indexed" property.
+     * Returns UNDEFINED if the property does not exist.
+     */
+    public Object get(int index);
 
-  /**
-   * Set the value of the named property.
-   */
-  public void put(String name, Object value);
+    /**
+     * Set the value of the named property.
+     */
+    public void put(String name, Object value);
 
-  /**
-   * Set the value of the indexed property.
-   */
-  public void put(int index, Object value);
+    /**
+     * Set the value of the indexed property.
+     */
+    public void put(int index, Object value);
 
-  /**
-   * Returns whether the named property exists or not.
-   */
-  public boolean has(String name);
+    /**
+     * Returns whether the named property exists or not.
+     */
+    public boolean has(String name);
 
-  /**
-   * Returns whether the indexed property exists or not.
-   */
-  public boolean has(int index);
+    /**
+     * Returns whether the indexed property exists or not.
+     */
+    public boolean has(int index);
 
-  /**
-   * Deletes the named property. Returns true on success.
-   */
-  public boolean delete(String name);
+    /**
+     * Deletes the named property. Returns true on success.
+     */
+    public boolean delete(String name);
 
-  /**
-   * Deletes the indexed property. Returns true on success.
-   */
-  public boolean delete(int index);
+    /**
+     * Deletes the indexed property. Returns true on success.
+     */
+    public boolean delete(int index);
 }

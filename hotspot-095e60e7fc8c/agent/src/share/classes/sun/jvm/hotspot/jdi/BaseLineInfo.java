@@ -45,12 +45,12 @@ class BaseLineInfo implements LineInfo {
     }
 
     public String liSourceName()
-                            throws AbsentInformationException {
+            throws AbsentInformationException {
         return declaringType.baseSourceName();
     }
 
     public String liSourcePath()
-                            throws AbsentInformationException {
+            throws AbsentInformationException {
         return declaringType.baseSourcePath();
     }
 }

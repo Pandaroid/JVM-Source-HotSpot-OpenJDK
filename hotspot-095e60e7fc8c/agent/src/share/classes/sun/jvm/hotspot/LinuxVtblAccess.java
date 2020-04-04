@@ -29,22 +29,22 @@ import sun.jvm.hotspot.types.Type;
 import sun.jvm.hotspot.types.basic.BasicVtblAccess;
 
 public class LinuxVtblAccess extends BasicVtblAccess {
-  private String vt;
+    private String vt;
 
-  public LinuxVtblAccess(SymbolLookup symbolLookup,
-                         String[] dllNames) {
-    super(symbolLookup, dllNames);
+    public LinuxVtblAccess(SymbolLookup symbolLookup,
+                           String[] dllNames) {
+        super(symbolLookup, dllNames);
 
-    if (symbolLookup.lookup("libjvm.so", "__vt_10JavaThread") != null) {
-       // old C++ ABI
-       vt = "__vt_";
-    } else {
-       // new C++ ABI
-       vt = "_ZTV";
+        if (symbolLookup.lookup("libjvm.so", "__vt_10JavaThread") != null) {
+            // old C++ ABI
+            vt = "__vt_";
+        } else {
+            // new C++ ABI
+            vt = "_ZTV";
+        }
     }
-  }
 
-  protected String vtblSymbolForType(Type type) {
-    return vt + type.getName().length() + type;
-  }
+    protected String vtblSymbolForType(Type type) {
+        return vt + type.getName().length() + type;
+    }
 }

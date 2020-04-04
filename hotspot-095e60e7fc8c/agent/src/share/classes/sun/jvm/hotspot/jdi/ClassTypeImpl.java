@@ -32,26 +32,25 @@ import java.util.*;
 import java.lang.ref.SoftReference;
 
 public class ClassTypeImpl extends ReferenceTypeImpl
-    implements ClassType
-{
-    private SoftReference interfacesCache    = null;
+        implements ClassType {
+    private SoftReference interfacesCache = null;
     private SoftReference allInterfacesCache = null;
-    private SoftReference subclassesCache    = null;
+    private SoftReference subclassesCache = null;
 
     protected ClassTypeImpl(VirtualMachine aVm, InstanceKlass aRef) {
         super(aVm, aRef);
     }
 
     public ClassType superclass() {
-        InstanceKlass kk = (InstanceKlass)ref().getSuper();
+        InstanceKlass kk = (InstanceKlass) ref().getSuper();
         if (kk == null) {
             return null;
         }
         return (ClassType) vm.referenceType(kk);
     }
 
-    public List interfaces()  {
-        List interfaces = (interfacesCache != null)? (List) interfacesCache.get() : null;
+    public List interfaces() {
+        List interfaces = (interfacesCache != null) ? (List) interfacesCache.get() : null;
         if (interfaces == null) {
             checkPrepared();
             interfaces = Collections.unmodifiableList(getInterfaces());
@@ -70,18 +69,18 @@ public class ClassTypeImpl extends ReferenceTypeImpl
 
         Iterator iter = immediate.iterator();
         while (iter.hasNext()) {
-            InterfaceTypeImpl interfaze = (InterfaceTypeImpl)iter.next();
+            InterfaceTypeImpl interfaze = (InterfaceTypeImpl) iter.next();
             interfaze.addSuperinterfaces(list);
         }
 
-        ClassTypeImpl superclass = (ClassTypeImpl)superclass();
+        ClassTypeImpl superclass = (ClassTypeImpl) superclass();
         if (superclass != null) {
             superclass.addInterfaces(list);
         }
     }
 
-    public List allInterfaces()  {
-        List allinterfaces = (allInterfacesCache != null)? (List) allInterfacesCache.get() : null;
+    public List allInterfaces() {
+        List allinterfaces = (allInterfacesCache != null) ? (List) allInterfacesCache.get() : null;
         if (allinterfaces == null) {
             checkPrepared();
             allinterfaces = new ArrayList();
@@ -93,15 +92,15 @@ public class ClassTypeImpl extends ReferenceTypeImpl
     }
 
     public List subclasses() {
-        List subclasses = (subclassesCache != null)? (List) subclassesCache.get() : null;
+        List subclasses = (subclassesCache != null) ? (List) subclassesCache.get() : null;
         if (subclasses == null) {
             List all = vm.allClasses();
             subclasses = new ArrayList(0);
             Iterator iter = all.iterator();
             while (iter.hasNext()) {
-                ReferenceType refType = (ReferenceType)iter.next();
+                ReferenceType refType = (ReferenceType) iter.next();
                 if (refType instanceof ClassType) {
-                    ClassType clazz = (ClassType)refType;
+                    ClassType clazz = (ClassType) refType;
                     ClassType superclass = clazz.superclass();
                     if ((superclass != null) && superclass.equals(this)) {
                         subclasses.add(refType);
@@ -114,25 +113,25 @@ public class ClassTypeImpl extends ReferenceTypeImpl
         return subclasses;
     }
 
-    public Method concreteMethodByName(String name, String signature)  {
-       checkPrepared();
-       List methods = visibleMethods();
-       Method method = null;
-       Iterator iter = methods.iterator();
-       while (iter.hasNext()) {
-           Method candidate = (Method)iter.next();
-           if (candidate.name().equals(name) &&
-               candidate.signature().equals(signature) &&
-               !candidate.isAbstract()) {
+    public Method concreteMethodByName(String name, String signature) {
+        checkPrepared();
+        List methods = visibleMethods();
+        Method method = null;
+        Iterator iter = methods.iterator();
+        while (iter.hasNext()) {
+            Method candidate = (Method) iter.next();
+            if (candidate.name().equals(name) &&
+                    candidate.signature().equals(signature) &&
+                    !candidate.isAbstract()) {
 
-               method = candidate;
-               break;
-           }
-       }
-       return method;
-   }
+                method = candidate;
+                break;
+            }
+        }
+        return method;
+    }
 
-   List getAllMethods() {
+    List getAllMethods() {
         ArrayList list = new ArrayList(methods());
         ClassType clazz = superclass();
         while (clazz != null) {
@@ -145,7 +144,7 @@ public class ClassTypeImpl extends ReferenceTypeImpl
          */
         Iterator iter = allInterfaces().iterator();
         while (iter.hasNext()) {
-            InterfaceType interfaze = (InterfaceType)iter.next();
+            InterfaceType interfaze = (InterfaceType) iter.next();
             list.addAll(interfaze.methods());
         }
         return list;
@@ -169,17 +168,17 @@ public class ClassTypeImpl extends ReferenceTypeImpl
     }
 
     public void setValue(Field field, Value value)
-        throws InvalidTypeException, ClassNotLoadedException {
+            throws InvalidTypeException, ClassNotLoadedException {
         vm.throwNotReadOnlyException("ClassType.setValue(...)");
     }
 
 
     public Value invokeMethod(ThreadReference threadIntf, Method methodIntf,
                               List arguments, int options)
-                                   throws InvalidTypeException,
-                                          ClassNotLoadedException,
-                                          IncompatibleThreadStateException,
-                                          InvocationException {
+            throws InvalidTypeException,
+            ClassNotLoadedException,
+            IncompatibleThreadStateException,
+            InvocationException {
         vm.throwNotReadOnlyException("ClassType.invokeMethod(...)");
         return null;
     }
@@ -187,10 +186,10 @@ public class ClassTypeImpl extends ReferenceTypeImpl
     public ObjectReference newInstance(ThreadReference threadIntf,
                                        Method methodIntf,
                                        List arguments, int options)
-                                   throws InvalidTypeException,
-                                          ClassNotLoadedException,
-                                          IncompatibleThreadStateException,
-                                          InvocationException {
+            throws InvalidTypeException,
+            ClassNotLoadedException,
+            IncompatibleThreadStateException,
+            InvocationException {
         vm.throwNotReadOnlyException("ClassType.newInstance(...)");
         return null;
     }
@@ -204,11 +203,11 @@ public class ClassTypeImpl extends ReferenceTypeImpl
 
         Iterator iter = interfaces().iterator();
         while (iter.hasNext()) {
-            InterfaceTypeImpl interfaze = (InterfaceTypeImpl)iter.next();
+            InterfaceTypeImpl interfaze = (InterfaceTypeImpl) iter.next();
             interfaze.addVisibleMethods(methodMap);
         }
 
-        ClassTypeImpl clazz = (ClassTypeImpl)superclass();
+        ClassTypeImpl clazz = (ClassTypeImpl) superclass();
         if (clazz != null) {
             clazz.addVisibleMethods(methodMap);
         }
@@ -217,7 +216,7 @@ public class ClassTypeImpl extends ReferenceTypeImpl
     }
 
     boolean isAssignableTo(ReferenceType type) {
-        ClassTypeImpl superclazz = (ClassTypeImpl)superclass();
+        ClassTypeImpl superclazz = (ClassTypeImpl) superclass();
         if (this.equals(type)) {
             return true;
         } else if ((superclazz != null) && superclazz.isAssignableTo(type)) {
@@ -226,7 +225,7 @@ public class ClassTypeImpl extends ReferenceTypeImpl
             List interfaces = interfaces();
             Iterator iter = interfaces.iterator();
             while (iter.hasNext()) {
-                InterfaceTypeImpl interfaze = (InterfaceTypeImpl)iter.next();
+                InterfaceTypeImpl interfaze = (InterfaceTypeImpl) iter.next();
                 if (interfaze.isAssignableTo(type)) {
                     return true;
                 }
@@ -236,6 +235,6 @@ public class ClassTypeImpl extends ReferenceTypeImpl
     }
 
     public String toString() {
-       return "class " + name() + "(" + loaderString() + ")";
+        return "class " + name() + "(" + loaderString() + ")";
     }
 }

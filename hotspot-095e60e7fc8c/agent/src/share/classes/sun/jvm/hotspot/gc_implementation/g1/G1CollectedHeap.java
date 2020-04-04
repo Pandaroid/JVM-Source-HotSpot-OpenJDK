@@ -57,10 +57,10 @@ public class G1CollectedHeap extends SharedHeap {
 
     static {
         VM.registerVMInitializedObserver(new Observer() {
-                public void update(Observable o, Object data) {
-                    initialize(VM.getVM().getTypeDataBase());
-                }
-            });
+            public void update(Observable o, Object data) {
+                initialize(VM.getVM().getTypeDataBase());
+            }
+        });
     }
 
     static private synchronized void initialize(TypeDataBase db) {
@@ -88,7 +88,7 @@ public class G1CollectedHeap extends SharedHeap {
     private HeapRegionManager hrm() {
         Address hrmAddr = addr.addOffsetTo(hrmFieldOffset);
         return (HeapRegionManager) VMObjectFactory.newObject(HeapRegionManager.class,
-                                                         hrmAddr);
+                hrmAddr);
     }
 
     public G1MonitoringSupport g1mm() {
@@ -104,13 +104,13 @@ public class G1CollectedHeap extends SharedHeap {
     public HeapRegionSetBase oldSet() {
         Address oldSetAddr = addr.addOffsetTo(oldSetFieldOffset);
         return (HeapRegionSetBase) VMObjectFactory.newObject(HeapRegionSetBase.class,
-                                                             oldSetAddr);
+                oldSetAddr);
     }
 
     public HeapRegionSetBase humongousSet() {
         Address humongousSetAddr = addr.addOffsetTo(humongousSetFieldOffset);
         return (HeapRegionSetBase) VMObjectFactory.newObject(HeapRegionSetBase.class,
-                                                             humongousSetAddr);
+                humongousSetAddr);
     }
 
     private Iterator<HeapRegion> heapRegionIterator() {

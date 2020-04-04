@@ -28,11 +28,9 @@ package com.sun.java.swing.action;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
-public class FileMenu extends AbstractAction
-{
+public class FileMenu extends AbstractAction {
 
-    public FileMenu()
-    {
+    public FileMenu() {
         super("File");
         putValue("ActionCommandKey", "file-menu-command");
         putValue("ShortDescription", "File operations");
@@ -40,8 +38,7 @@ public class FileMenu extends AbstractAction
         putValue("MnemonicKey", VALUE_MNEMONIC);
     }
 
-    public void actionPerformed(ActionEvent actionevent)
-    {
+    public void actionPerformed(ActionEvent actionevent) {
     }
 
     public static final String VALUE_COMMAND = "file-menu-command";

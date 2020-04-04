@@ -25,28 +25,29 @@
 package sun.jvm.hotspot.runtime;
 
 import java.util.*;
+
 import sun.jvm.hotspot.debugger.*;
 import sun.jvm.hotspot.oops.*;
 import sun.jvm.hotspot.types.*;
 
 public class PerfDataPrologue extends VMObject {
-    private static JIntField  magicField;
+    private static JIntField magicField;
     private static JByteField byteOrderField;
     private static JByteField majorVersionField;
     private static JByteField minorVersionField;
     private static JByteField accessibleField;
-    private static JIntField  usedField;
-    private static JIntField  overflowField;
+    private static JIntField usedField;
+    private static JIntField overflowField;
     private static JLongField modTimeStampField;
-    private static JIntField  entryOffsetField;
-    private static JIntField  numEntriesField;
+    private static JIntField entryOffsetField;
+    private static JIntField numEntriesField;
 
     static {
         VM.registerVMInitializedObserver(new Observer() {
-                public void update(Observable o, Object data) {
-                    initialize(VM.getVM().getTypeDataBase());
-                }
-            });
+            public void update(Observable o, Object data) {
+                initialize(VM.getVM().getTypeDataBase());
+            }
+        });
     }
 
     private static synchronized void initialize(TypeDataBase db) {
@@ -81,7 +82,7 @@ public class PerfDataPrologue extends VMObject {
     }
 
     public boolean accessible() {
-        return ((byte) accessibleField.getValue(addr)) != (byte)0;
+        return ((byte) accessibleField.getValue(addr)) != (byte) 0;
     }
 
     public int used() {

@@ -26,10 +26,12 @@ package sun.jvm.hotspot.memory;
 
 import sun.jvm.hotspot.debugger.*;
 
-/** No additional functionality for now */
+/**
+ * No additional functionality for now
+ */
 
 public class OffsetTableContigSpace extends ContiguousSpace {
-  public OffsetTableContigSpace(Address addr) {
-    super(addr);
-  }
+    public OffsetTableContigSpace(Address addr) {
+        super(addr);
+    }
 }

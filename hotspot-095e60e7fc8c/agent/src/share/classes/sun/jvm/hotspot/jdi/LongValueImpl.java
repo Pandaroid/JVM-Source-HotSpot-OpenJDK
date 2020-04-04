@@ -27,10 +27,10 @@ package sun.jvm.hotspot.jdi;
 import com.sun.jdi.*;
 
 public class LongValueImpl extends PrimitiveValueImpl
-                           implements LongValue {
+        implements LongValue {
     private long value;
 
-    LongValueImpl(VirtualMachine aVm,long aValue) {
+    LongValueImpl(VirtualMachine aVm, long aValue) {
         super(aVm);
 
         value = aValue;
@@ -38,8 +38,8 @@ public class LongValueImpl extends PrimitiveValueImpl
 
     public boolean equals(Object obj) {
         if ((obj != null) && (obj instanceof LongValue)) {
-            return (value == ((LongValue)obj).value()) &&
-                   super.equals(obj);
+            return (value == ((LongValue) obj).value()) &&
+                    super.equals(obj);
         } else {
             return false;
         }
@@ -72,35 +72,35 @@ public class LongValueImpl extends PrimitiveValueImpl
     }
 
     public boolean booleanValue() {
-        return(value == 0)?false:true;
+        return (value == 0) ? false : true;
     }
 
     public byte byteValue() {
-        return(byte)value;
+        return (byte) value;
     }
 
     public char charValue() {
-        return(char)value;
+        return (char) value;
     }
 
     public short shortValue() {
-        return(short)value;
+        return (short) value;
     }
 
     public int intValue() {
-        return(int)value;
+        return (int) value;
     }
 
     public long longValue() {
-        return(long)value;
+        return (long) value;
     }
 
     public float floatValue() {
-        return(float)value;
+        return (float) value;
     }
 
     public double doubleValue() {
-        return(double)value;
+        return (double) value;
     }
 
     byte checkedByteValue() throws InvalidTypeException {

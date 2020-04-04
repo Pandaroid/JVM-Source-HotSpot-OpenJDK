@@ -27,6 +27,7 @@ package sun.jvm.hotspot.utilities;
 import java.io.*;
 import java.nio.channels.*;
 import java.util.*;
+
 import sun.jvm.hotspot.debugger.*;
 import sun.jvm.hotspot.memory.*;
 import sun.jvm.hotspot.oops.*;
@@ -322,62 +323,62 @@ public class HeapHprofBinWriter extends AbstractHeapGraphWriter {
     private static final String HPROF_HEADER_1_0_2 = "JAVA PROFILE 1.0.2";
 
     // constants in enum HprofTag
-    private static final int HPROF_UTF8             = 0x01;
-    private static final int HPROF_LOAD_CLASS       = 0x02;
-    private static final int HPROF_UNLOAD_CLASS     = 0x03;
-    private static final int HPROF_FRAME            = 0x04;
-    private static final int HPROF_TRACE            = 0x05;
-    private static final int HPROF_ALLOC_SITES      = 0x06;
-    private static final int HPROF_HEAP_SUMMARY     = 0x07;
-    private static final int HPROF_START_THREAD     = 0x0A;
-    private static final int HPROF_END_THREAD       = 0x0B;
-    private static final int HPROF_HEAP_DUMP        = 0x0C;
-    private static final int HPROF_CPU_SAMPLES      = 0x0D;
+    private static final int HPROF_UTF8 = 0x01;
+    private static final int HPROF_LOAD_CLASS = 0x02;
+    private static final int HPROF_UNLOAD_CLASS = 0x03;
+    private static final int HPROF_FRAME = 0x04;
+    private static final int HPROF_TRACE = 0x05;
+    private static final int HPROF_ALLOC_SITES = 0x06;
+    private static final int HPROF_HEAP_SUMMARY = 0x07;
+    private static final int HPROF_START_THREAD = 0x0A;
+    private static final int HPROF_END_THREAD = 0x0B;
+    private static final int HPROF_HEAP_DUMP = 0x0C;
+    private static final int HPROF_CPU_SAMPLES = 0x0D;
     private static final int HPROF_CONTROL_SETTINGS = 0x0E;
 
     // 1.0.2 record types
     private static final int HPROF_HEAP_DUMP_SEGMENT = 0x1C;
-    private static final int HPROF_HEAP_DUMP_END     = 0x2C;
+    private static final int HPROF_HEAP_DUMP_END = 0x2C;
 
     // Heap dump constants
     // constants in enum HprofGcTag
-    private static final int HPROF_GC_ROOT_UNKNOWN       = 0xFF;
-    private static final int HPROF_GC_ROOT_JNI_GLOBAL    = 0x01;
-    private static final int HPROF_GC_ROOT_JNI_LOCAL     = 0x02;
-    private static final int HPROF_GC_ROOT_JAVA_FRAME    = 0x03;
-    private static final int HPROF_GC_ROOT_NATIVE_STACK  = 0x04;
-    private static final int HPROF_GC_ROOT_STICKY_CLASS  = 0x05;
-    private static final int HPROF_GC_ROOT_THREAD_BLOCK  = 0x06;
-    private static final int HPROF_GC_ROOT_MONITOR_USED  = 0x07;
-    private static final int HPROF_GC_ROOT_THREAD_OBJ    = 0x08;
-    private static final int HPROF_GC_CLASS_DUMP         = 0x20;
-    private static final int HPROF_GC_INSTANCE_DUMP      = 0x21;
-    private static final int HPROF_GC_OBJ_ARRAY_DUMP     = 0x22;
-    private static final int HPROF_GC_PRIM_ARRAY_DUMP    = 0x23;
+    private static final int HPROF_GC_ROOT_UNKNOWN = 0xFF;
+    private static final int HPROF_GC_ROOT_JNI_GLOBAL = 0x01;
+    private static final int HPROF_GC_ROOT_JNI_LOCAL = 0x02;
+    private static final int HPROF_GC_ROOT_JAVA_FRAME = 0x03;
+    private static final int HPROF_GC_ROOT_NATIVE_STACK = 0x04;
+    private static final int HPROF_GC_ROOT_STICKY_CLASS = 0x05;
+    private static final int HPROF_GC_ROOT_THREAD_BLOCK = 0x06;
+    private static final int HPROF_GC_ROOT_MONITOR_USED = 0x07;
+    private static final int HPROF_GC_ROOT_THREAD_OBJ = 0x08;
+    private static final int HPROF_GC_CLASS_DUMP = 0x20;
+    private static final int HPROF_GC_INSTANCE_DUMP = 0x21;
+    private static final int HPROF_GC_OBJ_ARRAY_DUMP = 0x22;
+    private static final int HPROF_GC_PRIM_ARRAY_DUMP = 0x23;
 
     // constants in enum HprofType
-    private static final int HPROF_ARRAY_OBJECT  = 1;
+    private static final int HPROF_ARRAY_OBJECT = 1;
     private static final int HPROF_NORMAL_OBJECT = 2;
-    private static final int HPROF_BOOLEAN       = 4;
-    private static final int HPROF_CHAR          = 5;
-    private static final int HPROF_FLOAT         = 6;
-    private static final int HPROF_DOUBLE        = 7;
-    private static final int HPROF_BYTE          = 8;
-    private static final int HPROF_SHORT         = 9;
-    private static final int HPROF_INT           = 10;
-    private static final int HPROF_LONG          = 11;
+    private static final int HPROF_BOOLEAN = 4;
+    private static final int HPROF_CHAR = 5;
+    private static final int HPROF_FLOAT = 6;
+    private static final int HPROF_DOUBLE = 7;
+    private static final int HPROF_BYTE = 8;
+    private static final int HPROF_SHORT = 9;
+    private static final int HPROF_INT = 10;
+    private static final int HPROF_LONG = 11;
 
     // Java type codes
     private static final int JVM_SIGNATURE_BOOLEAN = 'Z';
-    private static final int JVM_SIGNATURE_CHAR    = 'C';
-    private static final int JVM_SIGNATURE_BYTE    = 'B';
-    private static final int JVM_SIGNATURE_SHORT   = 'S';
-    private static final int JVM_SIGNATURE_INT     = 'I';
-    private static final int JVM_SIGNATURE_LONG    = 'J';
-    private static final int JVM_SIGNATURE_FLOAT   = 'F';
-    private static final int JVM_SIGNATURE_DOUBLE  = 'D';
-    private static final int JVM_SIGNATURE_ARRAY   = '[';
-    private static final int JVM_SIGNATURE_CLASS   = 'L';
+    private static final int JVM_SIGNATURE_CHAR = 'C';
+    private static final int JVM_SIGNATURE_BYTE = 'B';
+    private static final int JVM_SIGNATURE_SHORT = 'S';
+    private static final int JVM_SIGNATURE_INT = 'I';
+    private static final int JVM_SIGNATURE_LONG = 'J';
+    private static final int JVM_SIGNATURE_FLOAT = 'F';
+    private static final int JVM_SIGNATURE_DOUBLE = 'D';
+    private static final int JVM_SIGNATURE_ARRAY = '[';
+    private static final int JVM_SIGNATURE_CLASS = 'L';
 
     public synchronized void write(String fileName) throws IOException {
         // open file stream and create buffered data output stream
@@ -492,7 +493,7 @@ public class HeapHprofBinWriter extends AbstractHeapGraphWriter {
         long dumpLenLong = (dumpEnd - currentSegmentStart - 4L);
 
         // Check length boundary, overflow could happen but is _very_ unlikely
-        if(dumpLenLong >= (4L * 0x40000000)){
+        if (dumpLenLong >= (4L * 0x40000000)) {
             throw new RuntimeException("Heap segment size overflow.");
         }
 
@@ -518,16 +519,16 @@ public class HeapHprofBinWriter extends AbstractHeapGraphWriter {
         SystemDictionary sysDict = VM.getVM().getSystemDictionary();
         try {
             sysDict.allClassesDo(new SystemDictionary.ClassVisitor() {
-                            public void visit(Klass k) {
-                                try {
-                                    writeHeapRecordPrologue();
-                                    writeClassDumpRecord(k);
-                                    writeHeapRecordEpilogue();
-                                } catch (IOException e) {
-                                    throw new RuntimeException(e);
-                                }
-                            }
-                        });
+                public void visit(Klass k) {
+                    try {
+                        writeHeapRecordPrologue();
+                        writeClassDumpRecord(k);
+                        writeHeapRecordEpilogue();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            });
         } catch (RuntimeException re) {
             handleRuntimeException(re);
         }
@@ -543,7 +544,7 @@ public class HeapHprofBinWriter extends AbstractHeapGraphWriter {
     }
 
     private void writeClassDumpRecord(Klass k) throws IOException {
-        out.writeByte((byte)HPROF_GC_CLASS_DUMP);
+        out.writeByte((byte) HPROF_GC_CLASS_DUMP);
         writeObjectID(k.getJavaMirror());
         out.writeInt(DUMMY_STACK_TRACE_ID);
         Klass superKlass = k.getJavaSuper();
@@ -574,7 +575,7 @@ public class HeapHprofBinWriter extends AbstractHeapGraphWriter {
             List staticFields = new ArrayList();
             List instanceFields = new ArrayList();
             Iterator itr = null;
-            for (itr = declaredFields.iterator(); itr.hasNext();) {
+            for (itr = declaredFields.iterator(); itr.hasNext(); ) {
                 Field field = (Field) itr.next();
                 if (field.isStatic()) {
                     staticFields.add(field);
@@ -636,28 +637,29 @@ public class HeapHprofBinWriter extends AbstractHeapGraphWriter {
         if (blk != null) {
             try {
                 blk.oopsDo(new AddressVisitor() {
-                           public void visitAddress(Address handleAddr) {
-                               try {
-                                   if (handleAddr != null) {
-                                       OopHandle oopHandle = handleAddr.getOopHandleAt(0);
-                                       Oop oop = objectHeap.newOop(oopHandle);
-                                       // exclude JNI handles hotspot internal objects
-                                       if (oop != null && isJavaVisible(oop)) {
-                                           out.writeByte((byte) HPROF_GC_ROOT_JNI_LOCAL);
-                                           writeObjectID(oop);
-                                           out.writeInt(threadIndex);
-                                           out.writeInt(EMPTY_FRAME_DEPTH);
-                                       }
-                                   }
-                               } catch (IOException exp) {
-                                   throw new RuntimeException(exp);
-                               }
-                           }
-                           public void visitCompOopAddress(Address handleAddr) {
-                             throw new RuntimeException(
-                                   " Should not reach here. JNIHandles are not compressed \n");
-                           }
-                       });
+                    public void visitAddress(Address handleAddr) {
+                        try {
+                            if (handleAddr != null) {
+                                OopHandle oopHandle = handleAddr.getOopHandleAt(0);
+                                Oop oop = objectHeap.newOop(oopHandle);
+                                // exclude JNI handles hotspot internal objects
+                                if (oop != null && isJavaVisible(oop)) {
+                                    out.writeByte((byte) HPROF_GC_ROOT_JNI_LOCAL);
+                                    writeObjectID(oop);
+                                    out.writeInt(threadIndex);
+                                    out.writeInt(EMPTY_FRAME_DEPTH);
+                                }
+                            }
+                        } catch (IOException exp) {
+                            throw new RuntimeException(exp);
+                        }
+                    }
+
+                    public void visitCompOopAddress(Address handleAddr) {
+                        throw new RuntimeException(
+                                " Should not reach here. JNIHandles are not compressed \n");
+                    }
+                });
             } catch (RuntimeException re) {
                 handleRuntimeException(re);
             }
@@ -730,64 +732,64 @@ public class HeapHprofBinWriter extends AbstractHeapGraphWriter {
     private void writeBooleanArray(TypeArray array) throws IOException {
         final int length = (int) array.getLength();
         for (int index = 0; index < length; index++) {
-             long offset = BOOLEAN_BASE_OFFSET + index * BOOLEAN_SIZE;
-             out.writeBoolean(array.getHandle().getJBooleanAt(offset));
+            long offset = BOOLEAN_BASE_OFFSET + index * BOOLEAN_SIZE;
+            out.writeBoolean(array.getHandle().getJBooleanAt(offset));
         }
     }
 
     private void writeByteArray(TypeArray array) throws IOException {
         final int length = (int) array.getLength();
         for (int index = 0; index < length; index++) {
-             long offset = BYTE_BASE_OFFSET + index * BYTE_SIZE;
-             out.writeByte(array.getHandle().getJByteAt(offset));
+            long offset = BYTE_BASE_OFFSET + index * BYTE_SIZE;
+            out.writeByte(array.getHandle().getJByteAt(offset));
         }
     }
 
     private void writeShortArray(TypeArray array) throws IOException {
         final int length = (int) array.getLength();
         for (int index = 0; index < length; index++) {
-             long offset = SHORT_BASE_OFFSET + index * SHORT_SIZE;
-             out.writeShort(array.getHandle().getJShortAt(offset));
+            long offset = SHORT_BASE_OFFSET + index * SHORT_SIZE;
+            out.writeShort(array.getHandle().getJShortAt(offset));
         }
     }
 
     private void writeIntArray(TypeArray array) throws IOException {
         final int length = (int) array.getLength();
         for (int index = 0; index < length; index++) {
-             long offset = INT_BASE_OFFSET + index * INT_SIZE;
-             out.writeInt(array.getHandle().getJIntAt(offset));
+            long offset = INT_BASE_OFFSET + index * INT_SIZE;
+            out.writeInt(array.getHandle().getJIntAt(offset));
         }
     }
 
     private void writeLongArray(TypeArray array) throws IOException {
         final int length = (int) array.getLength();
         for (int index = 0; index < length; index++) {
-             long offset = LONG_BASE_OFFSET + index * LONG_SIZE;
-             out.writeLong(array.getHandle().getJLongAt(offset));
+            long offset = LONG_BASE_OFFSET + index * LONG_SIZE;
+            out.writeLong(array.getHandle().getJLongAt(offset));
         }
     }
 
     private void writeCharArray(TypeArray array) throws IOException {
         final int length = (int) array.getLength();
         for (int index = 0; index < length; index++) {
-             long offset = CHAR_BASE_OFFSET + index * CHAR_SIZE;
-             out.writeChar(array.getHandle().getJCharAt(offset));
+            long offset = CHAR_BASE_OFFSET + index * CHAR_SIZE;
+            out.writeChar(array.getHandle().getJCharAt(offset));
         }
     }
 
     private void writeFloatArray(TypeArray array) throws IOException {
         final int length = (int) array.getLength();
         for (int index = 0; index < length; index++) {
-             long offset = FLOAT_BASE_OFFSET + index * FLOAT_SIZE;
-             out.writeFloat(array.getHandle().getJFloatAt(offset));
+            long offset = FLOAT_BASE_OFFSET + index * FLOAT_SIZE;
+            out.writeFloat(array.getHandle().getJFloatAt(offset));
         }
     }
 
     private void writeDoubleArray(TypeArray array) throws IOException {
         final int length = (int) array.getLength();
         for (int index = 0; index < length; index++) {
-             long offset = DOUBLE_BASE_OFFSET + index * DOUBLE_SIZE;
-             out.writeDouble(array.getHandle().getJDoubleAt(offset));
+            long offset = DOUBLE_BASE_OFFSET + index * DOUBLE_SIZE;
+            out.writeDouble(array.getHandle().getJDoubleAt(offset));
         }
     }
 
@@ -817,7 +819,7 @@ public class HeapHprofBinWriter extends AbstractHeapGraphWriter {
         List fields = cd.fields;
         int size = cd.instSize;
         out.writeInt(size);
-        for (Iterator itr = fields.iterator(); itr.hasNext();) {
+        for (Iterator itr = fields.iterator(); itr.hasNext(); ) {
             writeField((Field) itr.next(), instance);
         }
     }
@@ -825,16 +827,16 @@ public class HeapHprofBinWriter extends AbstractHeapGraphWriter {
     //-- Internals only below this point
 
     private void writeFieldDescriptors(List fields, InstanceKlass ik)
-        throws IOException {
+            throws IOException {
         // ik == null for instance fields.
         out.writeShort((short) fields.size());
-        for (Iterator itr = fields.iterator(); itr.hasNext();) {
+        for (Iterator itr = fields.iterator(); itr.hasNext(); ) {
             Field field = (Field) itr.next();
             Symbol name = symTbl.probe(field.getID().getName());
             writeSymbolID(name);
             char typeCode = (char) field.getSignature().getByteAt(0);
             int kind = signatureToHprofKind(typeCode);
-            out.writeByte((byte)kind);
+            out.writeByte((byte) kind);
             if (ik != null) {
                 // static field
                 writeField(field, ik.getJavaMirror());
@@ -844,75 +846,75 @@ public class HeapHprofBinWriter extends AbstractHeapGraphWriter {
 
     public static int signatureToHprofKind(char ch) {
         switch (ch) {
-        case JVM_SIGNATURE_CLASS:
-        case JVM_SIGNATURE_ARRAY:
-            return HPROF_NORMAL_OBJECT;
-        case JVM_SIGNATURE_BOOLEAN:
-            return HPROF_BOOLEAN;
-        case JVM_SIGNATURE_CHAR:
-            return HPROF_CHAR;
-        case JVM_SIGNATURE_FLOAT:
-            return HPROF_FLOAT;
-        case JVM_SIGNATURE_DOUBLE:
-            return HPROF_DOUBLE;
-        case JVM_SIGNATURE_BYTE:
-            return HPROF_BYTE;
-        case JVM_SIGNATURE_SHORT:
-            return HPROF_SHORT;
-        case JVM_SIGNATURE_INT:
-            return HPROF_INT;
-        case JVM_SIGNATURE_LONG:
-            return HPROF_LONG;
-        default:
-            throw new RuntimeException("should not reach here");
+            case JVM_SIGNATURE_CLASS:
+            case JVM_SIGNATURE_ARRAY:
+                return HPROF_NORMAL_OBJECT;
+            case JVM_SIGNATURE_BOOLEAN:
+                return HPROF_BOOLEAN;
+            case JVM_SIGNATURE_CHAR:
+                return HPROF_CHAR;
+            case JVM_SIGNATURE_FLOAT:
+                return HPROF_FLOAT;
+            case JVM_SIGNATURE_DOUBLE:
+                return HPROF_DOUBLE;
+            case JVM_SIGNATURE_BYTE:
+                return HPROF_BYTE;
+            case JVM_SIGNATURE_SHORT:
+                return HPROF_SHORT;
+            case JVM_SIGNATURE_INT:
+                return HPROF_INT;
+            case JVM_SIGNATURE_LONG:
+                return HPROF_LONG;
+            default:
+                throw new RuntimeException("should not reach here");
         }
     }
 
     private void writeField(Field field, Oop oop) throws IOException {
         char typeCode = (char) field.getSignature().getByteAt(0);
         switch (typeCode) {
-        case JVM_SIGNATURE_BOOLEAN:
-            out.writeBoolean(((BooleanField)field).getValue(oop));
-            break;
-        case JVM_SIGNATURE_CHAR:
-            out.writeChar(((CharField)field).getValue(oop));
-            break;
-        case JVM_SIGNATURE_BYTE:
-            out.writeByte(((ByteField)field).getValue(oop));
-            break;
-        case JVM_SIGNATURE_SHORT:
-            out.writeShort(((ShortField)field).getValue(oop));
-            break;
-        case JVM_SIGNATURE_INT:
-            out.writeInt(((IntField)field).getValue(oop));
-            break;
-        case JVM_SIGNATURE_LONG:
-            out.writeLong(((LongField)field).getValue(oop));
-            break;
-        case JVM_SIGNATURE_FLOAT:
-            out.writeFloat(((FloatField)field).getValue(oop));
-            break;
-        case JVM_SIGNATURE_DOUBLE:
-            out.writeDouble(((DoubleField)field).getValue(oop));
-            break;
-        case JVM_SIGNATURE_CLASS:
-        case JVM_SIGNATURE_ARRAY: {
-            if (VM.getVM().isCompressedOopsEnabled()) {
-              OopHandle handle = ((NarrowOopField)field).getValueAsOopHandle(oop);
-              writeObjectID(getAddressValue(handle));
-            } else {
-              OopHandle handle = ((OopField)field).getValueAsOopHandle(oop);
-              writeObjectID(getAddressValue(handle));
+            case JVM_SIGNATURE_BOOLEAN:
+                out.writeBoolean(((BooleanField) field).getValue(oop));
+                break;
+            case JVM_SIGNATURE_CHAR:
+                out.writeChar(((CharField) field).getValue(oop));
+                break;
+            case JVM_SIGNATURE_BYTE:
+                out.writeByte(((ByteField) field).getValue(oop));
+                break;
+            case JVM_SIGNATURE_SHORT:
+                out.writeShort(((ShortField) field).getValue(oop));
+                break;
+            case JVM_SIGNATURE_INT:
+                out.writeInt(((IntField) field).getValue(oop));
+                break;
+            case JVM_SIGNATURE_LONG:
+                out.writeLong(((LongField) field).getValue(oop));
+                break;
+            case JVM_SIGNATURE_FLOAT:
+                out.writeFloat(((FloatField) field).getValue(oop));
+                break;
+            case JVM_SIGNATURE_DOUBLE:
+                out.writeDouble(((DoubleField) field).getValue(oop));
+                break;
+            case JVM_SIGNATURE_CLASS:
+            case JVM_SIGNATURE_ARRAY: {
+                if (VM.getVM().isCompressedOopsEnabled()) {
+                    OopHandle handle = ((NarrowOopField) field).getValueAsOopHandle(oop);
+                    writeObjectID(getAddressValue(handle));
+                } else {
+                    OopHandle handle = ((OopField) field).getValueAsOopHandle(oop);
+                    writeObjectID(getAddressValue(handle));
+                }
+                break;
             }
-            break;
-        }
-        default:
-            throw new RuntimeException("should not reach here");
+            default:
+                throw new RuntimeException("should not reach here");
         }
     }
 
     private void writeHeader(int tag, int len) throws IOException {
-        out.writeByte((byte)tag);
+        out.writeByte((byte) tag);
         out.writeInt(0); // current ticks
         out.writeInt(len);
     }
@@ -927,14 +929,14 @@ public class HeapHprofBinWriter extends AbstractHeapGraphWriter {
     private void writeSymbols() throws IOException {
         try {
             symTbl.symbolsDo(new SymbolTable.SymbolVisitor() {
-                    public void visit(Symbol sym) {
-                        try {
-                            writeSymbol(sym);
-                        } catch (IOException exp) {
-                            throw new RuntimeException(exp);
-                        }
+                public void visit(Symbol sym) {
+                    try {
+                        writeSymbol(sym);
+                    } catch (IOException exp) {
+                        throw new RuntimeException(exp);
                     }
-                });
+                }
+            });
         } catch (RuntimeException re) {
             handleRuntimeException(re);
         }
@@ -953,6 +955,7 @@ public class HeapHprofBinWriter extends AbstractHeapGraphWriter {
         try {
             sysDict.allClassesDo(new SystemDictionary.ClassVisitor() {
                 private int serialNum = 1;
+
                 public void visit(Klass k) {
                     try {
                         Instance clazz = k.getJavaMirror();
@@ -975,13 +978,12 @@ public class HeapHprofBinWriter extends AbstractHeapGraphWriter {
     // writes hprof binary file header
     private void writeFileHeader() throws IOException {
         // version string
-        if(useSegmentedHeapDump) {
+        if (useSegmentedHeapDump) {
             out.writeBytes(HPROF_HEADER_1_0_2);
-        }
-        else {
+        } else {
             out.writeBytes(HPROF_HEADER_1_0_1);
         }
-        out.writeByte((byte)'\0');
+        out.writeByte((byte) '\0');
 
         // write identifier size. we use pointers as identifiers.
         out.writeInt(OBJ_ID_SIZE);
@@ -992,7 +994,7 @@ public class HeapHprofBinWriter extends AbstractHeapGraphWriter {
 
     // writes unique ID for an object
     private void writeObjectID(Oop oop) throws IOException {
-        OopHandle handle = (oop != null)? oop.getHandle() : null;
+        OopHandle handle = (oop != null) ? oop.getHandle() : null;
         long address = getAddressValue(handle);
         writeObjectID(address);
     }
@@ -1010,7 +1012,7 @@ public class HeapHprofBinWriter extends AbstractHeapGraphWriter {
     }
 
     private long getAddressValue(Address addr) {
-        return (addr == null)? 0L : dbg.getAddressValue(addr);
+        return (addr == null) ? 0L : dbg.getAddressValue(addr);
     }
 
     // get all declared as well as inherited (directly/indirectly) fields
@@ -1019,9 +1021,9 @@ public class HeapHprofBinWriter extends AbstractHeapGraphWriter {
         List res = new ArrayList();
         while (klass != null) {
             List curFields = klass.getImmediateFields();
-            for (Iterator itr = curFields.iterator(); itr.hasNext();) {
+            for (Iterator itr = curFields.iterator(); itr.hasNext(); ) {
                 Field f = (Field) itr.next();
-                if (! f.isStatic()) {
+                if (!f.isStatic()) {
                     res.add(f);
                 }
             }
@@ -1035,32 +1037,32 @@ public class HeapHprofBinWriter extends AbstractHeapGraphWriter {
     // heap will include size of padding/alignment bytes as well.
     private int getSizeForFields(List fields) {
         int size = 0;
-        for (Iterator itr = fields.iterator(); itr.hasNext();) {
+        for (Iterator itr = fields.iterator(); itr.hasNext(); ) {
             Field field = (Field) itr.next();
             char typeCode = (char) field.getSignature().getByteAt(0);
             switch (typeCode) {
-            case JVM_SIGNATURE_BOOLEAN:
-            case JVM_SIGNATURE_BYTE:
-                size++;
-                break;
-            case JVM_SIGNATURE_CHAR:
-            case JVM_SIGNATURE_SHORT:
-                size += 2;
-                break;
-            case JVM_SIGNATURE_INT:
-            case JVM_SIGNATURE_FLOAT:
-                size += 4;
-                break;
-            case JVM_SIGNATURE_CLASS:
-            case JVM_SIGNATURE_ARRAY:
-                size += OBJ_ID_SIZE;
-                break;
-            case JVM_SIGNATURE_LONG:
-            case JVM_SIGNATURE_DOUBLE:
-                size += 8;
-                break;
-            default:
-                throw new RuntimeException("should not reach here");
+                case JVM_SIGNATURE_BOOLEAN:
+                case JVM_SIGNATURE_BYTE:
+                    size++;
+                    break;
+                case JVM_SIGNATURE_CHAR:
+                case JVM_SIGNATURE_SHORT:
+                    size += 2;
+                    break;
+                case JVM_SIGNATURE_INT:
+                case JVM_SIGNATURE_FLOAT:
+                    size += 4;
+                    break;
+                case JVM_SIGNATURE_CLASS:
+                case JVM_SIGNATURE_ARRAY:
+                    size += OBJ_ID_SIZE;
+                    break;
+                case JVM_SIGNATURE_LONG:
+                case JVM_SIGNATURE_DOUBLE:
+                    size += 8;
+                    break;
+                default:
+                    throw new RuntimeException("should not reach here");
             }
         }
         return size;

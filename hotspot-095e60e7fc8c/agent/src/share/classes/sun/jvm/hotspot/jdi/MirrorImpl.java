@@ -35,7 +35,7 @@ abstract class MirrorImpl extends Object implements Mirror {
         // Yes, its a bit of a hack. But by doing it this
         // way, this is the only place we have to change
         // typing to substitute a new impl.
-        vm = (VirtualMachineImpl)aVm;
+        vm = (VirtualMachineImpl) aVm;
     }
 
     public VirtualMachine virtualMachine() {
@@ -44,7 +44,7 @@ abstract class MirrorImpl extends Object implements Mirror {
 
     public boolean equals(Object obj) {
         if ((obj != null) && (obj instanceof Mirror)) {
-            Mirror other = (Mirror)obj;
+            Mirror other = (Mirror) obj;
             return vm.equals(other.virtualMachine());
         } else {
             return false;

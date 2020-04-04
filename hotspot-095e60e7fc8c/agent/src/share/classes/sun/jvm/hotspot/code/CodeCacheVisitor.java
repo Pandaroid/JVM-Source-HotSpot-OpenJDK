@@ -25,6 +25,7 @@
 package sun.jvm.hotspot.code;
 
 import java.util.*;
+
 import sun.jvm.hotspot.debugger.*;
 import sun.jvm.hotspot.memory.*;
 import sun.jvm.hotspot.runtime.*;
@@ -33,10 +34,10 @@ import sun.jvm.hotspot.utilities.*;
 
 public interface CodeCacheVisitor {
 
-  void prologue(Address start, Address end);
+    void prologue(Address start, Address end);
 
-  void visit(CodeBlob blob);
+    void visit(CodeBlob blob);
 
-  void epilogue();
+    void epilogue();
 
 }

@@ -33,26 +33,26 @@ import sun.jvm.hotspot.runtime.*;
 import sun.jvm.hotspot.types.*;
 
 public abstract class SharedHeap extends CollectedHeap {
-  private static VirtualConstructor ctor;
+    private static VirtualConstructor ctor;
 
-  static {
-    VM.registerVMInitializedObserver(new Observer() {
-        public void update(Observable o, Object data) {
-          initialize(VM.getVM().getTypeDataBase());
-        }
-      });
-  }
+    static {
+        VM.registerVMInitializedObserver(new Observer() {
+            public void update(Observable o, Object data) {
+                initialize(VM.getVM().getTypeDataBase());
+            }
+        });
+    }
 
-  private static synchronized void initialize(TypeDataBase db) {
-    Type type = db.lookupType("SharedHeap");
-    ctor = new VirtualConstructor(db);
-  }
+    private static synchronized void initialize(TypeDataBase db) {
+        Type type = db.lookupType("SharedHeap");
+        ctor = new VirtualConstructor(db);
+    }
 
-  public SharedHeap(Address addr) {
-    super(addr);
-  }
+    public SharedHeap(Address addr) {
+        super(addr);
+    }
 
-  public CollectedHeapName kind() {
-    return CollectedHeapName.SHARED_HEAP;
-  }
-  }
+    public CollectedHeapName kind() {
+        return CollectedHeapName.SHARED_HEAP;
+    }
+}

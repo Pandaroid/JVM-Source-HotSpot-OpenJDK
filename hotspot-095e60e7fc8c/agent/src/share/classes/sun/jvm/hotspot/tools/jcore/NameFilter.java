@@ -25,10 +25,10 @@
 package sun.jvm.hotspot.tools.jcore;
 
 import sun.jvm.hotspot.oops.*;
+
 import java.util.regex.*;
 
-public class NameFilter implements ClassFilter
-{
+public class NameFilter implements ClassFilter {
     public Pattern includePattern;
 
     public NameFilter() {

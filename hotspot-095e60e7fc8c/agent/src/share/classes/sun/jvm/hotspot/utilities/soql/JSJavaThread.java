@@ -25,6 +25,7 @@
 package sun.jvm.hotspot.utilities.soql;
 
 import java.util.*;
+
 import sun.jvm.hotspot.debugger.*;
 import sun.jvm.hotspot.oops.*;
 import sun.jvm.hotspot.runtime.*;
@@ -119,8 +120,8 @@ public class JSJavaThread extends JSJavaInstance {
                 ObjectMonitor waitingMonitor = jthread.getCurrentWaitingMonitor();
                 OopHandle waitingObj = null;
                 if (waitingMonitor != null) {
-                   // save object of current wait() call (if any) for later comparison
-                   waitingObj = waitingMonitor.object();
+                    // save object of current wait() call (if any) for later comparison
+                    waitingObj = waitingMonitor.object();
                 }
 
                 ObjectMonitor pendingMonitor = jthread.getCurrentPendingMonitor();
@@ -137,7 +138,7 @@ public class JSJavaThread extends JSJavaInstance {
                         MonitorInfo mi = (MonitorInfo) miItr.next();
 
                         if (mi.eliminated() && frame.isCompiledFrame()) {
-                          continue; // skip eliminated monitor
+                            continue; // skip eliminated monitor
                         }
                         OopHandle obj = mi.owner();
                         if (obj == null) {
@@ -146,8 +147,8 @@ public class JSJavaThread extends JSJavaInstance {
                         }
 
                         if (obj.equals(waitingObj)) {
-                           // the thread is waiting on this monitor so it isn't really owned
-                           continue;
+                            // the thread is waiting on this monitor so it isn't really owned
+                            continue;
                         }
 
                         if (obj.equals(pendingObj)) {
@@ -176,7 +177,7 @@ public class JSJavaThread extends JSJavaInstance {
                 // now convert List<OopHandle> to List<Oop>
                 ObjectHeap heap = VM.getVM().getObjectHeap();
                 for (Iterator loItr = lockedObjects.iterator(); loItr.hasNext(); ) {
-                    ownedMonitors.add(heap.newOop((OopHandle)loItr.next()));
+                    ownedMonitors.add(heap.newOop((OopHandle) loItr.next()));
                 }
             }
             monitorsCache = factory.newJSList(ownedMonitors);

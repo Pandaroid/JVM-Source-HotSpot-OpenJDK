@@ -23,11 +23,11 @@
  */
 
 package sun.jvm.hotspot.jdi;
+
 import com.sun.jdi.*;
 
 public class LocalVariableImpl extends MirrorImpl
-                               implements LocalVariable, ValueContainer
-{
+        implements LocalVariable, ValueContainer {
     private final Method method;
     private final int slot;
     private final Location scopeStart;
@@ -51,7 +51,7 @@ public class LocalVariableImpl extends MirrorImpl
 
     public boolean equals(Object obj) {
         if ((obj != null) && (obj instanceof LocalVariableImpl)) {
-            LocalVariableImpl other = (LocalVariableImpl)obj;
+            LocalVariableImpl other = (LocalVariableImpl) obj;
             return (method.equals(other.method) &&
                     slot() == other.slot() &&
                     super.equals(obj));
@@ -64,7 +64,7 @@ public class LocalVariableImpl extends MirrorImpl
         /*
          * TO DO: Better hash code
          */
-        return (int)method.hashCode() + slot();
+        return (int) method.hashCode() + slot();
     }
 
     public int compareTo(LocalVariable localVar) {
@@ -94,7 +94,7 @@ public class LocalVariableImpl extends MirrorImpl
     }
 
     public Type findType(String signature) throws ClassNotLoadedException {
-        ReferenceTypeImpl enclosing = (ReferenceTypeImpl)method.declaringType();
+        ReferenceTypeImpl enclosing = (ReferenceTypeImpl) method.declaringType();
         return enclosing.findType(signature);
     }
 
@@ -112,7 +112,7 @@ public class LocalVariableImpl extends MirrorImpl
 
         if (!frameMethod.equals(method)) {
             throw new IllegalArgumentException(
-                       "frame method different than variable's method");
+                    "frame method different than variable's method");
         }
 
         // this is here to cover the possibility that we will
@@ -123,12 +123,12 @@ public class LocalVariableImpl extends MirrorImpl
         }
 
         return ((scopeStart.compareTo(frame.location()) <= 0)
-             && (scopeEnd.compareTo(frame.location()) >= 0));
+                && (scopeEnd.compareTo(frame.location()) >= 0));
     }
 
     public boolean isArgument() {
         try {
-            MethodImpl method = (MethodImpl)scopeStart.method();
+            MethodImpl method = (MethodImpl) scopeStart.method();
             return (slot < method.argSlotCount());
         } catch (AbsentInformationException e) {
             // If this variable object exists, there shouldn't be absent info
@@ -153,9 +153,9 @@ public class LocalVariableImpl extends MirrorImpl
      * with its name when both variables are visible.
      */
     boolean hides(LocalVariable other) {
-        LocalVariableImpl otherImpl = (LocalVariableImpl)other;
+        LocalVariableImpl otherImpl = (LocalVariableImpl) other;
         if (!method.equals(otherImpl.method) ||
-            !name.equals(otherImpl.name)) {
+                !name.equals(otherImpl.name)) {
             return false;
         } else {
             return (scopeStart.compareTo(otherImpl.scopeStart) > 0);
@@ -163,7 +163,7 @@ public class LocalVariableImpl extends MirrorImpl
     }
 
     public String toString() {
-       return name() + " in " + method.toString() +
-              "@" + scopeStart.toString();
+        return name() + " in " + method.toString() +
+                "@" + scopeStart.toString();
     }
 }

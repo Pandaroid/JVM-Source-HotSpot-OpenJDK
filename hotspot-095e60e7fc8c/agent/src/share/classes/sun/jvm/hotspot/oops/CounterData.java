@@ -26,6 +26,7 @@ package sun.jvm.hotspot.oops;
 
 import java.io.*;
 import java.util.*;
+
 import sun.jvm.hotspot.debugger.*;
 import sun.jvm.hotspot.runtime.*;
 import sun.jvm.hotspot.types.*;
@@ -36,36 +37,37 @@ import sun.jvm.hotspot.utilities.*;
 // A CounterData corresponds to a simple counter.
 public class CounterData extends BitData {
 
-  static final int countOff = 0;
-  static final int counterCellCount = 1;
+    static final int countOff = 0;
+    static final int counterCellCount = 1;
 
-  public CounterData(DataLayout layout) {
-    super(layout);
-  }
+    public CounterData(DataLayout layout) {
+        super(layout);
+    }
 
-  static int staticCellCount() {
-    return counterCellCount;
-  }
+    static int staticCellCount() {
+        return counterCellCount;
+    }
 
-  public int cellCount() {
-    return staticCellCount();
-  }
+    public int cellCount() {
+        return staticCellCount();
+    }
 
-  // Direct accessor
-  int count() {
-    return uintAt(countOff);
-  }
+    // Direct accessor
+    int count() {
+        return uintAt(countOff);
+    }
 
-  // Code generation support
-  static int countOffset() {
-    return cellOffset(countOff);
-  }
-  static int counterDataSize() {
-    return cellOffset(counterCellCount);
-  }
+    // Code generation support
+    static int countOffset() {
+        return cellOffset(countOff);
+    }
 
-  public void printDataOn(PrintStream st) {
-    printShared(st, "CounterData");
-    st.println("count(" + count() + ")");
-  }
+    static int counterDataSize() {
+        return cellOffset(counterCellCount);
+    }
+
+    public void printDataOn(PrintStream st) {
+        printShared(st, "CounterData");
+        st.println("count(" + count() + ")");
+    }
 }

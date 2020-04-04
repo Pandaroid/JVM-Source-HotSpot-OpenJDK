@@ -49,7 +49,7 @@ class StratumLineInfo implements LineInfo {
     }
 
     public String liSourceName()
-                            throws AbsentInformationException {
+            throws AbsentInformationException {
         if (sourceName == null) {
             throw new AbsentInformationException();
         }
@@ -57,7 +57,7 @@ class StratumLineInfo implements LineInfo {
     }
 
     public String liSourcePath()
-                            throws AbsentInformationException {
+            throws AbsentInformationException {
         if (sourcePath == null) {
             throw new AbsentInformationException();
         }

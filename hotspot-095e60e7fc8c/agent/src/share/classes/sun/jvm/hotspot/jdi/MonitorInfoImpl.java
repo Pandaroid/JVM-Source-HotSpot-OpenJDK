@@ -38,7 +38,7 @@ public class MonitorInfoImpl extends MirrorImpl {
 
     ObjectReference monitor;
     ThreadReference thread;
-    int  stack_depth;
+    int stack_depth;
 
     MonitorInfoImpl(VirtualMachine vm, ObjectReference mon,
                     ThreadReference thread, int dpth) {

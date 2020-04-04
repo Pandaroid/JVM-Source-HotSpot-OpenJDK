@@ -26,6 +26,7 @@
 package com.sun.java.swing.ui;
 
 import com.sun.java.swing.action.*;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -35,89 +36,75 @@ import javax.swing.*;
 // Referenced classes of package com.sun.java.swing.ui:
 //            CommonUI
 
-public class WizardDlg extends JDialog
-{
+public class WizardDlg extends JDialog {
     private class CancelListener
-        implements ActionListener
-    {
+            implements ActionListener {
 
-        public void actionPerformed(ActionEvent evt)
-        {
-            if(cancelListener != null)
+        public void actionPerformed(ActionEvent evt) {
+            if (cancelListener != null)
                 cancelListener.actionPerformed(evt);
             setVisible(false);
         }
 
-        private CancelListener()
-        {
+        private CancelListener() {
         }
 
     }
 
     private class FinishListener
-        implements ActionListener
-    {
+            implements ActionListener {
 
-        public void actionPerformed(ActionEvent evt)
-        {
-            if(finishListener != null)
+        public void actionPerformed(ActionEvent evt) {
+            if (finishListener != null)
                 finishListener.actionPerformed(evt);
             setVisible(false);
         }
 
-        private FinishListener()
-        {
+        private FinishListener() {
         }
 
     }
 
     private class NextListener
-        implements ActionListener
-    {
+            implements ActionListener {
 
-        public void actionPerformed(ActionEvent evt)
-        {
+        public void actionPerformed(ActionEvent evt) {
             cardShowing++;
-            if(cardShowing > numCards)
+            if (cardShowing > numCards)
                 cardShowing = numCards;
             else
                 panesLayout.next(panesPanel);
-            if(nextListener != null)
+            if (nextListener != null)
                 nextListener.actionPerformed(evt);
             enableBackNextButtons();
         }
 
-        private NextListener()
-        {
+        private NextListener() {
         }
 
     }
 
     private class BackListener
-        implements ActionListener
-    {
+            implements ActionListener {
 
-        public void actionPerformed(ActionEvent evt)
-        {
+        public void actionPerformed(ActionEvent evt) {
             cardShowing--;
-            if(cardShowing < 1)
+            if (cardShowing < 1)
                 cardShowing = 1;
             else
                 panesLayout.previous(panesPanel);
-            if(backListener != null)
+            if (backListener != null)
                 backListener.actionPerformed(evt);
             enableBackNextButtons();
         }
 
-        private BackListener()
-        {
+        private BackListener() {
         }
 
     }
 
 
-    public WizardDlg(JFrame frame, String title, Vector panels, Vector images)
-    {
+    public WizardDlg(JFrame frame, String title, Vector panels, Vector images) {
         super(frame, title, true);
         this.title = title;
         this.images = images;
@@ -132,44 +119,38 @@ public class WizardDlg extends JDialog
         CommonUI.centerComponent(this);
     }
 
-    public WizardDlg(JFrame frame, String title, Vector panels)
-    {
+    public WizardDlg(JFrame frame, String title, Vector panels) {
         this(frame, title, panels, null);
     }
 
-    public WizardDlg(String title, Vector panels)
-    {
+    public WizardDlg(String title, Vector panels) {
         this(new JFrame(), title, panels, null);
     }
 
-    public void setPanels(Vector panels)
-    {
+    public void setPanels(Vector panels) {
         numCards = panels.size();
         cardShowing = 1;
         this.panels = panels;
         panesPanel.removeAll();
-        for(int i = 0; i < numCards; i++)
-            panesPanel.add((JPanel)panels.elementAt(i), (new Integer(i)).toString());
+        for (int i = 0; i < numCards; i++)
+            panesPanel.add((JPanel) panels.elementAt(i), (new Integer(i)).toString());
 
         validate();
         enableBackNextButtons();
     }
 
-    public void reset()
-    {
+    public void reset() {
         cardShowing = 1;
         panesLayout.first(panesPanel);
         enableBackNextButtons();
     }
 
-    public void setWestPanel(JPanel panel)
-    {
+    public void setWestPanel(JPanel panel) {
         Container pane = getContentPane();
         pane.add(panel, "West");
     }
 
-    public static void main(String args[])
-    {
+    public static void main(String args[]) {
         JPanel p1 = new JPanel();
         p1.add(new JButton("One"));
         JPanel p2 = new JPanel();
@@ -186,27 +167,24 @@ public class WizardDlg extends JDialog
         wizardDlg = new WizardDlg("Test Dialog", panels);
         wizardDlg.addFinishListener(new ActionListener() {
 
-            public void actionPerformed(ActionEvent evt)
-            {
-                System.exit(0);
-            }
+                                        public void actionPerformed(ActionEvent evt) {
+                                            System.exit(0);
+                                        }
 
-        }
-);
+                                    }
+        );
         wizardDlg.addCancelListener(new ActionListener() {
 
-            public void actionPerformed(ActionEvent evt)
-            {
-                System.exit(0);
-            }
+                                        public void actionPerformed(ActionEvent evt) {
+                                            System.exit(0);
+                                        }
 
-        }
-);
+                                    }
+        );
         wizardDlg.setVisible(true);
     }
 
-    private JPanel createButtonPanel()
-    {
+    private JPanel createButtonPanel() {
         JPanel panel = new JPanel();
         backAction = new BackAction();
         nextAction = new NextAction();
@@ -228,31 +206,24 @@ public class WizardDlg extends JDialog
         return p2;
     }
 
-    private void enableBackNextButtons()
-    {
-        if(cardShowing == 1)
-        {
+    private void enableBackNextButtons() {
+        if (cardShowing == 1) {
             backAction.setEnabled(false);
             finishAction.setEnabled(false);
-            if(numCards > 1)
-            {
+            if (numCards > 1) {
                 nextAction.setEnabled(true);
-            } else
-            {
+            } else {
                 finishAction.setEnabled(true);
                 nextAction.setEnabled(false);
             }
-        } else
-        if(cardShowing == numCards)
-        {
+        } else if (cardShowing == numCards) {
             nextAction.setEnabled(false);
             finishAction.setEnabled(true);
-            if(numCards > 1)
+            if (numCards > 1)
                 backAction.setEnabled(true);
             else
                 backAction.setEnabled(false);
-        } else
-        {
+        } else {
             backAction.setEnabled(true);
             nextAction.setEnabled(true);
             finishAction.setEnabled(false);
@@ -260,56 +231,46 @@ public class WizardDlg extends JDialog
         setTitle();
     }
 
-    private void setTitle()
-    {
-        JPanel panel = (JPanel)panels.elementAt(cardShowing - 1);
+    private void setTitle() {
+        JPanel panel = (JPanel) panels.elementAt(cardShowing - 1);
         String newTitle = title;
         String panelTitle = panel.getName();
-        if(panelTitle != null && panelTitle.equals(""))
-        {
+        if (panelTitle != null && panelTitle.equals("")) {
             newTitle = newTitle + " - ";
             newTitle = newTitle + panelTitle;
         }
         super.setTitle(newTitle);
     }
 
-    public synchronized void addFinishListener(ActionListener l)
-    {
+    public synchronized void addFinishListener(ActionListener l) {
         finishListener = AWTEventMulticaster.add(finishListener, l);
     }
 
-    public synchronized void removeFinishListener(ActionListener l)
-    {
+    public synchronized void removeFinishListener(ActionListener l) {
         finishListener = AWTEventMulticaster.remove(finishListener, l);
     }
 
-    public synchronized void addCancelListener(ActionListener l)
-    {
+    public synchronized void addCancelListener(ActionListener l) {
         cancelListener = AWTEventMulticaster.add(cancelListener, l);
     }
 
-    public synchronized void removeCancelListener(ActionListener l)
-    {
+    public synchronized void removeCancelListener(ActionListener l) {
         cancelListener = AWTEventMulticaster.remove(cancelListener, l);
     }
 
-    public synchronized void addNextListener(ActionListener l)
-    {
+    public synchronized void addNextListener(ActionListener l) {
         nextListener = AWTEventMulticaster.add(nextListener, l);
     }
 
-    public synchronized void removeNextListener(ActionListener l)
-    {
+    public synchronized void removeNextListener(ActionListener l) {
         nextListener = AWTEventMulticaster.remove(nextListener, l);
     }
 
-    public synchronized void addBackListener(ActionListener l)
-    {
+    public synchronized void addBackListener(ActionListener l) {
         backListener = AWTEventMulticaster.add(backListener, l);
     }
 
-    public synchronized void removeBackListener(ActionListener l)
-    {
+    public synchronized void removeBackListener(ActionListener l) {
         backListener = AWTEventMulticaster.remove(backListener, l);
     }
 
@@ -329,8 +290,6 @@ public class WizardDlg extends JDialog
     private Vector panels;
     private Vector images;
     private static WizardDlg wizardDlg;
-
-
 
 
 }

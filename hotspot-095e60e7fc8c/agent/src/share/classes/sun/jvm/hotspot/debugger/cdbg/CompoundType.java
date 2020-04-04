@@ -24,23 +24,33 @@
 
 package sun.jvm.hotspot.debugger.cdbg;
 
-/** Models all compound types, i.e., those containing fields: classes,
-    structs, and unions. The boolean type accessors indicate how the
-    type is really defined in the debug information. */
+/**
+ * Models all compound types, i.e., those containing fields: classes,
+ * structs, and unions. The boolean type accessors indicate how the
+ * type is really defined in the debug information.
+ */
 
 public interface CompoundType {
-  public int       getNumBaseClasses();
-  public BaseClass getBaseClass(int i);
+    public int getNumBaseClasses();
 
-  public int   getNumFields();
-  public Field getField(int i);
+    public BaseClass getBaseClass(int i);
 
-  /** Defined as a class in the debug information? */
-  public boolean isClass();
+    public int getNumFields();
 
-  /** Defined as a struct in the debug information? */
-  public boolean isStruct();
+    public Field getField(int i);
 
-  /** Defined as a union in the debug information? */
-  public boolean isUnion();
+    /**
+     * Defined as a class in the debug information?
+     */
+    public boolean isClass();
+
+    /**
+     * Defined as a struct in the debug information?
+     */
+    public boolean isStruct();
+
+    /**
+     * Defined as a union in the debug information?
+     */
+    public boolean isUnion();
 }

@@ -51,10 +51,16 @@ import sun.jvm.hotspot.ui.tree.SimpleTreeNode;
 
 public interface SAListener {
     public void showThreadOopInspector(JavaThread thread);
+
     public void showInspector(SimpleTreeNode node);
+
     public void showThreadStackMemory(JavaThread thread);
+
     public void showThreadInfo(JavaThread thread);
+
     public void showJavaStackTrace(JavaThread thread);
+
     public void showCodeViewer(Address address);
+
     public void showLiveness(Oop oop, LivenessPathList liveness);
 }

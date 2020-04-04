@@ -27,9 +27,12 @@ package sun.jvm.hotspot.ui;
 import java.awt.*;
 import java.io.*;
 import javax.swing.*;
+
 import sun.jvm.hotspot.runtime.*;
 
-/** A JPanel to show information about Java-level deadlocks. */
+/**
+ * A JPanel to show information about Java-level deadlocks.
+ */
 
 public class DeadlockDetectionPanel extends JPanel {
     public DeadlockDetectionPanel() {

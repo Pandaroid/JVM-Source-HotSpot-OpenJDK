@@ -106,10 +106,15 @@ public class CommandProcessor {
 
     public abstract static class DebuggerInterface {
         public abstract HotSpotAgent getAgent();
+
         public abstract boolean isAttached();
+
         public abstract void attach(String pid);
+
         public abstract void attach(String java, String core);
+
         public abstract void detach();
+
         public abstract void reattach();
     }
 
@@ -121,6 +126,7 @@ public class CommandProcessor {
 
     public static class NonBootFilter implements ClassFilter {
         private HashMap emitted = new HashMap();
+
         public boolean canInclude(InstanceKlass kls) {
             if (kls.getClassLoader() == null) return false;
             if (emitted.get(kls.getName()) != null) {
@@ -194,7 +200,7 @@ public class CommandProcessor {
                     add(w[i], t);
                 }
             }
-            tokens = (String[])t.toArray(new String[0]);
+            tokens = (String[]) t.toArray(new String[0]);
             i = 0;
             length = tokens.length;
 
@@ -206,12 +212,15 @@ public class CommandProcessor {
         String nextToken() {
             return tokens[i++];
         }
+
         boolean hasMoreTokens() {
             return i < length;
         }
+
         int countTokens() {
             return length - i;
         }
+
         void trim(int n) {
             if (length >= n) {
                 length -= n;
@@ -219,6 +228,7 @@ public class CommandProcessor {
                 throw new IndexOutOfBoundsException(String.valueOf(n));
             }
         }
+
         String join(String sep) {
             StringBuffer result = new StringBuffer();
             for (int w = i; w < length; w++) {
@@ -255,7 +265,9 @@ public class CommandProcessor {
         final String name;
         final String usage;
         final boolean okIfDisconnected;
+
         abstract void doit(Tokens t);
+
         void usage() {
             out.println("Usage: " + usage);
         }
@@ -283,7 +295,7 @@ public class CommandProcessor {
                     if (field instanceof OopTreeNodeAdapter) {
                         out.print(field);
                         out.print(" ");
-                        printOopValue(((OopTreeNodeAdapter)field).getOop());
+                        printOopValue(((OopTreeNodeAdapter) field).getOop());
                         out.println();
                     } else {
                         out.println(field);
@@ -323,7 +335,7 @@ public class CommandProcessor {
         out.print(" ");
         if (type.isCIntegerType()) {
             out.print("true ");
-            out.print(((CIntegerType)type).isUnsigned());
+            out.print(((CIntegerType) type).isUnsigned());
             out.print(" ");
         } else {
             out.print("false false ");
@@ -369,10 +381,10 @@ public class CommandProcessor {
             for (int i = 0; i < parts.length; i++) {
                 int len = parts[i].length();
                 if (len >= 26) {
-                    mangled.append((char)('a' + (len / 26)));
+                    mangled.append((char) ('a' + (len / 26)));
                     len = len % 26;
                 }
-                mangled.append((char)('A' + len));
+                mangled.append((char) ('A' + len));
                 mangled.append(parts[i]);
             }
             mangled.append("_");
@@ -386,589 +398,151 @@ public class CommandProcessor {
     }
 
     private final Command[] commandList = {
-        new Command("reattach", true) {
-            public void doit(Tokens t) {
-                int tokens = t.countTokens();
-                if (tokens != 0) {
-                    usage();
-                    return;
-                }
-                preAttach();
-                debugger.reattach();
-                postAttach();
-            }
-        },
-        new Command("attach", "attach pid | exec core", true) {
-            public void doit(Tokens t) {
-                int tokens = t.countTokens();
-                if (tokens == 1) {
-                    preAttach();
-                    debugger.attach(t.nextToken());
-                    postAttach();
-                } else if (tokens == 2) {
-                    preAttach();
-                    debugger.attach(t.nextToken(), t.nextToken());
-                    postAttach();
-                } else {
-                    usage();
-                }
-            }
-        },
-        new Command("detach", false) {
-            public void doit(Tokens t) {
-                if (t.countTokens() != 0) {
-                    usage();
-                } else {
-                    debugger.detach();
-                }
-            }
-        },
-        new Command("examine", "examine [ address/count ] | [ address,address]", false) {
-            Pattern args1 = Pattern.compile("^(0x[0-9a-f]+)(/([0-9]*)([a-z]*))?$");
-            Pattern args2 = Pattern.compile("^(0x[0-9a-f]+),(0x[0-9a-f]+)(/[a-z]*)?$");
-
-            String fill(Address a, int width) {
-                String s = "0x0";
-                if (a != null) {
-                    s = a.toString();
-                }
-                if (s.length() != width) {
-                    return s.substring(0, 2) + "000000000000000000000".substring(0, width - s.length()) + s.substring(2);
-                }
-                return s;
-            }
-
-            public void doit(Tokens t) {
-                if (t.countTokens() != 1) {
-                    usage();
-                } else {
-                    String arg = t.nextToken();
-                    Matcher m1 = args1.matcher(arg);
-                    Matcher m2 = args2.matcher(arg);
-                    Address start = null;
-                    Address end   = null;
-                    String format = "";
-                    int formatSize = (int)VM.getVM().getAddressSize();
-
-                    if (m1.matches()) {
-                        start = VM.getVM().getDebugger().parseAddress(m1.group(1));
-                        int count = 1;
-                        if (m1.group(2) != null) {
-                            count = Integer.parseInt(m1.group(3));
-                        }
-                        end = start.addOffsetTo(count * formatSize);
-                    } else if (m2.matches()) {
-                        start = VM.getVM().getDebugger().parseAddress(m2.group(1));
-                        end   = VM.getVM().getDebugger().parseAddress(m2.group(2));
-                    } else {
+            new Command("reattach", true) {
+                public void doit(Tokens t) {
+                    int tokens = t.countTokens();
+                    if (tokens != 0) {
                         usage();
                         return;
                     }
-                    int line = 80;
-                    int formatWidth = formatSize * 8 / 4 + 2;
-
-                    out.print(fill(start, formatWidth));
-                    out.print(": ");
-                    int width = line - formatWidth - 2;
-
-                    boolean needsPrintln = true;
-                    while (start != null && start.lessThan(end)) {
-                        Address val = start.getAddressAt(0);
-                        out.print(fill(val, formatWidth));
-                        needsPrintln = true;
-                        width -= formatWidth;
-                        start = start.addOffsetTo(formatSize);
-                        if (width <= formatWidth) {
-                            out.println();
-                            needsPrintln = false;
-                            if (start.lessThan(end)) {
-                                out.print(fill(start, formatWidth));
-                                out.print(": ");
-                                width = line - formatWidth - 2;
-                            }
-                        } else {
-                            out.print(" ");
-                            width -= 1;
-                        }
-                    }
-                    if (needsPrintln) {
-                        out.println();
-                    }
+                    preAttach();
+                    debugger.reattach();
+                    postAttach();
                 }
-            }
-        },
-        new Command("dumpreplaydata", "dumpreplaydata { <address > | -a | <thread_id> }", false) {
-            // This is used to dump replay data from ciInstanceKlass, ciMethodData etc
-            // default file name is replay.txt, also if java crashes in compiler
-            // thread, this file will be dumped in error processing.
-            public void doit(Tokens t) {
-                if (t.countTokens() != 1) {
-                    usage();
-                    return;
-                }
-                String name = t.nextToken();
-                Address a = null;
-                try {
-                    a = VM.getVM().getDebugger().parseAddress(name);
-                } catch (NumberFormatException e) { }
-                if (a != null) {
-                    // only nmethod, Method, MethodData and InstanceKlass needed to
-                    // dump replay data
-
-                    CodeBlob cb = VM.getVM().getCodeCache().findBlob(a);
-                    if (cb != null && (cb instanceof NMethod)) {
-                        ((NMethod)cb).dumpReplayData(out);
-                        return;
-                    }
-                    // assume it is Metadata
-                    Metadata meta = Metadata.instantiateWrapperFor(a);
-                    if (meta != null) {
-                        meta.dumpReplayData(out);
+            },
+            new Command("attach", "attach pid | exec core", true) {
+                public void doit(Tokens t) {
+                    int tokens = t.countTokens();
+                    if (tokens == 1) {
+                        preAttach();
+                        debugger.attach(t.nextToken());
+                        postAttach();
+                    } else if (tokens == 2) {
+                        preAttach();
+                        debugger.attach(t.nextToken(), t.nextToken());
+                        postAttach();
                     } else {
                         usage();
-                        return;
                     }
                 }
-                // Not an address
-                boolean all = name.equals("-a");
-                Threads threads = VM.getVM().getThreads();
-                for (JavaThread thread = threads.first(); thread != null; thread = thread.next()) {
-                    ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                    thread.printThreadIDOn(new PrintStream(bos));
-                    if (all || bos.toString().equals(name)) {
-                        if (thread instanceof CompilerThread) {
-                            CompilerThread ct = (CompilerThread)thread;
-                            ciEnv env = ct.env();
-                            if (env != null) {
-                               env.dumpReplayData(out);
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        new Command("buildreplayjars", "buildreplayjars [ all | app | boot ]  | [ prefix ]", false) {
-            // This is used to dump jar files of all the classes
-            // loaded in the core.  Everything on the bootclasspath
-            // will go in boot.jar and everything else will go in
-            // app.jar.  Then the classes can be loaded by the replay
-            // jvm using -Xbootclasspath/p:boot.jar -cp app.jar. boot.jar usually
-            // not needed, unless changed by jvmti.
-            public void doit(Tokens t) {
-                int tcount = t.countTokens();
-                if (tcount > 2) {
-                    usage();
-                    return;
-                }
-                try {
-                   String prefix = "";
-                   String option = "all"; // default
-                   switch(tcount) {
-                       case 0:
-                           break;
-                       case 1:
-                           option = t.nextToken();
-                           if (!option.equalsIgnoreCase("all") && !option.equalsIgnoreCase("app") &&
-                               !option.equalsIgnoreCase("root")) {
-                              prefix = option;
-                              option = "all";
-                           }
-                           break;
-                       case 2:
-                           option = t.nextToken();
-                           prefix = t.nextToken();
-                           break;
-                       default:
-                           usage();
-                           return;
-                   }
-                   if (!option.equalsIgnoreCase("all") && !option.equalsIgnoreCase("app") &&
-                               !option.equalsIgnoreCase("boot")) {
-                       usage();
-                       return;
-                   }
-                   ClassDump cd = new ClassDump();
-                   if (option.equalsIgnoreCase("all") || option.equalsIgnoreCase("boot")) {
-                     cd.setClassFilter(new BootFilter());
-                     cd.setJarOutput(prefix + "boot.jar");
-                     cd.run();
-                   }
-                   if (option.equalsIgnoreCase("all") || option.equalsIgnoreCase("app")) {
-                     cd.setClassFilter(new NonBootFilter());
-                     cd.setJarOutput(prefix + "app.jar");
-                     cd.run();
-                   }
-                } catch (IOException ioe) {
-                   ioe.printStackTrace();
-                }
-            }
-        },
-        new Command("findpc", "findpc address", false) {
-            public void doit(Tokens t) {
-                if (t.countTokens() != 1) {
-                    usage();
-                } else {
-                    Address a = VM.getVM().getDebugger().parseAddress(t.nextToken());
-                    PointerLocation loc = PointerFinder.find(a);
-                    loc.printOn(out);
-                }
-            }
-        },
-        new Command("symbol", "symbol address", false) {
-            public void doit(Tokens t) {
-                if (t.countTokens() != 1) {
-                    usage();
-                } else {
-                    Address a = VM.getVM().getDebugger().parseAddress(t.nextToken());
-                    Symbol.create(a).printValueOn(out);
-                    out.println();
-                }
-            }
-        },
-        new Command("symboltable", "symboltable name", false) {
-            public void doit(Tokens t) {
-                if (t.countTokens() != 1) {
-                    usage();
-                } else {
-                    out.println(SymbolTable.getTheTable().probe(t.nextToken()));
-                }
-            }
-        },
-        new Command("symboldump", "symboldump", false) {
-            public void doit(Tokens t) {
-                SymbolTable.getTheTable().symbolsDo(new SymbolTable.SymbolVisitor() {
-                        public void visit(Symbol sym) {
-                            sym.printValueOn(out);
-                            out.println();
-                        }
-                    });
-            }
-        },
-        new Command("flags", "flags [ flag | -nd ]", false) {
-            public void doit(Tokens t) {
-                int tokens = t.countTokens();
-                if (tokens != 0 && tokens != 1) {
-                    usage();
-                } else {
-                    String name = tokens > 0 ? t.nextToken() : null;
-                    boolean nonDefault = false;
-                    if (name != null && name.equals("-nd")) {
-                        name = null;
-                        nonDefault = true;
-                    }
-
-                    VM.Flag[] flags = VM.getVM().getCommandLineFlags();
-                    if (flags == null) {
-                        out.println("Command Flag info not available (use 1.4.1_03 or later)!");
+            },
+            new Command("detach", false) {
+                public void doit(Tokens t) {
+                    if (t.countTokens() != 0) {
+                        usage();
                     } else {
-                        boolean printed = false;
-                        for (int f = 0; f < flags.length; f++) {
-                            VM.Flag flag = flags[f];
-                            if (name == null || flag.getName().equals(name)) {
-
-                                if (nonDefault && flag.getOrigin() == 0) {
-                                    // only print flags which aren't their defaults
-                                    continue;
-                                }
-                                out.println(flag.getName() + " = " + flag.getValue() + " " + flag.getOrigin());
-                                printed = true;
-                            }
-                        }
-                        if (name != null && !printed) {
-                            out.println("Couldn't find flag: " + name);
-                        }
+                        debugger.detach();
                     }
                 }
-            }
-        },
-        new Command("help", "help [ command ]", true) {
-            public void doit(Tokens t) {
-                int tokens = t.countTokens();
-                Command cmd = null;
-                if (tokens == 1) {
-                    cmd = findCommand(t.nextToken());
+            },
+            new Command("examine", "examine [ address/count ] | [ address,address]", false) {
+                Pattern args1 = Pattern.compile("^(0x[0-9a-f]+)(/([0-9]*)([a-z]*))?$");
+                Pattern args2 = Pattern.compile("^(0x[0-9a-f]+),(0x[0-9a-f]+)(/[a-z]*)?$");
+
+                String fill(Address a, int width) {
+                    String s = "0x0";
+                    if (a != null) {
+                        s = a.toString();
+                    }
+                    if (s.length() != width) {
+                        return s.substring(0, 2) + "000000000000000000000".substring(0, width - s.length()) + s.substring(2);
+                    }
+                    return s;
                 }
 
-                if (cmd != null) {
-                    cmd.usage();
-                } else if (tokens == 0) {
-                    out.println("Available commands:");
-                    Object[] keys = commands.keySet().toArray();
-                    Arrays.sort(keys, new Comparator() {
-                             public int compare(Object o1, Object o2) {
-                                 return o1.toString().compareTo(o2.toString());
-                             }
-                          });
-                    for (int i = 0; i < keys.length; i++) {
-                        out.print("  ");
-                        out.println(((Command)commands.get(keys[i])).usage);
-                    }
-                }
-            }
-        },
-        new Command("history", "history", true) {
-            public void doit(Tokens t) {
-                int tokens = t.countTokens();
-                if (tokens != 0 && (tokens != 1 || !t.nextToken().equals("-h"))) {
-                    usage();
-                    return;
-                }
-                boolean printIndex = tokens == 0;
-                for (int i = 0; i < history.size(); i++) {
-                    if (printIndex) out.print(i + " ");
-                    out.println(history.get(i));
-                }
-            }
-        },
-        // decode raw address
-        new Command("dis", "dis address [length]", false) {
-            public void doit(Tokens t) {
-                int tokens = t.countTokens();
-                if (tokens != 1 && tokens != 2) {
-                    usage();
-                    return;
-                }
-                String name = t.nextToken();
-                Address addr = null;
-                int len = 0x10; // default length
-                try {
-                    addr = VM.getVM().getDebugger().parseAddress(name);
-                } catch (NumberFormatException e) {
-                   out.println(e);
-                   return;
-                }
-                if (tokens == 2) {
-                    try {
-                        len = Integer.parseInt(t.nextToken());
-                    } catch (NumberFormatException e) {
-                        out.println(e);
-                        return;
-                    }
-                }
-                HTMLGenerator generator = new HTMLGenerator(false);
-                out.println(generator.genHTMLForRawDisassembly(addr, len));
-            }
-
-        },
-        // decode codeblob or nmethod
-        new Command("disassemble", "disassemble address", false) {
-            public void doit(Tokens t) {
-                int tokens = t.countTokens();
-                if (tokens != 1) {
-                    usage();
-                    return;
-                }
-                String name = t.nextToken();
-                Address addr = null;
-                try {
-                    addr = VM.getVM().getDebugger().parseAddress(name);
-                } catch (NumberFormatException e) {
-                   out.println(e);
-                   return;
-                }
-
-                HTMLGenerator generator = new HTMLGenerator(false);
-                out.println(generator.genHTML(addr));
-            }
-        },
-        // print Java bytecode disassembly
-        new Command("jdis", "jdis address", false) {
-            public void doit(Tokens t) {
-                int tokens = t.countTokens();
-                if (tokens != 1) {
-                    usage();
-                    return;
-                }
-                Address a = VM.getVM().getDebugger().parseAddress(t.nextToken());
-                Method m = (Method)Metadata.instantiateWrapperFor(a);
-                HTMLGenerator html = new HTMLGenerator(false);
-                out.println(html.genHTML(m));
-            }
-        },
-        new Command("revptrs", "revptrs address", false) {
-            public void doit(Tokens t) {
-                int tokens = t.countTokens();
-                if (tokens != 1 && (tokens != 2 || !t.nextToken().equals("-c"))) {
-                    usage();
-                    return;
-                }
-                boolean chase = tokens == 2;
-                ReversePtrs revptrs = VM.getVM().getRevPtrs();
-                if (revptrs == null) {
-                    out.println("Computing reverse pointers...");
-                    ReversePtrsAnalysis analysis = new ReversePtrsAnalysis();
-                    final boolean[] complete = new boolean[1];
-                    HeapProgressThunk thunk = new HeapProgressThunk() {
-                            public void heapIterationFractionUpdate(double d) {}
-                            public synchronized void heapIterationComplete() {
-                                complete[0] = true;
-                                notify();
-                            }
-                        };
-                    analysis.setHeapProgressThunk(thunk);
-                    analysis.run();
-                    while (!complete[0]) {
-                        synchronized (thunk) {
-                            try {
-                                thunk.wait();
-                            } catch (Exception e) {
-                            }
-                        }
-                    }
-                    revptrs = VM.getVM().getRevPtrs();
-                    out.println("Done.");
-                }
-                Address a = VM.getVM().getDebugger().parseAddress(t.nextToken());
-                if (VM.getVM().getUniverse().heap().isInReserved(a)) {
-                    OopHandle handle = a.addOffsetToAsOopHandle(0);
-                    Oop oop = VM.getVM().getObjectHeap().newOop(handle);
-                    ArrayList ptrs = revptrs.get(oop);
-                    if (ptrs == null) {
-                        out.println("no live references to " + a);
+                public void doit(Tokens t) {
+                    if (t.countTokens() != 1) {
+                        usage();
                     } else {
-                        if (chase) {
-                            while (ptrs.size() == 1) {
-                                LivenessPathElement e = (LivenessPathElement)ptrs.get(0);
-                                ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                                Oop.printOopValueOn(e.getObj(), new PrintStream(bos));
-                                out.println(bos.toString());
-                                ptrs = revptrs.get(e.getObj());
+                        String arg = t.nextToken();
+                        Matcher m1 = args1.matcher(arg);
+                        Matcher m2 = args2.matcher(arg);
+                        Address start = null;
+                        Address end = null;
+                        String format = "";
+                        int formatSize = (int) VM.getVM().getAddressSize();
+
+                        if (m1.matches()) {
+                            start = VM.getVM().getDebugger().parseAddress(m1.group(1));
+                            int count = 1;
+                            if (m1.group(2) != null) {
+                                count = Integer.parseInt(m1.group(3));
                             }
+                            end = start.addOffsetTo(count * formatSize);
+                        } else if (m2.matches()) {
+                            start = VM.getVM().getDebugger().parseAddress(m2.group(1));
+                            end = VM.getVM().getDebugger().parseAddress(m2.group(2));
                         } else {
-                            for (int i = 0; i < ptrs.size(); i++) {
-                                LivenessPathElement e = (LivenessPathElement)ptrs.get(i);
-                                ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                                Oop.printOopValueOn(e.getObj(), new PrintStream(bos));
-                                out.println(bos.toString());
-                                oop = e.getObj();
-                            }
+                            usage();
+                            return;
                         }
-                    }
-                }
-            }
-        },
-        new Command("printmdo", "printmdo [ -a | expression ]", false) {
-            // Print every MDO in the heap or the one referenced by expression.
-            public void doit(Tokens t) {
-                if (t.countTokens() != 1) {
-                    usage();
-                } else {
-                    String s = t.nextToken();
-                    if (s.equals("-a")) {
-                        SystemDictionary sysDict = VM.getVM().getSystemDictionary();
-                        sysDict.allClassesDo(new SystemDictionary.ClassVisitor() {
-                                public void visit(Klass k) {
-                                    if (k instanceof InstanceKlass) {
-                                        MethodArray methods = ((InstanceKlass)k).getMethods();
-                                        for (int i = 0; i < methods.length(); i++) {
-                                            Method m = methods.at(i);
-                                            MethodData mdo = m.getMethodData();
-                                            if (mdo != null) {
-                                                out.println("MethodData " + mdo.getAddress() + " for " +
-                                                    "method " + m.getMethodHolder().getName().asString() + "." +
-                                                    m.getName().asString() +
-                                                            m.getSignature().asString() + "@" + m.getAddress());
-                                                mdo.printDataOn(out);
-                                    }
+                        int line = 80;
+                        int formatWidth = formatSize * 8 / 4 + 2;
+
+                        out.print(fill(start, formatWidth));
+                        out.print(": ");
+                        int width = line - formatWidth - 2;
+
+                        boolean needsPrintln = true;
+                        while (start != null && start.lessThan(end)) {
+                            Address val = start.getAddressAt(0);
+                            out.print(fill(val, formatWidth));
+                            needsPrintln = true;
+                            width -= formatWidth;
+                            start = start.addOffsetTo(formatSize);
+                            if (width <= formatWidth) {
+                                out.println();
+                                needsPrintln = false;
+                                if (start.lessThan(end)) {
+                                    out.print(fill(start, formatWidth));
+                                    out.print(": ");
+                                    width = line - formatWidth - 2;
                                 }
-                                    }
-                                }
-                            }
-                            );
-                    } else {
-                        Address a = VM.getVM().getDebugger().parseAddress(s);
-                        MethodData mdo = (MethodData) Metadata.instantiateWrapperFor(a);
-                        mdo.printDataOn(out);
-                    }
-                }
-            }
-        },
-        new Command("printall", "printall", false) {
-            // Print every MDO in the heap or the one referenced by expression.
-            public void doit(Tokens t) {
-                if (t.countTokens() != 0) {
-                    usage();
-                } else {
-                    SystemDictionary sysDict = VM.getVM().getSystemDictionary();
-                    sysDict.allClassesDo(new SystemDictionary.ClassVisitor() {
-                            public void visit(Klass k) {
-                                if (k instanceof InstanceKlass && ((InstanceKlass)k).getConstants().getCache() != null) {
-                                    MethodArray methods = ((InstanceKlass)k).getMethods();
-                                    for (int i = 0; i < methods.length(); i++) {
-                                        Method m = methods.at(i);
-                                        HTMLGenerator gen = new HTMLGenerator(false);
-                                        out.println(gen.genHTML(m));
-                                    }
-                                }
-                            }
-                        }
-                        );
-                }
-            }
-        },
-        new Command("dumpideal", "dumpideal { -a | id }", false) {
-            // Do a full dump of the nodes reachabile from root in each compiler thread.
-            public void doit(Tokens t) {
-                if (t.countTokens() != 1) {
-                    usage();
-                } else {
-                    String name = t.nextToken();
-                    boolean all = name.equals("-a");
-                    Threads threads = VM.getVM().getThreads();
-                    for (JavaThread thread = threads.first(); thread != null; thread = thread.next()) {
-                        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                        thread.printThreadIDOn(new PrintStream(bos));
-                        if (all || bos.toString().equals(name)) {
-                          if (thread instanceof CompilerThread) {
-                            CompilerThread ct = (CompilerThread)thread;
-                            out.println(ct);
-                            ciEnv env = ct.env();
-                            if (env != null) {
-                              Compile c = env.compilerData();
-                              c.root().dump(9999, out);
                             } else {
-                              out.println("  not compiling");
+                                out.print(" ");
+                                width -= 1;
                             }
-                          }
+                        }
+                        if (needsPrintln) {
+                            out.println();
                         }
                     }
                 }
-            }
-        },
-        new Command("dumpcfg", "dumpcfg { -a | id }", false) {
-            // Dump the PhaseCFG for every compiler thread that has one live.
-            public void doit(Tokens t) {
-                if (t.countTokens() != 1) {
-                    usage();
-                } else {
+            },
+            new Command("dumpreplaydata", "dumpreplaydata { <address > | -a | <thread_id> }", false) {
+                // This is used to dump replay data from ciInstanceKlass, ciMethodData etc
+                // default file name is replay.txt, also if java crashes in compiler
+                // thread, this file will be dumped in error processing.
+                public void doit(Tokens t) {
+                    if (t.countTokens() != 1) {
+                        usage();
+                        return;
+                    }
                     String name = t.nextToken();
-                    boolean all = name.equals("-a");
-                    Threads threads = VM.getVM().getThreads();
-                    for (JavaThread thread = threads.first(); thread != null; thread = thread.next()) {
-                        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                        thread.printThreadIDOn(new PrintStream(bos));
-                        if (all || bos.toString().equals(name)) {
-                          if (thread instanceof CompilerThread) {
-                            CompilerThread ct = (CompilerThread)thread;
-                            out.println(ct);
-                            ciEnv env = ct.env();
-                            if (env != null) {
-                              Compile c = env.compilerData();
-                              c.cfg().dump(out);
-                            }
-                          }
+                    Address a = null;
+                    try {
+                        a = VM.getVM().getDebugger().parseAddress(name);
+                    } catch (NumberFormatException e) {
+                    }
+                    if (a != null) {
+                        // only nmethod, Method, MethodData and InstanceKlass needed to
+                        // dump replay data
+
+                        CodeBlob cb = VM.getVM().getCodeCache().findBlob(a);
+                        if (cb != null && (cb instanceof NMethod)) {
+                            ((NMethod) cb).dumpReplayData(out);
+                            return;
+                        }
+                        // assume it is Metadata
+                        Metadata meta = Metadata.instantiateWrapperFor(a);
+                        if (meta != null) {
+                            meta.dumpReplayData(out);
+                        } else {
+                            usage();
+                            return;
                         }
                     }
-                }
-            }
-        },
-        new Command("dumpilt", "dumpilt { -a | id }", false) {
-            // dumps the InlineTree of a C2 compile
-            public void doit(Tokens t) {
-                if (t.countTokens() != 1) {
-                    usage();
-                } else {
-                    String name = t.nextToken();
+                    // Not an address
                     boolean all = name.equals("-a");
                     Threads threads = VM.getVM().getThreads();
                     for (JavaThread thread = threads.first(); thread != null; thread = thread.next()) {
@@ -976,423 +550,477 @@ public class CommandProcessor {
                         thread.printThreadIDOn(new PrintStream(bos));
                         if (all || bos.toString().equals(name)) {
                             if (thread instanceof CompilerThread) {
-                                CompilerThread ct = (CompilerThread)thread;
+                                CompilerThread ct = (CompilerThread) thread;
                                 ciEnv env = ct.env();
                                 if (env != null) {
-                                    Compile c = env.compilerData();
-                                    InlineTree ilt = c.ilt();
-                                    if (ilt != null) {
-                                        ilt.print(out);
+                                    env.dumpReplayData(out);
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            new Command("buildreplayjars", "buildreplayjars [ all | app | boot ]  | [ prefix ]", false) {
+                // This is used to dump jar files of all the classes
+                // loaded in the core.  Everything on the bootclasspath
+                // will go in boot.jar and everything else will go in
+                // app.jar.  Then the classes can be loaded by the replay
+                // jvm using -Xbootclasspath/p:boot.jar -cp app.jar. boot.jar usually
+                // not needed, unless changed by jvmti.
+                public void doit(Tokens t) {
+                    int tcount = t.countTokens();
+                    if (tcount > 2) {
+                        usage();
+                        return;
+                    }
+                    try {
+                        String prefix = "";
+                        String option = "all"; // default
+                        switch (tcount) {
+                            case 0:
+                                break;
+                            case 1:
+                                option = t.nextToken();
+                                if (!option.equalsIgnoreCase("all") && !option.equalsIgnoreCase("app") &&
+                                        !option.equalsIgnoreCase("root")) {
+                                    prefix = option;
+                                    option = "all";
+                                }
+                                break;
+                            case 2:
+                                option = t.nextToken();
+                                prefix = t.nextToken();
+                                break;
+                            default:
+                                usage();
+                                return;
+                        }
+                        if (!option.equalsIgnoreCase("all") && !option.equalsIgnoreCase("app") &&
+                                !option.equalsIgnoreCase("boot")) {
+                            usage();
+                            return;
+                        }
+                        ClassDump cd = new ClassDump();
+                        if (option.equalsIgnoreCase("all") || option.equalsIgnoreCase("boot")) {
+                            cd.setClassFilter(new BootFilter());
+                            cd.setJarOutput(prefix + "boot.jar");
+                            cd.run();
+                        }
+                        if (option.equalsIgnoreCase("all") || option.equalsIgnoreCase("app")) {
+                            cd.setClassFilter(new NonBootFilter());
+                            cd.setJarOutput(prefix + "app.jar");
+                            cd.run();
+                        }
+                    } catch (IOException ioe) {
+                        ioe.printStackTrace();
+                    }
+                }
+            },
+            new Command("findpc", "findpc address", false) {
+                public void doit(Tokens t) {
+                    if (t.countTokens() != 1) {
+                        usage();
+                    } else {
+                        Address a = VM.getVM().getDebugger().parseAddress(t.nextToken());
+                        PointerLocation loc = PointerFinder.find(a);
+                        loc.printOn(out);
+                    }
+                }
+            },
+            new Command("symbol", "symbol address", false) {
+                public void doit(Tokens t) {
+                    if (t.countTokens() != 1) {
+                        usage();
+                    } else {
+                        Address a = VM.getVM().getDebugger().parseAddress(t.nextToken());
+                        Symbol.create(a).printValueOn(out);
+                        out.println();
+                    }
+                }
+            },
+            new Command("symboltable", "symboltable name", false) {
+                public void doit(Tokens t) {
+                    if (t.countTokens() != 1) {
+                        usage();
+                    } else {
+                        out.println(SymbolTable.getTheTable().probe(t.nextToken()));
+                    }
+                }
+            },
+            new Command("symboldump", "symboldump", false) {
+                public void doit(Tokens t) {
+                    SymbolTable.getTheTable().symbolsDo(new SymbolTable.SymbolVisitor() {
+                        public void visit(Symbol sym) {
+                            sym.printValueOn(out);
+                            out.println();
+                        }
+                    });
+                }
+            },
+            new Command("flags", "flags [ flag | -nd ]", false) {
+                public void doit(Tokens t) {
+                    int tokens = t.countTokens();
+                    if (tokens != 0 && tokens != 1) {
+                        usage();
+                    } else {
+                        String name = tokens > 0 ? t.nextToken() : null;
+                        boolean nonDefault = false;
+                        if (name != null && name.equals("-nd")) {
+                            name = null;
+                            nonDefault = true;
+                        }
+
+                        VM.Flag[] flags = VM.getVM().getCommandLineFlags();
+                        if (flags == null) {
+                            out.println("Command Flag info not available (use 1.4.1_03 or later)!");
+                        } else {
+                            boolean printed = false;
+                            for (int f = 0; f < flags.length; f++) {
+                                VM.Flag flag = flags[f];
+                                if (name == null || flag.getName().equals(name)) {
+
+                                    if (nonDefault && flag.getOrigin() == 0) {
+                                        // only print flags which aren't their defaults
+                                        continue;
+                                    }
+                                    out.println(flag.getName() + " = " + flag.getValue() + " " + flag.getOrigin());
+                                    printed = true;
+                                }
+                            }
+                            if (name != null && !printed) {
+                                out.println("Couldn't find flag: " + name);
+                            }
+                        }
+                    }
+                }
+            },
+            new Command("help", "help [ command ]", true) {
+                public void doit(Tokens t) {
+                    int tokens = t.countTokens();
+                    Command cmd = null;
+                    if (tokens == 1) {
+                        cmd = findCommand(t.nextToken());
+                    }
+
+                    if (cmd != null) {
+                        cmd.usage();
+                    } else if (tokens == 0) {
+                        out.println("Available commands:");
+                        Object[] keys = commands.keySet().toArray();
+                        Arrays.sort(keys, new Comparator() {
+                            public int compare(Object o1, Object o2) {
+                                return o1.toString().compareTo(o2.toString());
+                            }
+                        });
+                        for (int i = 0; i < keys.length; i++) {
+                            out.print("  ");
+                            out.println(((Command) commands.get(keys[i])).usage);
+                        }
+                    }
+                }
+            },
+            new Command("history", "history", true) {
+                public void doit(Tokens t) {
+                    int tokens = t.countTokens();
+                    if (tokens != 0 && (tokens != 1 || !t.nextToken().equals("-h"))) {
+                        usage();
+                        return;
+                    }
+                    boolean printIndex = tokens == 0;
+                    for (int i = 0; i < history.size(); i++) {
+                        if (printIndex) out.print(i + " ");
+                        out.println(history.get(i));
+                    }
+                }
+            },
+            // decode raw address
+            new Command("dis", "dis address [length]", false) {
+                public void doit(Tokens t) {
+                    int tokens = t.countTokens();
+                    if (tokens != 1 && tokens != 2) {
+                        usage();
+                        return;
+                    }
+                    String name = t.nextToken();
+                    Address addr = null;
+                    int len = 0x10; // default length
+                    try {
+                        addr = VM.getVM().getDebugger().parseAddress(name);
+                    } catch (NumberFormatException e) {
+                        out.println(e);
+                        return;
+                    }
+                    if (tokens == 2) {
+                        try {
+                            len = Integer.parseInt(t.nextToken());
+                        } catch (NumberFormatException e) {
+                            out.println(e);
+                            return;
+                        }
+                    }
+                    HTMLGenerator generator = new HTMLGenerator(false);
+                    out.println(generator.genHTMLForRawDisassembly(addr, len));
+                }
+
+            },
+            // decode codeblob or nmethod
+            new Command("disassemble", "disassemble address", false) {
+                public void doit(Tokens t) {
+                    int tokens = t.countTokens();
+                    if (tokens != 1) {
+                        usage();
+                        return;
+                    }
+                    String name = t.nextToken();
+                    Address addr = null;
+                    try {
+                        addr = VM.getVM().getDebugger().parseAddress(name);
+                    } catch (NumberFormatException e) {
+                        out.println(e);
+                        return;
+                    }
+
+                    HTMLGenerator generator = new HTMLGenerator(false);
+                    out.println(generator.genHTML(addr));
+                }
+            },
+            // print Java bytecode disassembly
+            new Command("jdis", "jdis address", false) {
+                public void doit(Tokens t) {
+                    int tokens = t.countTokens();
+                    if (tokens != 1) {
+                        usage();
+                        return;
+                    }
+                    Address a = VM.getVM().getDebugger().parseAddress(t.nextToken());
+                    Method m = (Method) Metadata.instantiateWrapperFor(a);
+                    HTMLGenerator html = new HTMLGenerator(false);
+                    out.println(html.genHTML(m));
+                }
+            },
+            new Command("revptrs", "revptrs address", false) {
+                public void doit(Tokens t) {
+                    int tokens = t.countTokens();
+                    if (tokens != 1 && (tokens != 2 || !t.nextToken().equals("-c"))) {
+                        usage();
+                        return;
+                    }
+                    boolean chase = tokens == 2;
+                    ReversePtrs revptrs = VM.getVM().getRevPtrs();
+                    if (revptrs == null) {
+                        out.println("Computing reverse pointers...");
+                        ReversePtrsAnalysis analysis = new ReversePtrsAnalysis();
+                        final boolean[] complete = new boolean[1];
+                        HeapProgressThunk thunk = new HeapProgressThunk() {
+                            public void heapIterationFractionUpdate(double d) {
+                            }
+
+                            public synchronized void heapIterationComplete() {
+                                complete[0] = true;
+                                notify();
+                            }
+                        };
+                        analysis.setHeapProgressThunk(thunk);
+                        analysis.run();
+                        while (!complete[0]) {
+                            synchronized (thunk) {
+                                try {
+                                    thunk.wait();
+                                } catch (Exception e) {
+                                }
+                            }
+                        }
+                        revptrs = VM.getVM().getRevPtrs();
+                        out.println("Done.");
+                    }
+                    Address a = VM.getVM().getDebugger().parseAddress(t.nextToken());
+                    if (VM.getVM().getUniverse().heap().isInReserved(a)) {
+                        OopHandle handle = a.addOffsetToAsOopHandle(0);
+                        Oop oop = VM.getVM().getObjectHeap().newOop(handle);
+                        ArrayList ptrs = revptrs.get(oop);
+                        if (ptrs == null) {
+                            out.println("no live references to " + a);
+                        } else {
+                            if (chase) {
+                                while (ptrs.size() == 1) {
+                                    LivenessPathElement e = (LivenessPathElement) ptrs.get(0);
+                                    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                                    Oop.printOopValueOn(e.getObj(), new PrintStream(bos));
+                                    out.println(bos.toString());
+                                    ptrs = revptrs.get(e.getObj());
+                                }
+                            } else {
+                                for (int i = 0; i < ptrs.size(); i++) {
+                                    LivenessPathElement e = (LivenessPathElement) ptrs.get(i);
+                                    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                                    Oop.printOopValueOn(e.getObj(), new PrintStream(bos));
+                                    out.println(bos.toString());
+                                    oop = e.getObj();
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            new Command("printmdo", "printmdo [ -a | expression ]", false) {
+                // Print every MDO in the heap or the one referenced by expression.
+                public void doit(Tokens t) {
+                    if (t.countTokens() != 1) {
+                        usage();
+                    } else {
+                        String s = t.nextToken();
+                        if (s.equals("-a")) {
+                            SystemDictionary sysDict = VM.getVM().getSystemDictionary();
+                            sysDict.allClassesDo(new SystemDictionary.ClassVisitor() {
+                                                     public void visit(Klass k) {
+                                                         if (k instanceof InstanceKlass) {
+                                                             MethodArray methods = ((InstanceKlass) k).getMethods();
+                                                             for (int i = 0; i < methods.length(); i++) {
+                                                                 Method m = methods.at(i);
+                                                                 MethodData mdo = m.getMethodData();
+                                                                 if (mdo != null) {
+                                                                     out.println("MethodData " + mdo.getAddress() + " for " +
+                                                                             "method " + m.getMethodHolder().getName().asString() + "." +
+                                                                             m.getName().asString() +
+                                                                             m.getSignature().asString() + "@" + m.getAddress());
+                                                                     mdo.printDataOn(out);
+                                                                 }
+                                                             }
+                                                         }
+                                                     }
+                                                 }
+                            );
+                        } else {
+                            Address a = VM.getVM().getDebugger().parseAddress(s);
+                            MethodData mdo = (MethodData) Metadata.instantiateWrapperFor(a);
+                            mdo.printDataOn(out);
+                        }
+                    }
+                }
+            },
+            new Command("printall", "printall", false) {
+                // Print every MDO in the heap or the one referenced by expression.
+                public void doit(Tokens t) {
+                    if (t.countTokens() != 0) {
+                        usage();
+                    } else {
+                        SystemDictionary sysDict = VM.getVM().getSystemDictionary();
+                        sysDict.allClassesDo(new SystemDictionary.ClassVisitor() {
+                                                 public void visit(Klass k) {
+                                                     if (k instanceof InstanceKlass && ((InstanceKlass) k).getConstants().getCache() != null) {
+                                                         MethodArray methods = ((InstanceKlass) k).getMethods();
+                                                         for (int i = 0; i < methods.length(); i++) {
+                                                             Method m = methods.at(i);
+                                                             HTMLGenerator gen = new HTMLGenerator(false);
+                                                             out.println(gen.genHTML(m));
+                                                         }
+                                                     }
+                                                 }
+                                             }
+                        );
+                    }
+                }
+            },
+            new Command("dumpideal", "dumpideal { -a | id }", false) {
+                // Do a full dump of the nodes reachabile from root in each compiler thread.
+                public void doit(Tokens t) {
+                    if (t.countTokens() != 1) {
+                        usage();
+                    } else {
+                        String name = t.nextToken();
+                        boolean all = name.equals("-a");
+                        Threads threads = VM.getVM().getThreads();
+                        for (JavaThread thread = threads.first(); thread != null; thread = thread.next()) {
+                            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                            thread.printThreadIDOn(new PrintStream(bos));
+                            if (all || bos.toString().equals(name)) {
+                                if (thread instanceof CompilerThread) {
+                                    CompilerThread ct = (CompilerThread) thread;
+                                    out.println(ct);
+                                    ciEnv env = ct.env();
+                                    if (env != null) {
+                                        Compile c = env.compilerData();
+                                        c.root().dump(9999, out);
+                                    } else {
+                                        out.println("  not compiling");
                                     }
                                 }
                             }
                         }
                     }
                 }
-            }
-        },
-        new Command("vmstructsdump", "vmstructsdump", false) {
-            public void doit(Tokens t) {
-                if (t.countTokens() != 0) {
-                    usage();
-                    return;
-                }
-
-                // Dump a copy of the type database in a form that can
-                // be read back.
-                Iterator i = agent.getTypeDataBase().getTypes();
-                // Make sure the types are emitted in an order than can be read back in
-                HashSet emitted = new HashSet();
-                Stack pending = new Stack();
-                while (i.hasNext()) {
-                    Type n = (Type)i.next();
-                    if (emitted.contains(n.getName())) {
-                        continue;
-                    }
-
-                    while (n != null && !emitted.contains(n.getName())) {
-                        pending.push(n);
-                        n = n.getSuperclass();
-                    }
-                    while (!pending.empty()) {
-                        n = (Type)pending.pop();
-                        dumpType(n);
-                        emitted.add(n.getName());
-                    }
-                }
-                i = agent.getTypeDataBase().getTypes();
-                while (i.hasNext()) {
-                    dumpFields((Type)i.next(), false);
-                }
-            }
-        },
-
-        new Command("inspect", "inspect expression", false) {
-            public void doit(Tokens t) {
-                if (t.countTokens() != 1) {
-                    usage();
-                } else {
-                    Address a = VM.getVM().getDebugger().parseAddress(t.nextToken());
-                    SimpleTreeNode node = null;
-                    if (VM.getVM().getUniverse().heap().isInReserved(a)) {
-                        OopHandle handle = a.addOffsetToAsOopHandle(0);
-                        Oop oop = VM.getVM().getObjectHeap().newOop(handle);
-                        node = new OopTreeNodeAdapter(oop, null);
-
-                        out.println("instance of " + node.getValue() + " @ " + a +
-                                    " (size = " + oop.getObjectSize() + ")");
-                    } else if (VM.getVM().getCodeCache().contains(a)) {
-                        CodeBlob blob = VM.getVM().getCodeCache().findBlobUnsafe(a);
-                        a = blob.headerBegin();
-                    }
-                    if (node == null) {
-                        Type type = VM.getVM().getTypeDataBase().guessTypeForAddress(a);
-                        if (type != null) {
-                            out.println("Type is " + type.getName() + " (size of " + type.getSize() + ")");
-                            node = new CTypeTreeNodeAdapter(a, type, null);
-                        }
-                    }
-                    if (node != null) {
-                        printNode(node);
-                    }
-                }
-            }
-        },
-        new Command("jhisto", "jhisto", false) {
-            public void doit(Tokens t) {
-                 ObjectHistogram histo = new ObjectHistogram();
-                 histo.run(out, err);
-            }
-        },
-        new Command("jstack", "jstack [-v]", false) {
-            public void doit(Tokens t) {
-                boolean verbose = false;
-                if (t.countTokens() > 0 && t.nextToken().equals("-v")) {
-                    verbose = true;
-                }
-                StackTrace jstack = new StackTrace(verbose, true);
-                jstack.run(out);
-            }
-        },
-        new Command("print", "print expression", false) {
-            public void doit(Tokens t) {
-                if (t.countTokens() != 1) {
-                    usage();
-                } else {
-                    Address a = VM.getVM().getDebugger().parseAddress(t.nextToken());
-                    HTMLGenerator gen = new HTMLGenerator(false);
-                    out.println(gen.genHTML(a));
-                }
-            }
-        },
-        new Command("printas", "printas type expression", false) {
-            public void doit(Tokens t) {
-                if (t.countTokens() != 2) {
-                    usage();
-                } else {
-                    Type type = agent.getTypeDataBase().lookupType(t.nextToken());
-                    Address a = VM.getVM().getDebugger().parseAddress(t.nextToken());
-                    CTypeTreeNodeAdapter node = new CTypeTreeNodeAdapter(a, type, null);
-
-                    out.println("pointer to " + type + " @ " + a +
-                                " (size = " + type.getSize() + ")");
-                    printNode(node);
-                }
-            }
-        },
-        new Command("printstatics", "printstatics [ type ]", false) {
-            public void doit(Tokens t) {
-                if (t.countTokens() > 1) {
-                    usage();
-                } else {
-                    if (t.countTokens() == 0) {
-                        out.println("All known static fields");
-                        printNode(new CTypeTreeNodeAdapter(agent.getTypeDataBase().getTypes()));
+            },
+            new Command("dumpcfg", "dumpcfg { -a | id }", false) {
+                // Dump the PhaseCFG for every compiler thread that has one live.
+                public void doit(Tokens t) {
+                    if (t.countTokens() != 1) {
+                        usage();
                     } else {
-                        Type type = agent.getTypeDataBase().lookupType(t.nextToken());
-                        out.println("Static fields of " + type.getName());
-                        printNode(new CTypeTreeNodeAdapter(type));
+                        String name = t.nextToken();
+                        boolean all = name.equals("-a");
+                        Threads threads = VM.getVM().getThreads();
+                        for (JavaThread thread = threads.first(); thread != null; thread = thread.next()) {
+                            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                            thread.printThreadIDOn(new PrintStream(bos));
+                            if (all || bos.toString().equals(name)) {
+                                if (thread instanceof CompilerThread) {
+                                    CompilerThread ct = (CompilerThread) thread;
+                                    out.println(ct);
+                                    ciEnv env = ct.env();
+                                    if (env != null) {
+                                        Compile c = env.compilerData();
+                                        c.cfg().dump(out);
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
-            }
-        },
-        new Command("pmap", "pmap", false) {
-            public void doit(Tokens t) {
-                PMap pmap = new PMap();
-                pmap.run(out, debugger.getAgent().getDebugger());
-            }
-        },
-        new Command("pstack", "pstack [-v]", false) {
-            public void doit(Tokens t) {
-                boolean verbose = false;
-                if (t.countTokens() > 0 && t.nextToken().equals("-v")) {
-                    verbose = true;
-                }
-                PStack pstack = new PStack(verbose, true);
-                pstack.run(out, debugger.getAgent().getDebugger());
-            }
-        },
-        new Command("quit", true) {
-            public void doit(Tokens t) {
-                if (t.countTokens() != 0) {
-                    usage();
-                } else {
-                    debugger.detach();
-                    quit = true;
-                }
-            }
-        },
-        new Command("echo", "echo [ true | false ]", true) {
-            public void doit(Tokens t) {
-                if (t.countTokens() == 0) {
-                    out.println("echo is " + doEcho);
-                } else if (t.countTokens() == 1) {
-                    doEcho = Boolean.valueOf(t.nextToken()).booleanValue();
-                } else {
-                    usage();
-                }
-            }
-        },
-        new Command("versioncheck", "versioncheck [ true | false ]", true) {
-            public void doit(Tokens t) {
-                if (t.countTokens() == 0) {
-                    out.println("versioncheck is " +
-                                (System.getProperty("sun.jvm.hotspot.runtime.VM.disableVersionCheck") == null));
-                } else if (t.countTokens() == 1) {
-                    if (Boolean.valueOf(t.nextToken()).booleanValue()) {
-                        System.setProperty("sun.jvm.hotspot.runtime.VM.disableVersionCheck", null);
+            },
+            new Command("dumpilt", "dumpilt { -a | id }", false) {
+                // dumps the InlineTree of a C2 compile
+                public void doit(Tokens t) {
+                    if (t.countTokens() != 1) {
+                        usage();
                     } else {
-                        System.setProperty("sun.jvm.hotspot.runtime.VM.disableVersionCheck", "true");
-                    }
-                } else {
-                    usage();
-                }
-            }
-        },
-        new Command("scanoops", "scanoops start end [ type ]", false) {
-            public void doit(Tokens t) {
-                if (t.countTokens() != 2 && t.countTokens() != 3) {
-                    usage();
-                } else {
-                    long stride = VM.getVM().getAddressSize();
-                    Address base = VM.getVM().getDebugger().parseAddress(t.nextToken());
-                    Address end  = VM.getVM().getDebugger().parseAddress(t.nextToken());
-                    Klass klass = null;
-                    if (t.countTokens() == 1) {
-                        klass = SystemDictionaryHelper.findInstanceKlass(t.nextToken());
-                        if (klass == null) {
-                            out.println("No such type.");
-                            return;
-                        }
-                    }
-                    while (base != null && base.lessThan(end)) {
-                        long step = stride;
-                        OopHandle handle = base.addOffsetToAsOopHandle(0);
-                        if (RobustOopDeterminator.oopLooksValid(handle)) {
-                            try {
-                                Oop oop = VM.getVM().getObjectHeap().newOop(handle);
-                                if (klass == null || oop.getKlass().isSubtypeOf(klass))
-                                    out.println(handle.toString() + " " + oop.getKlass().getName().asString());
-                                step = oop.getObjectSize();
-                            } catch (UnknownOopException ex) {
-                                // ok
-                            } catch (RuntimeException ex) {
-                                ex.printStackTrace();
-                            }
-                        }
-                        base = base.addOffsetTo(step);
-                    }
-                }
-            }
-        },
-        new Command("intConstant", "intConstant [ name [ value ] ]", true) {
-            public void doit(Tokens t) {
-                if (t.countTokens() != 1 && t.countTokens() != 0 && t.countTokens() != 2) {
-                    usage();
-                    return;
-                }
-                HotSpotTypeDataBase db = (HotSpotTypeDataBase)agent.getTypeDataBase();
-                if (t.countTokens() == 1) {
-                    String name = t.nextToken();
-                    out.println("intConstant " + name + " " + db.lookupIntConstant(name));
-                } else if (t.countTokens() == 0) {
-                    Iterator i = db.getIntConstants();
-                    while (i.hasNext()) {
-                        String name = (String)i.next();
-                        out.println("intConstant " + name + " " + db.lookupIntConstant(name));
-                    }
-                } else if (t.countTokens() == 2) {
-                    String name = t.nextToken();
-                    Integer value = Integer.valueOf(t.nextToken());
-                    db.addIntConstant(name, value);
-                }
-            }
-        },
-        new Command("longConstant", "longConstant [ name [ value ] ]", true) {
-            public void doit(Tokens t) {
-                if (t.countTokens() != 1 && t.countTokens() != 0 && t.countTokens() != 2) {
-                    usage();
-                    return;
-                }
-                HotSpotTypeDataBase db = (HotSpotTypeDataBase)agent.getTypeDataBase();
-                if (t.countTokens() == 1) {
-                    String name = t.nextToken();
-                    out.println("longConstant " + name + " " + db.lookupLongConstant(name));
-                } else if (t.countTokens() == 0) {
-                    Iterator i = db.getLongConstants();
-                    while (i.hasNext()) {
-                        String name = (String)i.next();
-                        out.println("longConstant " + name + " " + db.lookupLongConstant(name));
-                    }
-                } else if (t.countTokens() == 2) {
-                    String name = t.nextToken();
-                    Long value = Long.valueOf(t.nextToken());
-                    db.addLongConstant(name, value);
-                }
-            }
-        },
-        new Command("field", "field [ type [ name fieldtype isStatic offset address ] ]", true) {
-            public void doit(Tokens t) {
-                if (t.countTokens() != 1 && t.countTokens() != 0 && t.countTokens() != 6) {
-                    usage();
-                    return;
-                }
-                if (t.countTokens() == 1) {
-                    Type type = agent.getTypeDataBase().lookupType(t.nextToken());
-                    dumpFields(type);
-                } else if (t.countTokens() == 0) {
-                    Iterator i = agent.getTypeDataBase().getTypes();
-                    while (i.hasNext()) {
-                        dumpFields((Type)i.next());
-                    }
-                } else {
-                    BasicType containingType = (BasicType)agent.getTypeDataBase().lookupType(t.nextToken());
-
-                    String fieldName = t.nextToken();
-
-                    // The field's Type must already be in the database -- no exceptions
-                    Type fieldType = agent.getTypeDataBase().lookupType(t.nextToken());
-
-                    boolean isStatic = Boolean.valueOf(t.nextToken()).booleanValue();
-                    long offset = Long.parseLong(t.nextToken());
-                    Address staticAddress = parseAddress(t.nextToken());
-                    if (isStatic && staticAddress == null) {
-                        staticAddress = lookup(containingType.getName() + "::" + fieldName);
-                    }
-
-                    // check to see if the field already exists
-                    Iterator i = containingType.getFields();
-                    while (i.hasNext()) {
-                        Field f = (Field) i.next();
-                        if (f.getName().equals(fieldName)) {
-                            if (f.isStatic() != isStatic) {
-                                throw new RuntimeException("static/nonstatic mismatch: " + t.input);
-                            }
-                            if (!isStatic) {
-                                if (f.getOffset() != offset) {
-                                    throw new RuntimeException("bad redefinition of field offset: " + t.input);
-                                }
-                            } else {
-                                if (!f.getStaticFieldAddress().equals(staticAddress)) {
-                                    throw new RuntimeException("bad redefinition of field location: " + t.input);
+                        String name = t.nextToken();
+                        boolean all = name.equals("-a");
+                        Threads threads = VM.getVM().getThreads();
+                        for (JavaThread thread = threads.first(); thread != null; thread = thread.next()) {
+                            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                            thread.printThreadIDOn(new PrintStream(bos));
+                            if (all || bos.toString().equals(name)) {
+                                if (thread instanceof CompilerThread) {
+                                    CompilerThread ct = (CompilerThread) thread;
+                                    ciEnv env = ct.env();
+                                    if (env != null) {
+                                        Compile c = env.compilerData();
+                                        InlineTree ilt = c.ilt();
+                                        if (ilt != null) {
+                                            ilt.print(out);
+                                        }
+                                    }
                                 }
                             }
-                            if (f.getType() != fieldType) {
-                                throw new RuntimeException("bad redefinition of field type: " + t.input);
-                            }
-                            return;
                         }
                     }
-
-                    // Create field by type
-                    HotSpotTypeDataBase db = (HotSpotTypeDataBase)agent.getTypeDataBase();
-                    db.createField(containingType,
-                                   fieldName, fieldType,
-                                   isStatic,
-                                   offset,
-                                   staticAddress);
-
                 }
-            }
-
-        },
-        new Command("tokenize", "tokenize ...", true) {
-            public void doit(Tokens t) {
-                while (t.hasMoreTokens()) {
-                    out.println("\"" + t.nextToken() + "\"");
-                }
-            }
-        },
-        new Command("type", "type [ type [ name super isOop isInteger isUnsigned size ] ]", true) {
-            public void doit(Tokens t) {
-                if (t.countTokens() != 1 && t.countTokens() != 0 && t.countTokens() != 6) {
-                    usage();
-                    return;
-                }
-                if (t.countTokens() == 6) {
-                    String typeName = t.nextToken();
-                    String superclassName = t.nextToken();
-                    if (superclassName.equals("null")) {
-                        superclassName = null;
-                    }
-                    boolean isOop = Boolean.valueOf(t.nextToken()).booleanValue();
-                    boolean isInteger = Boolean.valueOf(t.nextToken()).booleanValue();
-                    boolean isUnsigned = Boolean.valueOf(t.nextToken()).booleanValue();
-                    long size = Long.parseLong(t.nextToken());
-
-                    BasicType type = null;
-                    try {
-                        type = (BasicType)agent.getTypeDataBase().lookupType(typeName);
-                    } catch (RuntimeException e) {
-                    }
-                    if (type != null) {
-                        if (type.isOopType() != isOop) {
-                            throw new RuntimeException("oop mismatch in type definition: " + t.input);
-                        }
-                        if (type.isCIntegerType() != isInteger) {
-                            throw new RuntimeException("integer type mismatch in type definition: " + t.input);
-                        }
-                        if (type.isCIntegerType() && (((CIntegerType)type).isUnsigned()) != isUnsigned) {
-                            throw new RuntimeException("unsigned mismatch in type definition: " + t.input);
-                        }
-                        if (type.getSuperclass() == null) {
-                            if (superclassName != null) {
-                                if (type.getSize() == -1) {
-                                    type.setSuperclass(agent.getTypeDataBase().lookupType(superclassName));
-                                } else {
-                                    throw new RuntimeException("unexpected superclass in type definition: " + t.input);
-                                }
-                            }
-                        } else {
-                            if (superclassName == null) {
-                                throw new RuntimeException("missing superclass in type definition: " + t.input);
-                            }
-                            if (!type.getSuperclass().getName().equals(superclassName)) {
-                                throw new RuntimeException("incorrect superclass in type definition: " + t.input);
-                            }
-                        }
-                        if (type.getSize() != size) {
-                            if (type.getSize() == -1) {
-                                type.setSize(size);
-                            }
-                            throw new RuntimeException("size mismatch in type definition: " + t.input);
-                        }
+            },
+            new Command("vmstructsdump", "vmstructsdump", false) {
+                public void doit(Tokens t) {
+                    if (t.countTokens() != 0) {
+                        usage();
                         return;
                     }
 
-                    // Create type
-                    HotSpotTypeDataBase db = (HotSpotTypeDataBase)agent.getTypeDataBase();
-                    db.createType(typeName, superclassName, isOop, isInteger, isUnsigned, size);
-                } else if (t.countTokens() == 1) {
-                    Type type = agent.getTypeDataBase().lookupType(t.nextToken());
-                    dumpType(type);
-                } else {
+                    // Dump a copy of the type database in a form that can
+                    // be read back.
                     Iterator i = agent.getTypeDataBase().getTypes();
                     // Make sure the types are emitted in an order than can be read back in
                     HashSet emitted = new HashSet();
                     Stack pending = new Stack();
                     while (i.hasNext()) {
-                        Type n = (Type)i.next();
+                        Type n = (Type) i.next();
                         if (emitted.contains(n.getName())) {
                             continue;
                         }
@@ -1402,92 +1030,481 @@ public class CommandProcessor {
                             n = n.getSuperclass();
                         }
                         while (!pending.empty()) {
-                            n = (Type)pending.pop();
+                            n = (Type) pending.pop();
                             dumpType(n);
                             emitted.add(n.getName());
                         }
                     }
-                }
-            }
-
-        },
-        new Command("source", "source filename", true) {
-            public void doit(Tokens t) {
-                if (t.countTokens() != 1) {
-                    usage();
-                    return;
-                }
-                String file = t.nextToken();
-                BufferedReader savedInput = in;
-                try {
-                    BufferedReader input = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
-                    in = input;
-                    run(false);
-                } catch (Exception e) {
-                    out.println("Error: " + e);
-                    if (verboseExceptions) {
-                        e.printStackTrace(out);
+                    i = agent.getTypeDataBase().getTypes();
+                    while (i.hasNext()) {
+                        dumpFields((Type) i.next(), false);
                     }
-                } finally {
-                    in = savedInput;
                 }
+            },
 
-            }
-        },
-        new Command("search", "search [ heap | perm | rawheap | codecache | threads ] value", false) {
-            public void doit(Tokens t) {
-                if (t.countTokens() != 2) {
-                    usage();
-                    return;
-                }
-                String type = t.nextToken();
-                final Address value = VM.getVM().getDebugger().parseAddress(t.nextToken());
-                final long stride = VM.getVM().getAddressSize();
-                if (type.equals("threads")) {
-                    Threads threads = VM.getVM().getThreads();
-                    for (JavaThread thread = threads.first(); thread != null; thread = thread.next()) {
-                        Address base = thread.getStackBase();
-                        Address end = thread.getLastJavaSP();
-                        if (end == null) continue;
-                        if (end.lessThan(base)) {
-                            Address tmp = base;
-                            base = end;
-                            end = tmp;
+            new Command("inspect", "inspect expression", false) {
+                public void doit(Tokens t) {
+                    if (t.countTokens() != 1) {
+                        usage();
+                    } else {
+                        Address a = VM.getVM().getDebugger().parseAddress(t.nextToken());
+                        SimpleTreeNode node = null;
+                        if (VM.getVM().getUniverse().heap().isInReserved(a)) {
+                            OopHandle handle = a.addOffsetToAsOopHandle(0);
+                            Oop oop = VM.getVM().getObjectHeap().newOop(handle);
+                            node = new OopTreeNodeAdapter(oop, null);
+
+                            out.println("instance of " + node.getValue() + " @ " + a +
+                                    " (size = " + oop.getObjectSize() + ")");
+                        } else if (VM.getVM().getCodeCache().contains(a)) {
+                            CodeBlob blob = VM.getVM().getCodeCache().findBlobUnsafe(a);
+                            a = blob.headerBegin();
                         }
-                        //out.println("Searching " + base + " " + end);
-                        while (base != null && base.lessThan(end)) {
-                            Address val = base.getAddressAt(0);
-                            if (AddressOps.equal(val, value)) {
-                                ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                                thread.printThreadIDOn(new PrintStream(bos));
-                                out.println("found on the stack of thread " + bos.toString() + " at " + base);
+                        if (node == null) {
+                            Type type = VM.getVM().getTypeDataBase().guessTypeForAddress(a);
+                            if (type != null) {
+                                out.println("Type is " + type.getName() + " (size of " + type.getSize() + ")");
+                                node = new CTypeTreeNodeAdapter(a, type, null);
                             }
-                            base = base.addOffsetTo(stride);
+                        }
+                        if (node != null) {
+                            printNode(node);
                         }
                     }
-                } else if (type.equals("rawheap")) {
-                    RawHeapVisitor iterator = new RawHeapVisitor() {
+                }
+            },
+            new Command("jhisto", "jhisto", false) {
+                public void doit(Tokens t) {
+                    ObjectHistogram histo = new ObjectHistogram();
+                    histo.run(out, err);
+                }
+            },
+            new Command("jstack", "jstack [-v]", false) {
+                public void doit(Tokens t) {
+                    boolean verbose = false;
+                    if (t.countTokens() > 0 && t.nextToken().equals("-v")) {
+                        verbose = true;
+                    }
+                    StackTrace jstack = new StackTrace(verbose, true);
+                    jstack.run(out);
+                }
+            },
+            new Command("print", "print expression", false) {
+                public void doit(Tokens t) {
+                    if (t.countTokens() != 1) {
+                        usage();
+                    } else {
+                        Address a = VM.getVM().getDebugger().parseAddress(t.nextToken());
+                        HTMLGenerator gen = new HTMLGenerator(false);
+                        out.println(gen.genHTML(a));
+                    }
+                }
+            },
+            new Command("printas", "printas type expression", false) {
+                public void doit(Tokens t) {
+                    if (t.countTokens() != 2) {
+                        usage();
+                    } else {
+                        Type type = agent.getTypeDataBase().lookupType(t.nextToken());
+                        Address a = VM.getVM().getDebugger().parseAddress(t.nextToken());
+                        CTypeTreeNodeAdapter node = new CTypeTreeNodeAdapter(a, type, null);
+
+                        out.println("pointer to " + type + " @ " + a +
+                                " (size = " + type.getSize() + ")");
+                        printNode(node);
+                    }
+                }
+            },
+            new Command("printstatics", "printstatics [ type ]", false) {
+                public void doit(Tokens t) {
+                    if (t.countTokens() > 1) {
+                        usage();
+                    } else {
+                        if (t.countTokens() == 0) {
+                            out.println("All known static fields");
+                            printNode(new CTypeTreeNodeAdapter(agent.getTypeDataBase().getTypes()));
+                        } else {
+                            Type type = agent.getTypeDataBase().lookupType(t.nextToken());
+                            out.println("Static fields of " + type.getName());
+                            printNode(new CTypeTreeNodeAdapter(type));
+                        }
+                    }
+                }
+            },
+            new Command("pmap", "pmap", false) {
+                public void doit(Tokens t) {
+                    PMap pmap = new PMap();
+                    pmap.run(out, debugger.getAgent().getDebugger());
+                }
+            },
+            new Command("pstack", "pstack [-v]", false) {
+                public void doit(Tokens t) {
+                    boolean verbose = false;
+                    if (t.countTokens() > 0 && t.nextToken().equals("-v")) {
+                        verbose = true;
+                    }
+                    PStack pstack = new PStack(verbose, true);
+                    pstack.run(out, debugger.getAgent().getDebugger());
+                }
+            },
+            new Command("quit", true) {
+                public void doit(Tokens t) {
+                    if (t.countTokens() != 0) {
+                        usage();
+                    } else {
+                        debugger.detach();
+                        quit = true;
+                    }
+                }
+            },
+            new Command("echo", "echo [ true | false ]", true) {
+                public void doit(Tokens t) {
+                    if (t.countTokens() == 0) {
+                        out.println("echo is " + doEcho);
+                    } else if (t.countTokens() == 1) {
+                        doEcho = Boolean.valueOf(t.nextToken()).booleanValue();
+                    } else {
+                        usage();
+                    }
+                }
+            },
+            new Command("versioncheck", "versioncheck [ true | false ]", true) {
+                public void doit(Tokens t) {
+                    if (t.countTokens() == 0) {
+                        out.println("versioncheck is " +
+                                (System.getProperty("sun.jvm.hotspot.runtime.VM.disableVersionCheck") == null));
+                    } else if (t.countTokens() == 1) {
+                        if (Boolean.valueOf(t.nextToken()).booleanValue()) {
+                            System.setProperty("sun.jvm.hotspot.runtime.VM.disableVersionCheck", null);
+                        } else {
+                            System.setProperty("sun.jvm.hotspot.runtime.VM.disableVersionCheck", "true");
+                        }
+                    } else {
+                        usage();
+                    }
+                }
+            },
+            new Command("scanoops", "scanoops start end [ type ]", false) {
+                public void doit(Tokens t) {
+                    if (t.countTokens() != 2 && t.countTokens() != 3) {
+                        usage();
+                    } else {
+                        long stride = VM.getVM().getAddressSize();
+                        Address base = VM.getVM().getDebugger().parseAddress(t.nextToken());
+                        Address end = VM.getVM().getDebugger().parseAddress(t.nextToken());
+                        Klass klass = null;
+                        if (t.countTokens() == 1) {
+                            klass = SystemDictionaryHelper.findInstanceKlass(t.nextToken());
+                            if (klass == null) {
+                                out.println("No such type.");
+                                return;
+                            }
+                        }
+                        while (base != null && base.lessThan(end)) {
+                            long step = stride;
+                            OopHandle handle = base.addOffsetToAsOopHandle(0);
+                            if (RobustOopDeterminator.oopLooksValid(handle)) {
+                                try {
+                                    Oop oop = VM.getVM().getObjectHeap().newOop(handle);
+                                    if (klass == null || oop.getKlass().isSubtypeOf(klass))
+                                        out.println(handle.toString() + " " + oop.getKlass().getName().asString());
+                                    step = oop.getObjectSize();
+                                } catch (UnknownOopException ex) {
+                                    // ok
+                                } catch (RuntimeException ex) {
+                                    ex.printStackTrace();
+                                }
+                            }
+                            base = base.addOffsetTo(step);
+                        }
+                    }
+                }
+            },
+            new Command("intConstant", "intConstant [ name [ value ] ]", true) {
+                public void doit(Tokens t) {
+                    if (t.countTokens() != 1 && t.countTokens() != 0 && t.countTokens() != 2) {
+                        usage();
+                        return;
+                    }
+                    HotSpotTypeDataBase db = (HotSpotTypeDataBase) agent.getTypeDataBase();
+                    if (t.countTokens() == 1) {
+                        String name = t.nextToken();
+                        out.println("intConstant " + name + " " + db.lookupIntConstant(name));
+                    } else if (t.countTokens() == 0) {
+                        Iterator i = db.getIntConstants();
+                        while (i.hasNext()) {
+                            String name = (String) i.next();
+                            out.println("intConstant " + name + " " + db.lookupIntConstant(name));
+                        }
+                    } else if (t.countTokens() == 2) {
+                        String name = t.nextToken();
+                        Integer value = Integer.valueOf(t.nextToken());
+                        db.addIntConstant(name, value);
+                    }
+                }
+            },
+            new Command("longConstant", "longConstant [ name [ value ] ]", true) {
+                public void doit(Tokens t) {
+                    if (t.countTokens() != 1 && t.countTokens() != 0 && t.countTokens() != 2) {
+                        usage();
+                        return;
+                    }
+                    HotSpotTypeDataBase db = (HotSpotTypeDataBase) agent.getTypeDataBase();
+                    if (t.countTokens() == 1) {
+                        String name = t.nextToken();
+                        out.println("longConstant " + name + " " + db.lookupLongConstant(name));
+                    } else if (t.countTokens() == 0) {
+                        Iterator i = db.getLongConstants();
+                        while (i.hasNext()) {
+                            String name = (String) i.next();
+                            out.println("longConstant " + name + " " + db.lookupLongConstant(name));
+                        }
+                    } else if (t.countTokens() == 2) {
+                        String name = t.nextToken();
+                        Long value = Long.valueOf(t.nextToken());
+                        db.addLongConstant(name, value);
+                    }
+                }
+            },
+            new Command("field", "field [ type [ name fieldtype isStatic offset address ] ]", true) {
+                public void doit(Tokens t) {
+                    if (t.countTokens() != 1 && t.countTokens() != 0 && t.countTokens() != 6) {
+                        usage();
+                        return;
+                    }
+                    if (t.countTokens() == 1) {
+                        Type type = agent.getTypeDataBase().lookupType(t.nextToken());
+                        dumpFields(type);
+                    } else if (t.countTokens() == 0) {
+                        Iterator i = agent.getTypeDataBase().getTypes();
+                        while (i.hasNext()) {
+                            dumpFields((Type) i.next());
+                        }
+                    } else {
+                        BasicType containingType = (BasicType) agent.getTypeDataBase().lookupType(t.nextToken());
+
+                        String fieldName = t.nextToken();
+
+                        // The field's Type must already be in the database -- no exceptions
+                        Type fieldType = agent.getTypeDataBase().lookupType(t.nextToken());
+
+                        boolean isStatic = Boolean.valueOf(t.nextToken()).booleanValue();
+                        long offset = Long.parseLong(t.nextToken());
+                        Address staticAddress = parseAddress(t.nextToken());
+                        if (isStatic && staticAddress == null) {
+                            staticAddress = lookup(containingType.getName() + "::" + fieldName);
+                        }
+
+                        // check to see if the field already exists
+                        Iterator i = containingType.getFields();
+                        while (i.hasNext()) {
+                            Field f = (Field) i.next();
+                            if (f.getName().equals(fieldName)) {
+                                if (f.isStatic() != isStatic) {
+                                    throw new RuntimeException("static/nonstatic mismatch: " + t.input);
+                                }
+                                if (!isStatic) {
+                                    if (f.getOffset() != offset) {
+                                        throw new RuntimeException("bad redefinition of field offset: " + t.input);
+                                    }
+                                } else {
+                                    if (!f.getStaticFieldAddress().equals(staticAddress)) {
+                                        throw new RuntimeException("bad redefinition of field location: " + t.input);
+                                    }
+                                }
+                                if (f.getType() != fieldType) {
+                                    throw new RuntimeException("bad redefinition of field type: " + t.input);
+                                }
+                                return;
+                            }
+                        }
+
+                        // Create field by type
+                        HotSpotTypeDataBase db = (HotSpotTypeDataBase) agent.getTypeDataBase();
+                        db.createField(containingType,
+                                fieldName, fieldType,
+                                isStatic,
+                                offset,
+                                staticAddress);
+
+                    }
+                }
+
+            },
+            new Command("tokenize", "tokenize ...", true) {
+                public void doit(Tokens t) {
+                    while (t.hasMoreTokens()) {
+                        out.println("\"" + t.nextToken() + "\"");
+                    }
+                }
+            },
+            new Command("type", "type [ type [ name super isOop isInteger isUnsigned size ] ]", true) {
+                public void doit(Tokens t) {
+                    if (t.countTokens() != 1 && t.countTokens() != 0 && t.countTokens() != 6) {
+                        usage();
+                        return;
+                    }
+                    if (t.countTokens() == 6) {
+                        String typeName = t.nextToken();
+                        String superclassName = t.nextToken();
+                        if (superclassName.equals("null")) {
+                            superclassName = null;
+                        }
+                        boolean isOop = Boolean.valueOf(t.nextToken()).booleanValue();
+                        boolean isInteger = Boolean.valueOf(t.nextToken()).booleanValue();
+                        boolean isUnsigned = Boolean.valueOf(t.nextToken()).booleanValue();
+                        long size = Long.parseLong(t.nextToken());
+
+                        BasicType type = null;
+                        try {
+                            type = (BasicType) agent.getTypeDataBase().lookupType(typeName);
+                        } catch (RuntimeException e) {
+                        }
+                        if (type != null) {
+                            if (type.isOopType() != isOop) {
+                                throw new RuntimeException("oop mismatch in type definition: " + t.input);
+                            }
+                            if (type.isCIntegerType() != isInteger) {
+                                throw new RuntimeException("integer type mismatch in type definition: " + t.input);
+                            }
+                            if (type.isCIntegerType() && (((CIntegerType) type).isUnsigned()) != isUnsigned) {
+                                throw new RuntimeException("unsigned mismatch in type definition: " + t.input);
+                            }
+                            if (type.getSuperclass() == null) {
+                                if (superclassName != null) {
+                                    if (type.getSize() == -1) {
+                                        type.setSuperclass(agent.getTypeDataBase().lookupType(superclassName));
+                                    } else {
+                                        throw new RuntimeException("unexpected superclass in type definition: " + t.input);
+                                    }
+                                }
+                            } else {
+                                if (superclassName == null) {
+                                    throw new RuntimeException("missing superclass in type definition: " + t.input);
+                                }
+                                if (!type.getSuperclass().getName().equals(superclassName)) {
+                                    throw new RuntimeException("incorrect superclass in type definition: " + t.input);
+                                }
+                            }
+                            if (type.getSize() != size) {
+                                if (type.getSize() == -1) {
+                                    type.setSize(size);
+                                }
+                                throw new RuntimeException("size mismatch in type definition: " + t.input);
+                            }
+                            return;
+                        }
+
+                        // Create type
+                        HotSpotTypeDataBase db = (HotSpotTypeDataBase) agent.getTypeDataBase();
+                        db.createType(typeName, superclassName, isOop, isInteger, isUnsigned, size);
+                    } else if (t.countTokens() == 1) {
+                        Type type = agent.getTypeDataBase().lookupType(t.nextToken());
+                        dumpType(type);
+                    } else {
+                        Iterator i = agent.getTypeDataBase().getTypes();
+                        // Make sure the types are emitted in an order than can be read back in
+                        HashSet emitted = new HashSet();
+                        Stack pending = new Stack();
+                        while (i.hasNext()) {
+                            Type n = (Type) i.next();
+                            if (emitted.contains(n.getName())) {
+                                continue;
+                            }
+
+                            while (n != null && !emitted.contains(n.getName())) {
+                                pending.push(n);
+                                n = n.getSuperclass();
+                            }
+                            while (!pending.empty()) {
+                                n = (Type) pending.pop();
+                                dumpType(n);
+                                emitted.add(n.getName());
+                            }
+                        }
+                    }
+                }
+
+            },
+            new Command("source", "source filename", true) {
+                public void doit(Tokens t) {
+                    if (t.countTokens() != 1) {
+                        usage();
+                        return;
+                    }
+                    String file = t.nextToken();
+                    BufferedReader savedInput = in;
+                    try {
+                        BufferedReader input = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+                        in = input;
+                        run(false);
+                    } catch (Exception e) {
+                        out.println("Error: " + e);
+                        if (verboseExceptions) {
+                            e.printStackTrace(out);
+                        }
+                    } finally {
+                        in = savedInput;
+                    }
+
+                }
+            },
+            new Command("search", "search [ heap | perm | rawheap | codecache | threads ] value", false) {
+                public void doit(Tokens t) {
+                    if (t.countTokens() != 2) {
+                        usage();
+                        return;
+                    }
+                    String type = t.nextToken();
+                    final Address value = VM.getVM().getDebugger().parseAddress(t.nextToken());
+                    final long stride = VM.getVM().getAddressSize();
+                    if (type.equals("threads")) {
+                        Threads threads = VM.getVM().getThreads();
+                        for (JavaThread thread = threads.first(); thread != null; thread = thread.next()) {
+                            Address base = thread.getStackBase();
+                            Address end = thread.getLastJavaSP();
+                            if (end == null) continue;
+                            if (end.lessThan(base)) {
+                                Address tmp = base;
+                                base = end;
+                                end = tmp;
+                            }
+                            //out.println("Searching " + base + " " + end);
+                            while (base != null && base.lessThan(end)) {
+                                Address val = base.getAddressAt(0);
+                                if (AddressOps.equal(val, value)) {
+                                    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                                    thread.printThreadIDOn(new PrintStream(bos));
+                                    out.println("found on the stack of thread " + bos.toString() + " at " + base);
+                                }
+                                base = base.addOffsetTo(stride);
+                            }
+                        }
+                    } else if (type.equals("rawheap")) {
+                        RawHeapVisitor iterator = new RawHeapVisitor() {
                             public void prologue(long used) {
                             }
 
                             public void visitAddress(Address addr) {
                                 Address val = addr.getAddressAt(0);
                                 if (AddressOps.equal(val, value)) {
-                                        out.println("found at " + addr);
+                                    out.println("found at " + addr);
                                 }
                             }
+
                             public void visitCompOopAddress(Address addr) {
                                 Address val = addr.getCompOopAddressAt(0);
                                 if (AddressOps.equal(val, value)) {
                                     out.println("found at " + addr);
                                 }
                             }
+
                             public void epilogue() {
                             }
                         };
-                    VM.getVM().getObjectHeap().iterateRaw(iterator);
-                } else if (type.equals("heap")) {
-                    HeapVisitor iterator = new DefaultHeapVisitor() {
+                        VM.getVM().getObjectHeap().iterateRaw(iterator);
+                    } else if (type.equals("heap")) {
+                        HeapVisitor iterator = new DefaultHeapVisitor() {
                             public boolean doObj(Oop obj) {
                                 int index = 0;
                                 Address start = obj.getHandle();
@@ -1504,10 +1521,11 @@ public class CommandProcessor {
                             }
                         };
                         VM.getVM().getObjectHeap().iterate(iterator);
-                } else if (type.equals("codecache")) {
-                    CodeCacheVisitor v = new CodeCacheVisitor() {
+                    } else if (type.equals("codecache")) {
+                        CodeCacheVisitor v = new CodeCacheVisitor() {
                             public void prologue(Address start, Address end) {
                             }
+
                             public void visit(CodeBlob blob) {
                                 boolean printed = false;
                                 Address base = blob.getAddress();
@@ -1529,161 +1547,164 @@ public class CommandProcessor {
                                     base = base.addOffsetTo(stride);
                                 }
                             }
+
                             public void epilogue() {
                             }
 
 
                         };
-                    VM.getVM().getCodeCache().iterate(v);
+                        VM.getVM().getCodeCache().iterate(v);
 
+                    }
                 }
-            }
-        },
-        new Command("dumpcodecache", "dumpcodecache", false) {
-            public void doit(Tokens t) {
-                if (t.countTokens() != 0) {
-                    usage();
-                } else {
-                    final PrintStream fout = out;
-                    final HTMLGenerator gen = new HTMLGenerator(false);
-                    CodeCacheVisitor v = new CodeCacheVisitor() {
+            },
+            new Command("dumpcodecache", "dumpcodecache", false) {
+                public void doit(Tokens t) {
+                    if (t.countTokens() != 0) {
+                        usage();
+                    } else {
+                        final PrintStream fout = out;
+                        final HTMLGenerator gen = new HTMLGenerator(false);
+                        CodeCacheVisitor v = new CodeCacheVisitor() {
                             public void prologue(Address start, Address end) {
                             }
+
                             public void visit(CodeBlob blob) {
                                 fout.println(gen.genHTML(blob.contentBegin()));
                             }
+
                             public void epilogue() {
                             }
 
 
                         };
-                    VM.getVM().getCodeCache().iterate(v);
-                }
-            }
-        },
-        new Command("where", "where { -a | id }", false) {
-            public void doit(Tokens t) {
-                if (t.countTokens() != 1) {
-                    usage();
-                } else {
-                    String name = t.nextToken();
-                    Threads threads = VM.getVM().getThreads();
-                    boolean all = name.equals("-a");
-                    for (JavaThread thread = threads.first(); thread != null; thread = thread.next()) {
-                        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                        thread.printThreadIDOn(new PrintStream(bos));
-                        if (all || bos.toString().equals(name)) {
-                            out.println("Thread " + bos.toString() + " Address: " + thread.getAddress());
-                            HTMLGenerator gen = new HTMLGenerator(false);
-                            try {
-                                out.println(gen.genHTMLForJavaStackTrace(thread));
-                            } catch (Exception e) {
-                                err.println("Error: " + e);
-                                if (verboseExceptions) {
-                                    e.printStackTrace(err);
-                                }
-                            }
-                            if (!all) return;
-                        }
-                    }
-                    if (!all) out.println("Couldn't find thread " + name);
-                }
-            }
-        },
-        new Command("thread", "thread { -a | id }", false) {
-            public void doit(Tokens t) {
-                if (t.countTokens() != 1) {
-                    usage();
-                } else {
-                    String name = t.nextToken();
-                    Threads threads = VM.getVM().getThreads();
-                    boolean all = name.equals("-a");
-                    for (JavaThread thread = threads.first(); thread != null; thread = thread.next()) {
-                        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                        thread.printThreadIDOn(new PrintStream(bos));
-                        if (all || bos.toString().equals(name)) {
-                            out.println("Thread " + bos.toString() + " Address " + thread.getAddress());
-                            thread.printInfoOn(out);
-                            out.println(" ");
-                            if (!all) return;
-                        }
-                    }
-                    out.println("Couldn't find thread " + name);
-                }
-            }
-        },
-
-        new Command("threads", false) {
-            public void doit(Tokens t) {
-                if (t.countTokens() != 0) {
-                    usage();
-                } else {
-                    Threads threads = VM.getVM().getThreads();
-                    for (JavaThread thread = threads.first(); thread != null; thread = thread.next()) {
-                        thread.printThreadIDOn(out);
-                        out.println(" " + thread.getThreadName());
-                        thread.printInfoOn(out);
-                        out.println("\n...");
+                        VM.getVM().getCodeCache().iterate(v);
                     }
                 }
-            }
-        },
-
-        new Command("livenmethods", false) {
-            public void doit(Tokens t) {
-                if (t.countTokens() != 0) {
-                    usage();
-                } else {
-                    ArrayList nmethods = new ArrayList();
-                    Threads threads = VM.getVM().getThreads();
-                    HTMLGenerator gen = new HTMLGenerator(false);
-                    for (JavaThread thread = threads.first(); thread != null; thread = thread.next()) {
-                        try {
-                            for (JavaVFrame vf = thread.getLastJavaVFrameDbg(); vf != null; vf = vf.javaSender()) {
-                                if (vf instanceof CompiledVFrame) {
-                                    NMethod c = ((CompiledVFrame)vf).getCode();
-                                    if (!nmethods.contains(c)) {
-                                        nmethods.add(c);
-                                        out.println(gen.genHTML(c));
+            },
+            new Command("where", "where { -a | id }", false) {
+                public void doit(Tokens t) {
+                    if (t.countTokens() != 1) {
+                        usage();
+                    } else {
+                        String name = t.nextToken();
+                        Threads threads = VM.getVM().getThreads();
+                        boolean all = name.equals("-a");
+                        for (JavaThread thread = threads.first(); thread != null; thread = thread.next()) {
+                            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                            thread.printThreadIDOn(new PrintStream(bos));
+                            if (all || bos.toString().equals(name)) {
+                                out.println("Thread " + bos.toString() + " Address: " + thread.getAddress());
+                                HTMLGenerator gen = new HTMLGenerator(false);
+                                try {
+                                    out.println(gen.genHTMLForJavaStackTrace(thread));
+                                } catch (Exception e) {
+                                    err.println("Error: " + e);
+                                    if (verboseExceptions) {
+                                        e.printStackTrace(err);
                                     }
                                 }
+                                if (!all) return;
                             }
-                        } catch (Exception e) {
-                            e.printStackTrace();
+                        }
+                        if (!all) out.println("Couldn't find thread " + name);
+                    }
+                }
+            },
+            new Command("thread", "thread { -a | id }", false) {
+                public void doit(Tokens t) {
+                    if (t.countTokens() != 1) {
+                        usage();
+                    } else {
+                        String name = t.nextToken();
+                        Threads threads = VM.getVM().getThreads();
+                        boolean all = name.equals("-a");
+                        for (JavaThread thread = threads.first(); thread != null; thread = thread.next()) {
+                            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                            thread.printThreadIDOn(new PrintStream(bos));
+                            if (all || bos.toString().equals(name)) {
+                                out.println("Thread " + bos.toString() + " Address " + thread.getAddress());
+                                thread.printInfoOn(out);
+                                out.println(" ");
+                                if (!all) return;
+                            }
+                        }
+                        out.println("Couldn't find thread " + name);
+                    }
+                }
+            },
+
+            new Command("threads", false) {
+                public void doit(Tokens t) {
+                    if (t.countTokens() != 0) {
+                        usage();
+                    } else {
+                        Threads threads = VM.getVM().getThreads();
+                        for (JavaThread thread = threads.first(); thread != null; thread = thread.next()) {
+                            thread.printThreadIDOn(out);
+                            out.println(" " + thread.getThreadName());
+                            thread.printInfoOn(out);
+                            out.println("\n...");
                         }
                     }
                 }
-            }
-        },
-        new Command("universe", false) {
-            public void doit(Tokens t) {
-                if (t.countTokens() != 0) {
-                    usage();
-                } else {
-                    Universe u = VM.getVM().getUniverse();
-                    out.println("Heap Parameters:");
-                    u.heap().printOn(out);
+            },
+
+            new Command("livenmethods", false) {
+                public void doit(Tokens t) {
+                    if (t.countTokens() != 0) {
+                        usage();
+                    } else {
+                        ArrayList nmethods = new ArrayList();
+                        Threads threads = VM.getVM().getThreads();
+                        HTMLGenerator gen = new HTMLGenerator(false);
+                        for (JavaThread thread = threads.first(); thread != null; thread = thread.next()) {
+                            try {
+                                for (JavaVFrame vf = thread.getLastJavaVFrameDbg(); vf != null; vf = vf.javaSender()) {
+                                    if (vf instanceof CompiledVFrame) {
+                                        NMethod c = ((CompiledVFrame) vf).getCode();
+                                        if (!nmethods.contains(c)) {
+                                            nmethods.add(c);
+                                            out.println(gen.genHTML(c));
+                                        }
+                                    }
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
                 }
-            }
-        },
-        new Command("verbose", "verbose true | false", true) {
-            public void doit(Tokens t) {
-                if (t.countTokens() != 1) {
-                    usage();
-                } else {
-                    verboseExceptions = Boolean.valueOf(t.nextToken()).booleanValue();
+            },
+            new Command("universe", false) {
+                public void doit(Tokens t) {
+                    if (t.countTokens() != 0) {
+                        usage();
+                    } else {
+                        Universe u = VM.getVM().getUniverse();
+                        out.println("Heap Parameters:");
+                        u.heap().printOn(out);
+                    }
                 }
-            }
-        },
-        new Command("assert", "assert true | false", true) {
-            public void doit(Tokens t) {
-                if (t.countTokens() != 1) {
-                    usage();
-                } else {
-                    Assert.ASSERTS_ENABLED = Boolean.valueOf(t.nextToken()).booleanValue();
+            },
+            new Command("verbose", "verbose true | false", true) {
+                public void doit(Tokens t) {
+                    if (t.countTokens() != 1) {
+                        usage();
+                    } else {
+                        verboseExceptions = Boolean.valueOf(t.nextToken()).booleanValue();
+                    }
                 }
-            }
-        },
+            },
+            new Command("assert", "assert true | false", true) {
+                public void doit(Tokens t) {
+                    if (t.countTokens() != 1) {
+                        usage();
+                    } else {
+                        Assert.ASSERTS_ENABLED = Boolean.valueOf(t.nextToken()).booleanValue();
+                    }
+                }
+            },
     };
 
     private boolean verboseExceptions = false;
@@ -1692,7 +1713,7 @@ public class CommandProcessor {
     private boolean doEcho = false;
 
     private Command findCommand(String key) {
-        return (Command)commands.get(key);
+        return (Command) commands.get(key);
     }
 
     public void printPrompt() {
@@ -1715,34 +1736,40 @@ public class CommandProcessor {
     private void postAttach() {
         // create JavaScript engine and start it
         jsengine = new JSJavaScriptEngine() {
-                        private ObjectReader reader = new ObjectReader();
-                        private JSJavaFactory factory = new JSJavaFactoryImpl();
-                        public ObjectReader getObjectReader() {
-                            return reader;
-                        }
-                        public JSJavaFactory getJSJavaFactory() {
-                            return factory;
-                        }
-                        protected void quit() {
-                            debugger.detach();
-                            quit = true;
-                        }
-                        protected BufferedReader getInputReader() {
-                            return in;
-                        }
-                        protected PrintStream getOutputStream() {
-                            return out;
-                        }
-                        protected PrintStream getErrorStream() {
-                            return err;
-                        }
-                   };
+            private ObjectReader reader = new ObjectReader();
+            private JSJavaFactory factory = new JSJavaFactoryImpl();
+
+            public ObjectReader getObjectReader() {
+                return reader;
+            }
+
+            public JSJavaFactory getJSJavaFactory() {
+                return factory;
+            }
+
+            protected void quit() {
+                debugger.detach();
+                quit = true;
+            }
+
+            protected BufferedReader getInputReader() {
+                return in;
+            }
+
+            protected PrintStream getOutputStream() {
+                return out;
+            }
+
+            protected PrintStream getErrorStream() {
+                return err;
+            }
+        };
         try {
             jsengine.defineFunction(this,
-                     this.getClass().getMethod("registerCommand",
-                                new Class[] {
-                                     String.class, String.class, String.class
-                                }));
+                    this.getClass().getMethod("registerCommand",
+                            new Class[]{
+                                    String.class, String.class, String.class
+                            }));
         } catch (NoSuchMethodException exp) {
             // should not happen, see below...!!
             exp.printStackTrace();
@@ -1752,15 +1779,15 @@ public class CommandProcessor {
 
     public void registerCommand(String cmd, String usage, final String func) {
         commands.put(cmd, new Command(cmd, usage, false) {
-                              public void doit(Tokens t) {
-                                  final int len = t.countTokens();
-                                  Object[] args = new Object[len];
-                                  for (int i = 0; i < len; i++) {
-                                      args[i] = t.nextToken();
-                                  }
-                                  jsengine.call(func, args);
-                              }
-                          });
+            public void doit(Tokens t) {
+                final int len = t.countTokens();
+                Object[] args = new Object[len];
+                for (int i = 0; i < len; i++) {
+                    args[i] = t.nextToken();
+                }
+                jsengine.call(func, args);
+            }
+        });
     }
 
     public void setOutput(PrintStream o) {
@@ -1828,51 +1855,51 @@ public class CommandProcessor {
 
                     String cmd = m.group();
                     if (cmd.equals("!!")) {
-                        result.append((String)history.get(history.size() - 1));
+                        result.append((String) history.get(history.size() - 1));
                     } else if (cmd.equals("!!-")) {
-                        Tokens item = new Tokens((String)history.get(history.size() - 1));
+                        Tokens item = new Tokens((String) history.get(history.size() - 1));
                         item.trim(1);
                         result.append(item.join(" "));
                     } else if (cmd.equals("!*")) {
-                        Tokens item = new Tokens((String)history.get(history.size() - 1));
+                        Tokens item = new Tokens((String) history.get(history.size() - 1));
                         item.nextToken();
                         result.append(item.join(" "));
                     } else if (cmd.equals("!$")) {
-                        Tokens item = new Tokens((String)history.get(history.size() - 1));
+                        Tokens item = new Tokens((String) history.get(history.size() - 1));
                         result.append(item.at(item.countTokens() - 1));
                     } else {
                         String tail = cmd.substring(1);
                         switch (tail.charAt(0)) {
-                        case '0':
-                        case '1':
-                        case '2':
-                        case '3':
-                        case '4':
-                        case '5':
-                        case '6':
-                        case '7':
-                        case '8':
-                        case '9':
-                        case '-': {
-                            int index = Integer.parseInt(tail);
-                            if (index < 0) {
-                                index = history.size() + index;
+                            case '0':
+                            case '1':
+                            case '2':
+                            case '3':
+                            case '4':
+                            case '5':
+                            case '6':
+                            case '7':
+                            case '8':
+                            case '9':
+                            case '-': {
+                                int index = Integer.parseInt(tail);
+                                if (index < 0) {
+                                    index = history.size() + index;
+                                }
+                                if (index > size) {
+                                    err.println("No such history item");
+                                } else {
+                                    result.append((String) history.get(index));
+                                }
+                                break;
                             }
-                            if (index > size) {
-                                err.println("No such history item");
-                            } else {
-                                result.append((String)history.get(index));
-                            }
-                            break;
-                        }
-                        default: {
-                            for (int i = history.size() - 1; i >= 0; i--) {
-                                String s = (String)history.get(i);
-                                if (s.startsWith(tail)) {
-                                    result.append(s);
+                            default: {
+                                for (int i = history.size() - 1; i >= 0; i--) {
+                                    String s = (String) history.get(i);
+                                    if (s.startsWith(tail)) {
+                                        result.append(s);
+                                    }
                                 }
                             }
-                        }
                         }
                     }
                 }

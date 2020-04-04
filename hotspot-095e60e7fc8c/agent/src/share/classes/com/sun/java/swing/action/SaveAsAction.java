@@ -29,16 +29,13 @@ package com.sun.java.swing.action;
 // Referenced classes of package com.sun.java.swing.action:
 //            DelegateAction, ActionManager
 
-public class SaveAsAction extends DelegateAction
-{
+public class SaveAsAction extends DelegateAction {
 
-    public SaveAsAction()
-    {
+    public SaveAsAction() {
         this("general/SaveAs16.gif");
     }
 
-    public SaveAsAction(String iconPath)
-    {
+    public SaveAsAction(String iconPath) {
         super("Save As", ActionManager.getIcon(iconPath));
         putValue("ActionCommandKey", "save-as-command");
         putValue("ShortDescription", "Save as a new file");

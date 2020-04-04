@@ -47,10 +47,10 @@ public class HeapRegionManager extends VMObject {
 
     static {
         VM.registerVMInitializedObserver(new Observer() {
-                public void update(Observable o, Object data) {
-                    initialize(VM.getVM().getTypeDataBase());
-                }
-            });
+            public void update(Observable o, Object data) {
+                initialize(VM.getVM().getTypeDataBase());
+            }
+        });
     }
 
     static private synchronized void initialize(TypeDataBase db) {
@@ -63,7 +63,7 @@ public class HeapRegionManager extends VMObject {
     private G1HeapRegionTable regions() {
         Address regionsAddr = addr.addOffsetTo(regionsFieldOffset);
         return (G1HeapRegionTable) VMObjectFactory.newObject(G1HeapRegionTable.class,
-                                                             regionsAddr);
+                regionsAddr);
     }
 
     public long capacity() {

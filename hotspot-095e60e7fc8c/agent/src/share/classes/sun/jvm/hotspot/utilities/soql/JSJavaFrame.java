@@ -25,18 +25,19 @@
 package sun.jvm.hotspot.utilities.soql;
 
 import java.util.*;
+
 import sun.jvm.hotspot.debugger.*;
 import sun.jvm.hotspot.oops.*;
 import sun.jvm.hotspot.runtime.*;
 
 public class JSJavaFrame extends DefaultScriptObject {
-    private static final int FIELD_METHOD      = 0;
-    private static final int FIELD_BCI         = 1;
+    private static final int FIELD_METHOD = 0;
+    private static final int FIELD_BCI = 1;
     private static final int FIELD_LINE_NUMBER = 2;
-    private static final int FIELD_LOCALS      = 3;
+    private static final int FIELD_LOCALS = 3;
     private static final int FIELD_THIS_OBJECT = 4;
-    private static final int FIELD_THREAD      = 5;
-    private static final int FIELD_UNDEFINED   = -1;
+    private static final int FIELD_THREAD = 5;
+    private static final int FIELD_UNDEFINED = -1;
 
     public JSJavaFrame(JavaVFrame jvf, JSJavaFactory fac) {
         this.jvf = jvf;
@@ -46,32 +47,32 @@ public class JSJavaFrame extends DefaultScriptObject {
     public Object get(String name) {
         int fieldID = getFieldID(name);
         switch (fieldID) {
-        case FIELD_METHOD:
-            return getMethod();
-        case FIELD_BCI:
-            return new Integer(getBCI());
-        case FIELD_LINE_NUMBER:
-            return new Integer(getLineNumber());
-        case FIELD_LOCALS:
-            return getLocals();
-        case FIELD_THIS_OBJECT:
-            return getThisObject();
-        case FIELD_THREAD:
-            return getThread();
-        case FIELD_UNDEFINED:
-        default:
-            return super.get(name);
+            case FIELD_METHOD:
+                return getMethod();
+            case FIELD_BCI:
+                return new Integer(getBCI());
+            case FIELD_LINE_NUMBER:
+                return new Integer(getLineNumber());
+            case FIELD_LOCALS:
+                return getLocals();
+            case FIELD_THIS_OBJECT:
+                return getThisObject();
+            case FIELD_THREAD:
+                return getThread();
+            case FIELD_UNDEFINED:
+            default:
+                return super.get(name);
         }
     }
 
     public Object[] getIds() {
-       Object[] fieldNames = fields.keySet().toArray();
-       Object[] superFields = super.getIds();
-       Object[] res = new Object[fieldNames.length + superFields.length];
-       System.arraycopy(fieldNames, 0, res, 0, fieldNames.length);
-       System.arraycopy(superFields, 0, res, fieldNames.length, superFields.length);
-       return res;
-   }
+        Object[] fieldNames = fields.keySet().toArray();
+        Object[] superFields = super.getIds();
+        Object[] res = new Object[fieldNames.length + superFields.length];
+        System.arraycopy(fieldNames, 0, res, 0, fieldNames.length);
+        System.arraycopy(superFields, 0, res, fieldNames.length, superFields.length);
+        return res;
+    }
 
     public boolean has(String name) {
         if (getFieldID(name) != FIELD_UNDEFINED) {
@@ -101,13 +102,14 @@ public class JSJavaFrame extends DefaultScriptObject {
 
     //-- Internals only below this point
     private static Map fields = new HashMap();
+
     private static void addField(String name, int fieldId) {
         fields.put(name, new Integer(fieldId));
     }
 
     private static int getFieldID(String name) {
         Integer res = (Integer) fields.get(name);
-        return (res != null)? res.intValue() : FIELD_UNDEFINED;
+        return (res != null) ? res.intValue() : FIELD_UNDEFINED;
     }
 
     static {
@@ -133,7 +135,7 @@ public class JSJavaFrame extends DefaultScriptObject {
             return 0;
         } else {
             int lineNum = jvf.getMethod().getLineNumberFromBCI(bci);
-            return (lineNum <= 0)? 0 : lineNum;
+            return (lineNum <= 0) ? 0 : lineNum;
         }
     }
 
@@ -143,8 +145,8 @@ public class JSJavaFrame extends DefaultScriptObject {
             localsCache = factory.newJSMap(map);
             StackValueCollection values = jvf.getLocals();
             Method method = jvf.getMethod();
-            if (method.isNative() || ! method.hasLocalVariableTable() ||
-                values == null) {
+            if (method.isNative() || !method.hasLocalVariableTable() ||
+                    values == null) {
                 return localsCache;
             }
 
@@ -161,9 +163,9 @@ public class JSJavaFrame extends DefaultScriptObject {
 
             OopHandle handle = null;
             ObjectHeap heap = VM.getVM().getObjectHeap();
-            for (Iterator varItr = visibleVars.iterator(); varItr.hasNext();) {
+            for (Iterator varItr = visibleVars.iterator(); varItr.hasNext(); ) {
                 LocalVariableTableElement cur = (LocalVariableTableElement) varItr.next();
-                String name =  method.getConstants().getSymbolAt(cur.getNameCPIndex()).asString();
+                String name = method.getConstants().getSymbolAt(cur.getNameCPIndex()).asString();
                 int slot = cur.getSlot();
 
                 String signature = method.getConstants().getSymbolAt(cur.getDescriptorCPIndex()).asString();
@@ -186,7 +188,7 @@ public class JSJavaFrame extends DefaultScriptObject {
                 } else if (variableType == BasicType.T_LONG) {
                     value = new Long(values.longAt(slot));
                 } else if (variableType == BasicType.T_OBJECT ||
-                       variableType == BasicType.T_ARRAY) {
+                        variableType == BasicType.T_ARRAY) {
                     handle = values.oopHandleAt(slot);
                     value = factory.newJSJavaObject(heap.newOop(handle));
                 } else {

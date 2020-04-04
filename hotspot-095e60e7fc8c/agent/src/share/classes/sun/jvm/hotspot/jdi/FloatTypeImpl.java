@@ -37,7 +37,7 @@ public class FloatTypeImpl extends PrimitiveTypeImpl implements FloatType {
     }
 
     PrimitiveValue convert(PrimitiveValue value) throws InvalidTypeException {
-        return vm.mirrorOf(((PrimitiveValueImpl)value).checkedFloatValue());
+        return vm.mirrorOf(((PrimitiveValueImpl) value).checkedFloatValue());
     }
 
 }

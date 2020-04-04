@@ -26,40 +26,44 @@ package sun.jvm.hotspot.code;
 
 import java.io.*;
 
-/** A ConstantLongValue describes a constant long; i.e., the
-    corresponding logical entity is either a source constant or its
-    computation has been constant-folded. */
+/**
+ * A ConstantLongValue describes a constant long; i.e., the
+ * corresponding logical entity is either a source constant or its
+ * computation has been constant-folded.
+ */
 
 public class ConstantLongValue extends ScopeValue {
-  private long value;
+    private long value;
 
-  public ConstantLongValue(long value) {
-    this.value = value;
-  }
+    public ConstantLongValue(long value) {
+        this.value = value;
+    }
 
-  public boolean isConstantLong() {
-    return true;
-  }
+    public boolean isConstantLong() {
+        return true;
+    }
 
-  public long getValue() {
-    return value;
-  }
+    public long getValue() {
+        return value;
+    }
 
-  /** Serialization of debugging information */
-  ConstantLongValue(DebugInfoReadStream stream) {
-    value = stream.readLong();
-  }
+    /**
+     * Serialization of debugging information
+     */
+    ConstantLongValue(DebugInfoReadStream stream) {
+        value = stream.readLong();
+    }
 
-  // FIXME: not yet implementable
-  // void write_on(DebugInfoWriteStream* stream);
+    // FIXME: not yet implementable
+    // void write_on(DebugInfoWriteStream* stream);
 
-  // Printing
+    // Printing
 
-  public void print() {
-    printOn(System.out);
-  }
+    public void print() {
+        printOn(System.out);
+    }
 
-  public void printOn(PrintStream tty) {
-    tty.print(value);
-  }
+    public void printOn(PrintStream tty) {
+        tty.print(value);
+    }
 }

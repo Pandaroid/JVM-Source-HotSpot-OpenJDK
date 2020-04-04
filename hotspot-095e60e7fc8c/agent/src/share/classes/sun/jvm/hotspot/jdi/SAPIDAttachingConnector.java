@@ -39,12 +39,12 @@ public class SAPIDAttachingConnector extends ConnectorImpl implements AttachingC
     private Transport transport;
 
     public SAPIDAttachingConnector(com.sun.tools.jdi.VirtualMachineManagerService ignored) {
-         this();
+        this();
     }
 
     public SAPIDAttachingConnector() {
-         super();
-         // fixme jjh:  create resources for the these strings,
+        super();
+        // fixme jjh:  create resources for the these strings,
         addStringArgument(
                 ARG_PID,
                 "PID",                     //getString("sa.pid.label"),
@@ -52,10 +52,10 @@ public class SAPIDAttachingConnector extends ConnectorImpl implements AttachingC
                 "",
                 true);
         transport = new Transport() {
-                   public String name() {
-                       return "local process";
-                       }
-                };
+            public String name() {
+                return "local process";
+            }
+        };
     }
 
     // security check to see whether the caller can perform attach
@@ -77,29 +77,29 @@ public class SAPIDAttachingConnector extends ConnectorImpl implements AttachingC
     }
 
     private VirtualMachine createVirtualMachine(Class virtualMachineImplClass, int pid)
-        throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+            throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         java.lang.reflect.Method createByPIDMethod
-                  = virtualMachineImplClass.getMethod("createVirtualMachineForPID",
-                     new Class[] {
-                         VirtualMachineManager.class,
-                         Integer.TYPE, Integer.TYPE
-                     });
+                = virtualMachineImplClass.getMethod("createVirtualMachineForPID",
+                new Class[]{
+                        VirtualMachineManager.class,
+                        Integer.TYPE, Integer.TYPE
+                });
         return (VirtualMachine) createByPIDMethod.invoke(null,
-                     new Object[] {
-                         Bootstrap.virtualMachineManager(),
-                         new Integer(pid),
-                         new Integer(0)
-                     });
+                new Object[]{
+                        Bootstrap.virtualMachineManager(),
+                        new Integer(pid),
+                        new Integer(0)
+                });
     }
 
     public VirtualMachine attach(Map arguments) throws IOException,
-                                      IllegalConnectorArgumentsException {
+            IllegalConnectorArgumentsException {
         int pid = 0;
         try {
             pid = Integer.parseInt(argument(ARG_PID, arguments).value());
         } catch (NumberFormatException nfe) {
             throw (IllegalConnectorArgumentsException) new IllegalConnectorArgumentsException
-                                                  (nfe.getMessage(), ARG_PID).initCause(nfe);
+                    (nfe.getMessage(), ARG_PID).initCause(nfe);
         }
 
         checkProcessAttach(pid);

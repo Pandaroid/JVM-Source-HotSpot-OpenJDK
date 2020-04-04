@@ -37,7 +37,7 @@ public class CharTypeImpl extends PrimitiveTypeImpl implements CharType {
     }
 
     PrimitiveValue convert(PrimitiveValue value) throws InvalidTypeException {
-        return vm.mirrorOf(((PrimitiveValueImpl)value).checkedCharValue());
+        return vm.mirrorOf(((PrimitiveValueImpl) value).checkedCharValue());
     }
 
 }

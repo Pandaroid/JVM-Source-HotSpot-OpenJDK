@@ -41,12 +41,13 @@ import java.util.EventObject;
  * by using a JTree as a renderer (and editor) for the cells in a
  * particular column in the JTable.
  *
- *
  * @author Philip Milne
  * @author Scott Violet
  */
 public class JTreeTable extends JTable {
-    /** A subclass of JTree. */
+    /**
+     * A subclass of JTree.
+     */
     protected TreeTableCellRenderer tree;
 
     //////////////////////////
@@ -54,7 +55,7 @@ public class JTreeTable extends JTable {
     //////////////////////////
 
     private boolean treeEditable = true;
-    private boolean showsIcons   = true;
+    private boolean showsIcons = true;
 
     public boolean getTreeEditable() {
         return treeEditable;
@@ -95,7 +96,7 @@ public class JTreeTable extends JTable {
 
         // Force the JTable and JTree to share their row selection models.
         ListToTreeSelectionModelWrapper selectionWrapper = new
-                                ListToTreeSelectionModelWrapper();
+                ListToTreeSelectionModelWrapper();
         tree.setSelectionModel(selectionWrapper);
         setSelectionModel(selectionWrapper.getListSelectionModel());
 
@@ -124,7 +125,7 @@ public class JTreeTable extends JTable {
      */
     public void updateUI() {
         super.updateUI();
-        if(tree != null) {
+        if (tree != null) {
             tree.updateUI();
             // Do this so that the editor is referencing the current renderer
             // from the tree. The renderer can potentially change each time
@@ -134,7 +135,7 @@ public class JTreeTable extends JTable {
         // Use the tree's default foreground and background colors in the
         // table.
         LookAndFeel.installColorsAndFont(this, "Tree.background",
-                                         "Tree.foreground", "Tree.font");
+                "Tree.foreground", "Tree.font");
     }
 
     /**
@@ -167,9 +168,9 @@ public class JTreeTable extends JTable {
     public void sizeColumnsToFit(int resizingColumn) {
         super.sizeColumnsToFit(resizingColumn);
         if (getEditingColumn() != -1 && getColumnClass(editingColumn) ==
-            TreeTableModel.class) {
+                TreeTableModel.class) {
             Rectangle cellRect = getCellRect(realEditingRow(),
-                                             getEditingColumn(), false);
+                    getEditingColumn(), false);
             Component component = getEditorComponent();
             component.setBounds(cellRect);
             component.validate();
@@ -199,7 +200,7 @@ public class JTreeTable extends JTable {
      * not fill the bounds of the cell, we need the renderer to paint
      * the tree in the background, and then draw the editor over it.
      */
-    public boolean editCellAt(int row, int column, EventObject e){
+    public boolean editCellAt(int row, int column, EventObject e) {
         boolean retValue = super.editCellAt(row, column, e);
         if (retValue && getColumnClass(column) == TreeTableModel.class) {
             repaint(getCellRect(row, column, false));
@@ -207,26 +208,49 @@ public class JTreeTable extends JTable {
         return retValue;
     }
 
-    /** A DefaultTreeCellRenderer which can optionally skip drawing
-        all icons. */
+    /**
+     * A DefaultTreeCellRenderer which can optionally skip drawing
+     * all icons.
+     */
     class JTreeTableCellRenderer extends DefaultTreeCellRenderer {
-        public Icon getClosedIcon()        { return (showsIcons ? super.getClosedIcon()        : null); }
-        public Icon getDefaultClosedIcon() { return (showsIcons ? super.getDefaultClosedIcon() : null); }
-        public Icon getDefaultLeafIcon()   { return (showsIcons ? super.getDefaultLeafIcon()   : null); }
-        public Icon getDefaultOpenIcon()   { return (showsIcons ? super.getDefaultOpenIcon()   : null); }
-        public Icon getLeafIcon()          { return (showsIcons ? super.getLeafIcon()          : null); }
-        public Icon getOpenIcon()          { return (showsIcons ? super.getOpenIcon()          : null); }
+        public Icon getClosedIcon() {
+            return (showsIcons ? super.getClosedIcon() : null);
+        }
+
+        public Icon getDefaultClosedIcon() {
+            return (showsIcons ? super.getDefaultClosedIcon() : null);
+        }
+
+        public Icon getDefaultLeafIcon() {
+            return (showsIcons ? super.getDefaultLeafIcon() : null);
+        }
+
+        public Icon getDefaultOpenIcon() {
+            return (showsIcons ? super.getDefaultOpenIcon() : null);
+        }
+
+        public Icon getLeafIcon() {
+            return (showsIcons ? super.getLeafIcon() : null);
+        }
+
+        public Icon getOpenIcon() {
+            return (showsIcons ? super.getOpenIcon() : null);
+        }
     }
 
     /**
      * A TreeCellRenderer that displays a JTree.
      */
     public class TreeTableCellRenderer extends JTree implements
-                 TableCellRenderer {
-        /** Last table/tree row asked to renderer. */
+            TableCellRenderer {
+        /**
+         * Last table/tree row asked to renderer.
+         */
         protected int visibleRow;
-        /** Border to draw around the tree, if this is non-null, it will
-         * be painted. */
+        /**
+         * Border to draw around the tree, if this is non-null, it will
+         * be painted.
+         */
         protected Border highlightBorder;
 
         public TreeTableCellRenderer(TreeModel model) {
@@ -244,15 +268,15 @@ public class JTreeTable extends JTable {
             // colors.
             TreeCellRenderer tcr = getCellRenderer();
             if (tcr instanceof DefaultTreeCellRenderer) {
-                DefaultTreeCellRenderer dtcr = ((DefaultTreeCellRenderer)tcr);
+                DefaultTreeCellRenderer dtcr = ((DefaultTreeCellRenderer) tcr);
                 // For 1.1 uncomment this, 1.2 has a bug that will cause an
                 // exception to be thrown if the border selection color is
                 // null.
                 // dtcr.setBorderSelectionColor(null);
                 dtcr.setTextSelectionColor(UIManager.getColor
-                                           ("Table.selectionForeground"));
+                        ("Table.selectionForeground"));
                 dtcr.setBackgroundSelectionColor(UIManager.getColor
-                                                ("Table.selectionBackground"));
+                        ("Table.selectionBackground"));
             }
         }
 
@@ -264,7 +288,7 @@ public class JTreeTable extends JTable {
             if (rowHeight > 0) {
                 super.setRowHeight(rowHeight);
                 if (JTreeTable.this != null &&
-                    JTreeTable.this.getRowHeight() != rowHeight) {
+                        JTreeTable.this.getRowHeight() != rowHeight) {
                     JTreeTable.this.setRowHeight(getRowHeight());
                 }
             }
@@ -287,8 +311,8 @@ public class JTreeTable extends JTable {
             // Draw the Table border if we have focus.
             if (highlightBorder != null) {
                 highlightBorder.paintBorder(this, g, 0, visibleRow *
-                                            getRowHeight(), getWidth(),
-                                            getRowHeight());
+                                getRowHeight(), getWidth(),
+                        getRowHeight());
             }
         }
 
@@ -303,11 +327,10 @@ public class JTreeTable extends JTable {
             Color background;
             Color foreground;
 
-            if(isSelected) {
+            if (isSelected) {
                 background = table.getSelectionBackground();
                 foreground = table.getSelectionForeground();
-            }
-            else {
+            } else {
                 background = table.getBackground();
                 foreground = table.getForeground();
             }
@@ -315,15 +338,14 @@ public class JTreeTable extends JTable {
             if (realEditingRow() == row && getEditingColumn() == column) {
                 background = UIManager.getColor("Table.focusCellBackground");
                 foreground = UIManager.getColor("Table.focusCellForeground");
-            }
-            else if (hasFocus) {
+            } else if (hasFocus) {
                 highlightBorder = UIManager.getBorder
-                                  ("Table.focusCellHighlightBorder");
+                        ("Table.focusCellHighlightBorder");
                 if (isCellEditable(row, column)) {
                     background = UIManager.getColor
-                                 ("Table.focusCellBackground");
+                            ("Table.focusCellBackground");
                     foreground = UIManager.getColor
-                                 ("Table.focusCellForeground");
+                            ("Table.focusCellForeground");
                 }
             }
 
@@ -332,12 +354,11 @@ public class JTreeTable extends JTable {
 
             TreeCellRenderer tcr = getCellRenderer();
             if (tcr instanceof DefaultTreeCellRenderer) {
-                DefaultTreeCellRenderer dtcr = ((DefaultTreeCellRenderer)tcr);
+                DefaultTreeCellRenderer dtcr = ((DefaultTreeCellRenderer) tcr);
                 if (isSelected) {
                     dtcr.setTextSelectionColor(foreground);
                     dtcr.setBackgroundSelectionColor(background);
-                }
-                else {
+                } else {
                     dtcr.setTextNonSelectionColor(foreground);
                     dtcr.setBackgroundNonSelectionColor(background);
                 }
@@ -401,7 +422,7 @@ public class JTreeTable extends JTable {
                                                      boolean isSelected,
                                                      int r, int c) {
             Component component = super.getTableCellEditorComponent
-                (table, value, isSelected, r, c);
+                    (table, value, isSelected, r, c);
             JTree t = getTree();
             boolean rv = t.isRootVisible();
             int offsetRow = rv ? r : r - 1;
@@ -410,20 +431,20 @@ public class JTreeTable extends JTable {
             TreeCellRenderer tcr = t.getCellRenderer();
             if (tcr instanceof DefaultTreeCellRenderer) {
                 Object node = t.getPathForRow(offsetRow).
-                                getLastPathComponent();
+                        getLastPathComponent();
                 Icon icon;
                 if (t.getModel().isLeaf(node))
-                    icon = ((DefaultTreeCellRenderer)tcr).getLeafIcon();
+                    icon = ((DefaultTreeCellRenderer) tcr).getLeafIcon();
                 else if (tree.isExpanded(offsetRow))
-                    icon = ((DefaultTreeCellRenderer)tcr).getOpenIcon();
+                    icon = ((DefaultTreeCellRenderer) tcr).getOpenIcon();
                 else
-                    icon = ((DefaultTreeCellRenderer)tcr).getClosedIcon();
+                    icon = ((DefaultTreeCellRenderer) tcr).getClosedIcon();
                 if (icon != null) {
-                    offset += ((DefaultTreeCellRenderer)tcr).getIconTextGap() +
-                              icon.getIconWidth();
+                    offset += ((DefaultTreeCellRenderer) tcr).getIconTextGap() +
+                            icon.getIconWidth();
                 }
             }
-            ((TreeTableTextField)getComponent()).offset = offset;
+            ((TreeTableTextField) getComponent()).offset = offset;
             return component;
         }
 
@@ -433,7 +454,7 @@ public class JTreeTable extends JTable {
          */
         public boolean isCellEditable(EventObject e) {
             if (e instanceof MouseEvent) {
-                MouseEvent me = (MouseEvent)e;
+                MouseEvent me = (MouseEvent) e;
                 // If the modifiers are not 0 (or the left mouse button),
                 // tree may try and toggle the selection, and table
                 // will then try and toggle, resulting in the
@@ -441,16 +462,16 @@ public class JTreeTable extends JTable {
                 // only dispatch when the modifiers are 0 (or the left mouse
                 // button).
                 if (me.getModifiers() == 0 ||
-                    me.getModifiers() == InputEvent.BUTTON1_MASK) {
+                        me.getModifiers() == InputEvent.BUTTON1_MASK) {
                     for (int counter = getColumnCount() - 1; counter >= 0;
                          counter--) {
                         if (getColumnClass(counter) == TreeTableModel.class) {
                             MouseEvent newME = new MouseEvent
-                                  (JTreeTable.this.tree, me.getID(),
-                                   me.getWhen(), me.getModifiers(),
-                                   me.getX() - getCellRect(0, counter, true).x,
-                                   me.getY(), me.getClickCount(),
-                                   me.isPopupTrigger());
+                                    (JTreeTable.this.tree, me.getID(),
+                                            me.getWhen(), me.getModifiers(),
+                                            me.getX() - getCellRect(0, counter, true).x,
+                                            me.getY(), me.getClickCount(),
+                                            me.isPopupTrigger());
                             JTreeTable.this.tree.dispatchEvent(newME);
                             break;
                         }
@@ -491,13 +512,15 @@ public class JTreeTable extends JTable {
      * in the DefaultTreeSelectionModel.
      */
     class ListToTreeSelectionModelWrapper extends DefaultTreeSelectionModel {
-        /** Set to true when we are updating the ListSelectionModel. */
-        protected boolean         updatingListSelectionModel;
+        /**
+         * Set to true when we are updating the ListSelectionModel.
+         */
+        protected boolean updatingListSelectionModel;
 
         public ListToTreeSelectionModelWrapper() {
             super();
             getListSelectionModel().addListSelectionListener
-                                    (createListSelectionListener());
+                    (createListSelectionListener());
         }
 
         /**
@@ -515,12 +538,11 @@ public class JTreeTable extends JTable {
          * alters the ListSelectionModel.
          */
         public void resetRowSelection() {
-            if(!updatingListSelectionModel) {
+            if (!updatingListSelectionModel) {
                 updatingListSelectionModel = true;
                 try {
                     super.resetRowSelection();
-                }
-                finally {
+                } finally {
                     updatingListSelectionModel = false;
                 }
             }
@@ -544,29 +566,28 @@ public class JTreeTable extends JTable {
          * selection model.
          */
         protected void updateSelectedPathsFromSelectedRows() {
-            if(!updatingListSelectionModel) {
+            if (!updatingListSelectionModel) {
                 updatingListSelectionModel = true;
                 try {
                     // This is way expensive, ListSelectionModel needs an
                     // enumerator for iterating.
-                    int        min = listSelectionModel.getMinSelectionIndex();
-                    int        max = listSelectionModel.getMaxSelectionIndex();
+                    int min = listSelectionModel.getMinSelectionIndex();
+                    int max = listSelectionModel.getMaxSelectionIndex();
 
                     clearSelection();
-                    if(min != -1 && max != -1) {
-                        for(int counter = min; counter <= max; counter++) {
-                            if(listSelectionModel.isSelectedIndex(counter)) {
-                                TreePath     selPath = tree.getPathForRow
-                                                            (counter);
+                    if (min != -1 && max != -1) {
+                        for (int counter = min; counter <= max; counter++) {
+                            if (listSelectionModel.isSelectedIndex(counter)) {
+                                TreePath selPath = tree.getPathForRow
+                                        (counter);
 
-                                if(selPath != null) {
+                                if (selPath != null) {
                                     addSelectionPath(selPath);
                                 }
                             }
                         }
                     }
-                }
-                finally {
+                } finally {
                     updatingListSelectionModel = false;
                 }
             }

@@ -25,6 +25,7 @@
 import com.sun.jdi.*;
 import com.sun.jdi.request.*;
 import com.sun.jdi.event.*;
+
 import java.util.*;
 import java.io.*;
 
@@ -95,7 +96,7 @@ abstract public class TestScaffold extends TargetAdapter {
         if (ourVMDeathRequest != null) {
             Iterator myIter = eventSet.iterator();
             while (myIter.hasNext()) {
-                Event myEvent = (Event)myIter.next();
+                Event myEvent = (Event) myIter.next();
                 if (!(myEvent instanceof VMDeathEvent)) {
                     // We assume that an EventSet contains only VMDeathEvents
                     // or no VMDeathEvents.
@@ -165,7 +166,7 @@ abstract public class TestScaffold extends TargetAdapter {
      */
     protected void createDefaultExceptionRequest() {
         ourExceptionRequest = requestManager.createExceptionRequest(null,
-                                                                false, true);
+                false, true);
 
         // We can't afford to make this be other than SUSPEND_NONE.  Otherwise,
         // it would have to be resumed.  If our connect() listener resumes it,
@@ -185,33 +186,33 @@ abstract public class TestScaffold extends TargetAdapter {
 
         private void notifyEvent(TargetListener listener, Event event) {
             if (event instanceof BreakpointEvent) {
-                listener.breakpointReached((BreakpointEvent)event);
+                listener.breakpointReached((BreakpointEvent) event);
             } else if (event instanceof ExceptionEvent) {
-                listener.exceptionThrown((ExceptionEvent)event);
+                listener.exceptionThrown((ExceptionEvent) event);
             } else if (event instanceof StepEvent) {
-                listener.stepCompleted((StepEvent)event);
+                listener.stepCompleted((StepEvent) event);
             } else if (event instanceof ClassPrepareEvent) {
-                listener.classPrepared((ClassPrepareEvent)event);
+                listener.classPrepared((ClassPrepareEvent) event);
             } else if (event instanceof ClassUnloadEvent) {
-                listener.classUnloaded((ClassUnloadEvent)event);
+                listener.classUnloaded((ClassUnloadEvent) event);
             } else if (event instanceof MethodEntryEvent) {
-                listener.methodEntered((MethodEntryEvent)event);
+                listener.methodEntered((MethodEntryEvent) event);
             } else if (event instanceof MethodExitEvent) {
-                listener.methodExited((MethodExitEvent)event);
+                listener.methodExited((MethodExitEvent) event);
             } else if (event instanceof AccessWatchpointEvent) {
-                listener.fieldAccessed((AccessWatchpointEvent)event);
+                listener.fieldAccessed((AccessWatchpointEvent) event);
             } else if (event instanceof ModificationWatchpointEvent) {
-                listener.fieldModified((ModificationWatchpointEvent)event);
+                listener.fieldModified((ModificationWatchpointEvent) event);
             } else if (event instanceof ThreadStartEvent) {
-                listener.threadStarted((ThreadStartEvent)event);
+                listener.threadStarted((ThreadStartEvent) event);
             } else if (event instanceof ThreadDeathEvent) {
-                listener.threadDied((ThreadDeathEvent)event);
+                listener.threadDied((ThreadDeathEvent) event);
             } else if (event instanceof VMStartEvent) {
-                listener.vmStarted((VMStartEvent)event);
+                listener.vmStarted((VMStartEvent) event);
             } else if (event instanceof VMDeathEvent) {
-                listener.vmDied((VMDeathEvent)event);
+                listener.vmDied((VMDeathEvent) event);
             } else if (event instanceof VMDisconnectEvent) {
-                listener.vmDisconnected((VMDisconnectEvent)event);
+                listener.vmDisconnected((VMDisconnectEvent) event);
             } else {
                 throw new InternalError("Unknown event type: " + event.getClass());
             }
@@ -220,15 +221,15 @@ abstract public class TestScaffold extends TargetAdapter {
         private void traceSuspendPolicy(int policy) {
             if (shouldTrace) {
                 switch (policy) {
-                case EventRequest.SUSPEND_NONE:
-                    traceln("TS: eventHandler: suspend = SUSPEND_NONE");
-                    break;
-                case EventRequest.SUSPEND_ALL:
-                    traceln("TS: eventHandler: suspend = SUSPEND_ALL");
-                    break;
-                case EventRequest.SUSPEND_EVENT_THREAD:
-                    traceln("TS: eventHandler: suspend = SUSPEND_EVENT_THREAD");
-                    break;
+                    case EventRequest.SUSPEND_NONE:
+                        traceln("TS: eventHandler: suspend = SUSPEND_NONE");
+                        break;
+                    case EventRequest.SUSPEND_ALL:
+                        traceln("TS: eventHandler: suspend = SUSPEND_ALL");
+                        break;
+                    case EventRequest.SUSPEND_EVENT_THREAD:
+                        traceln("TS: eventHandler: suspend = SUSPEND_EVENT_THREAD");
+                        break;
                 }
             }
         }
@@ -242,7 +243,7 @@ abstract public class TestScaffold extends TargetAdapter {
                     synchronized (listeners) {
                         ListIterator iter = listeners.listIterator();
                         while (iter.hasNext()) {
-                            TargetListener listener = (TargetListener)iter.next();
+                            TargetListener listener = (TargetListener) iter.next();
                             traceln("TS: eventHandler: listener = " + listener);
                             listener.eventSetReceived(set);
                             if (listener.shouldRemoveListener()) {
@@ -250,7 +251,7 @@ abstract public class TestScaffold extends TargetAdapter {
                             } else {
                                 Iterator jter = set.iterator();
                                 while (jter.hasNext()) {
-                                    Event event = (Event)jter.next();
+                                    Event event = (Event) jter.next();
                                     traceln("TS: eventHandler:    event = " + event.getClass());
 
                                     if (event instanceof VMDisconnectEvent) {
@@ -285,7 +286,7 @@ abstract public class TestScaffold extends TargetAdapter {
                     failure("FAILED: Exception occured in eventHandler: " + e);
                     e.printStackTrace();
                     connected = false;
-                    synchronized(TestScaffold.this) {
+                    synchronized (TestScaffold.this) {
                         // This will make the waiters such as waitForVMDisconnect
                         // exit their wait loops.
                         vmDisconnected = true;
@@ -337,7 +338,7 @@ abstract public class TestScaffold extends TargetAdapter {
                 System.in.read();
                 System.err.println("running...");
 
-            } catch(Exception e) {
+            } catch (Exception e) {
             }
         }
     }
@@ -412,12 +413,12 @@ abstract public class TestScaffold extends TargetAdapter {
      * from the debuggee and distributes them to listeners.  That thread
      * keeps running until a VMDisconnectedEvent occurs or some exception
      * occurs during its processing.
-     *
+     * <p>
      * The 'listenUntilVMDisconnect' method adds 'this' as a listener.
      * This means that 'this's vmDied method will get called.  This has a
      * default impl in TargetAdapter.java which can be overridden in the
      * testcase.
-     *
+     * <p>
      * waitForRequestedEvent also adds an adaptor listener that listens
      * for the particular event it is supposed to wait for (and it also
      * catches VMDisconnectEvents.)  This listener is removed once
@@ -430,56 +431,57 @@ abstract public class TestScaffold extends TargetAdapter {
 
         argInfo.targetVMArgs += VMConnection.getDebuggeeVMOptions();
         connection = new VMConnection(argInfo.connectorSpec,
-                                      argInfo.traceFlags);
+                argInfo.traceFlags);
 
         addListener(new TargetAdapter() {
-                public void eventSetComplete(EventSet set) {
-                    if (TestScaffold.this.containsOurVMDeathRequest(set)) {
-                        traceln("TS: connect: set.resume() called");
-                        set.resume();
+            public void eventSetComplete(EventSet set) {
+                if (TestScaffold.this.containsOurVMDeathRequest(set)) {
+                    traceln("TS: connect: set.resume() called");
+                    set.resume();
 
-                        // Note that we want to do the above resume before
-                        // waking up any sleepers.
-                        synchronized(TestScaffold.this) {
-                            TestScaffold.this.notifyAll();
-                        }
-                    }
-                }
-
-                public void vmStarted(VMStartEvent event) {
-                    synchronized(TestScaffold.this) {
-                        vmStartThread = event.thread();
+                    // Note that we want to do the above resume before
+                    // waking up any sleepers.
+                    synchronized (TestScaffold.this) {
                         TestScaffold.this.notifyAll();
                     }
                 }
-                /**
-                 * By default, we catch uncaught exceptions and print a msg.
-                 * The testcase must override the createDefaultExceptionRequest
-                 * method if it doesn't want this behavior.
-                 */
-                public void exceptionThrown(ExceptionEvent event) {
-                    if (TestScaffold.this.ourExceptionRequest != null &&
+            }
+
+            public void vmStarted(VMStartEvent event) {
+                synchronized (TestScaffold.this) {
+                    vmStartThread = event.thread();
+                    TestScaffold.this.notifyAll();
+                }
+            }
+
+            /**
+             * By default, we catch uncaught exceptions and print a msg.
+             * The testcase must override the createDefaultExceptionRequest
+             * method if it doesn't want this behavior.
+             */
+            public void exceptionThrown(ExceptionEvent event) {
+                if (TestScaffold.this.ourExceptionRequest != null &&
                         TestScaffold.this.ourExceptionRequest.equals(
-                                                        event.request())) {
-                        println("Note: Unexpected Debuggee Exception: " +
-                                event.exception().referenceType().name() +
-                                " at line " + event.location().lineNumber());
-                        TestScaffold.this.exceptionCaught = true;
-                    }
+                                event.request())) {
+                    println("Note: Unexpected Debuggee Exception: " +
+                            event.exception().referenceType().name() +
+                            " at line " + event.location().lineNumber());
+                    TestScaffold.this.exceptionCaught = true;
                 }
+            }
 
-                public void vmDied(VMDeathEvent event) {
-                    vmDied = true;
-                    traceln("TS: vmDied called");
-                }
+            public void vmDied(VMDeathEvent event) {
+                vmDied = true;
+                traceln("TS: vmDied called");
+            }
 
-                public void vmDisconnected(VMDisconnectEvent event) {
-                    synchronized(TestScaffold.this) {
-                        vmDisconnected = true;
-                        TestScaffold.this.notifyAll();
-                    }
+            public void vmDisconnected(VMDisconnectEvent event) {
+                synchronized (TestScaffold.this) {
+                    vmDisconnected = true;
+                    TestScaffold.this.notifyAll();
                 }
-            });
+            }
+        });
         if (connection.connector().name().equals("com.sun.jdi.CommandLineLaunch")) {
             if (argInfo.targetVMArgs.length() > 0) {
                 if (connection.connectorArg("options").length() > 0) {
@@ -523,8 +525,8 @@ abstract public class TestScaffold extends TargetAdapter {
 
     protected void listenUntilVMDisconnect() {
         try {
-            addListener (this);
-        } catch (Exception ex){
+            addListener(this);
+        } catch (Exception ex) {
             ex.printStackTrace();
             testFailed = true;
         } finally {
@@ -609,14 +611,14 @@ abstract public class TestScaffold extends TargetAdapter {
 
     private StepEvent doStep(ThreadReference thread, int gran, int depth) {
         final StepRequest sr =
-                  requestManager.createStepRequest(thread, gran, depth);
+                requestManager.createStepRequest(thread, gran, depth);
 
         sr.addClassExclusionFilter("java.*");
         sr.addClassExclusionFilter("sun.*");
         sr.addClassExclusionFilter("com.sun.*");
         sr.addCountFilter(1);
         sr.enable();
-        StepEvent retEvent = (StepEvent)waitForRequestedEvent(sr);
+        StepEvent retEvent = (StepEvent) waitForRequestedEvent(sr);
         requestManager.deleteEventRequest(sr);
         return retEvent;
     }
@@ -643,17 +645,17 @@ abstract public class TestScaffold extends TargetAdapter {
 
     public BreakpointEvent resumeTo(Location loc) {
         final BreakpointRequest request =
-            requestManager.createBreakpointRequest(loc);
+                requestManager.createBreakpointRequest(loc);
         request.addCountFilter(1);
         request.enable();
-        return (BreakpointEvent)waitForRequestedEvent(request);
+        return (BreakpointEvent) waitForRequestedEvent(request);
     }
 
     public ReferenceType findReferenceType(String name) {
         List rts = vm.classesByName(name);
         Iterator iter = rts.iterator();
         while (iter.hasNext()) {
-            ReferenceType rt = (ReferenceType)iter.next();
+            ReferenceType rt = (ReferenceType) iter.next();
             if (rt.name().equals(name)) {
                 return rt;
             }
@@ -665,9 +667,9 @@ abstract public class TestScaffold extends TargetAdapter {
         List methods = rt.methods();
         Iterator iter = methods.iterator();
         while (iter.hasNext()) {
-            Method method = (Method)iter.next();
+            Method method = (Method) iter.next();
             if (method.name().equals(name) &&
-                method.signature().equals(signature)) {
+                    method.signature().equals(signature)) {
                 return method;
             }
         }
@@ -675,7 +677,7 @@ abstract public class TestScaffold extends TargetAdapter {
     }
 
     public Location findLocation(ReferenceType rt, int lineNumber)
-                         throws AbsentInformationException {
+            throws AbsentInformationException {
         List locs = rt.locationsOfLine(lineNumber);
         if (locs.size() == 0) {
             throw new IllegalArgumentException("Bad line number");
@@ -683,11 +685,11 @@ abstract public class TestScaffold extends TargetAdapter {
             throw new IllegalArgumentException("Line number has multiple locations");
         }
 
-        return (Location)locs.get(0);
+        return (Location) locs.get(0);
     }
 
     public BreakpointEvent resumeTo(String clsName, String methodName,
-                                         String methodSignature) {
+                                    String methodSignature) {
         ReferenceType rt = findReferenceType(clsName);
         if (rt == null) {
             rt = resumeToPrepareOf(clsName).referenceType();
@@ -712,11 +714,11 @@ abstract public class TestScaffold extends TargetAdapter {
 
     public ClassPrepareEvent resumeToPrepareOf(String className) {
         final ClassPrepareRequest request =
-            requestManager.createClassPrepareRequest();
+                requestManager.createClassPrepareRequest();
         request.addClassFilter(className);
         request.addCountFilter(1);
         request.enable();
-        return (ClassPrepareEvent)waitForRequestedEvent(request);
+        return (ClassPrepareEvent) waitForRequestedEvent(request);
     }
 
     public void resumeToVMDisconnect() {
@@ -735,13 +737,13 @@ abstract public class TestScaffold extends TargetAdapter {
 
     public void shutdown(String message) {
         traceln("TS: shutdown: vmDied= " + vmDied +
-                 ", vmDisconnected= " + vmDisconnected +
-                 ", connection = " + connection);
+                ", vmDisconnected= " + vmDisconnected +
+                ", connection = " + connection);
 
         if ((connection != null)) {
             try {
                 connection.disposeVM();
-             } catch (VMDisconnectedException e) {
+            } catch (VMDisconnectedException e) {
                 // Shutting down after the VM has gone away. This is
                 // not an error, and we just ignore it.
             }

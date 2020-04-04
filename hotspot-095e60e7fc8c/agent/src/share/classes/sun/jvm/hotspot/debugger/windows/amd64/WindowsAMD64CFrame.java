@@ -31,50 +31,52 @@ import sun.jvm.hotspot.debugger.cdbg.basic.*;
 import sun.jvm.hotspot.debugger.windbg.*;
 
 public class WindowsAMD64CFrame extends BasicCFrame {
-  private Address rbp;
-  private Address pc;
+    private Address rbp;
+    private Address pc;
 
-  private static final int ADDRESS_SIZE = 8;
+    private static final int ADDRESS_SIZE = 8;
 
-  /** Constructor for topmost frame */
-  public WindowsAMD64CFrame(WindbgDebugger dbg, Address rbp, Address pc) {
-    super(dbg.getCDebugger());
-    this.rbp = rbp;
-    this.pc  = pc;
-    this.dbg = dbg;
-  }
-
-  public CFrame sender(ThreadProxy thread) {
-    AMD64ThreadContext context = (AMD64ThreadContext) thread.getContext();
-    Address rsp = context.getRegisterAsAddress(AMD64ThreadContext.RSP);
-
-    if ( (rbp == null) || rbp.lessThan(rsp) ) {
-      return null;
+    /**
+     * Constructor for topmost frame
+     */
+    public WindowsAMD64CFrame(WindbgDebugger dbg, Address rbp, Address pc) {
+        super(dbg.getCDebugger());
+        this.rbp = rbp;
+        this.pc = pc;
+        this.dbg = dbg;
     }
 
-    // Check alignment of rbp
-    if ( dbg.getAddressValue(rbp) % ADDRESS_SIZE != 0) {
-        return null;
+    public CFrame sender(ThreadProxy thread) {
+        AMD64ThreadContext context = (AMD64ThreadContext) thread.getContext();
+        Address rsp = context.getRegisterAsAddress(AMD64ThreadContext.RSP);
+
+        if ((rbp == null) || rbp.lessThan(rsp)) {
+            return null;
+        }
+
+        // Check alignment of rbp
+        if (dbg.getAddressValue(rbp) % ADDRESS_SIZE != 0) {
+            return null;
+        }
+
+        Address nextRBP = rbp.getAddressAt(0 * ADDRESS_SIZE);
+        if (nextRBP == null || nextRBP.lessThanOrEqual(rbp)) {
+            return null;
+        }
+        Address nextPC = rbp.getAddressAt(1 * ADDRESS_SIZE);
+        if (nextPC == null) {
+            return null;
+        }
+        return new WindowsAMD64CFrame(dbg, nextRBP, nextPC);
     }
 
-    Address nextRBP = rbp.getAddressAt( 0 * ADDRESS_SIZE);
-    if (nextRBP == null || nextRBP.lessThanOrEqual(rbp)) {
-      return null;
+    public Address pc() {
+        return pc;
     }
-    Address nextPC  = rbp.getAddressAt( 1 * ADDRESS_SIZE);
-    if (nextPC == null) {
-      return null;
+
+    public Address localVariableBase() {
+        return rbp;
     }
-    return new WindowsAMD64CFrame(dbg, nextRBP, nextPC);
-  }
 
-  public Address pc() {
-    return pc;
-  }
-
-  public Address localVariableBase() {
-    return rbp;
-  }
-
-  private WindbgDebugger dbg;
+    private WindbgDebugger dbg;
 }

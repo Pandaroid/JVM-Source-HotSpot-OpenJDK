@@ -26,11 +26,13 @@ package sun.jvm.hotspot.utilities.soql;
 
 import java.util.*;
 import javax.script.ScriptException;
+
 import sun.jvm.hotspot.debugger.*;
 import sun.jvm.hotspot.memory.*;
 import sun.jvm.hotspot.oops.*;
 import sun.jvm.hotspot.runtime.*;
 import sun.jvm.hotspot.utilities.*;
+
 import java.lang.reflect.Method;
 
 public class JSJavaHeap extends DefaultScriptObject {
@@ -48,17 +50,17 @@ public class JSJavaHeap extends DefaultScriptObject {
     public Object get(String name) {
         int fieldID = getFieldID(name);
         switch (fieldID) {
-        case FIELD_CAPACITY:
-            return new Long(getCapacity());
-        case FIELD_USED:
-            return new Long(getUsed());
-        case FIELD_FOR_EACH_OBJECT:
-            return new MethodCallable(this, forEachObjectMethod);
-        case FIELD_FOR_EACH_CLASS:
-            return new MethodCallable(this, forEachClassMethod);
-        case FIELD_UNDEFINED:
-        default:
-            return super.get(name);
+            case FIELD_CAPACITY:
+                return new Long(getCapacity());
+            case FIELD_USED:
+                return new Long(getUsed());
+            case FIELD_FOR_EACH_OBJECT:
+                return new MethodCallable(this, forEachObjectMethod);
+            case FIELD_FOR_EACH_CLASS:
+                return new MethodCallable(this, forEachClassMethod);
+            case FIELD_UNDEFINED:
+            default:
+                return super.get(name);
         }
     }
 
@@ -90,51 +92,51 @@ public class JSJavaHeap extends DefaultScriptObject {
         Klass kls = null;
         Callable func = null;
         switch (args.length) {
-        case 3: {
-            Object b = args[2];
-            if (b != null && b instanceof Boolean) {
-                subtypes = ((Boolean)b).booleanValue();
+            case 3: {
+                Object b = args[2];
+                if (b != null && b instanceof Boolean) {
+                    subtypes = ((Boolean) b).booleanValue();
+                }
             }
-        }
-        case 2: {
-            Object k = args[1];
-            if (k == null) return;
-            if (k instanceof JSJavaKlass) {
-                kls = ((JSJavaKlass)k).getKlass();
-            } else if (k instanceof String) {
-                kls = SystemDictionaryHelper.findInstanceKlass((String)k);
-                if (kls == null) return;
+            case 2: {
+                Object k = args[1];
+                if (k == null) return;
+                if (k instanceof JSJavaKlass) {
+                    kls = ((JSJavaKlass) k).getKlass();
+                } else if (k instanceof String) {
+                    kls = SystemDictionaryHelper.findInstanceKlass((String) k);
+                    if (kls == null) return;
+                }
             }
-        }
-        case 1: {
-            Object f = args[0];
-            if (f != null && f instanceof Callable) {
-                func = (Callable) f;
-            } else {
-                // unknown target - just return
-                return ;
+            case 1: {
+                Object f = args[0];
+                if (f != null && f instanceof Callable) {
+                    func = (Callable) f;
+                } else {
+                    // unknown target - just return
+                    return;
+                }
             }
-        }
-        break;
+            break;
 
-        default:
-            return;
+            default:
+                return;
         }
 
         final Callable finalFunc = func;
-      HeapVisitor visitor = new DefaultHeapVisitor() {
-                public boolean doObj(Oop oop) {
-                    JSJavaObject jo = factory.newJSJavaObject(oop);
-                    if (jo != null) {
-                  try {
-                    finalFunc.call(new Object[] { jo });
-                  } catch (ScriptException exp) {
-                    throw new RuntimeException(exp);
-                  }
+        HeapVisitor visitor = new DefaultHeapVisitor() {
+            public boolean doObj(Oop oop) {
+                JSJavaObject jo = factory.newJSJavaObject(oop);
+                if (jo != null) {
+                    try {
+                        finalFunc.call(new Object[]{jo});
+                    } catch (ScriptException exp) {
+                        throw new RuntimeException(exp);
                     }
-                return false;
                 }
-            };
+                return false;
+            }
+        };
         ObjectHeap heap = VM.getVM().getObjectHeap();
         if (kls == null) {
             kls = SystemDictionaryHelper.findInstanceKlass("java.lang.Object");
@@ -146,67 +148,67 @@ public class JSJavaHeap extends DefaultScriptObject {
         boolean withLoader = false;
         Callable func = null;
         switch (args.length) {
-        case 2: {
-            Object b = args[1];
-            if (b instanceof Boolean) {
-                withLoader = ((Boolean)b).booleanValue();
+            case 2: {
+                Object b = args[1];
+                if (b instanceof Boolean) {
+                    withLoader = ((Boolean) b).booleanValue();
+                }
             }
-        }
-        case 1: {
-            Object f = args[0];
-            if (f instanceof Callable) {
-                func = (Callable) f;
-            } else {
+            case 1: {
+                Object f = args[0];
+                if (f instanceof Callable) {
+                    func = (Callable) f;
+                } else {
+                    return;
+                }
+            }
+            break;
+            default:
                 return;
-            }
-        }
-        break;
-        default:
-            return;
         }
 
-      final Callable finalFunc = func;
+        final Callable finalFunc = func;
         SystemDictionary sysDict = VM.getVM().getSystemDictionary();
         if (withLoader) {
             sysDict.classesDo(new SystemDictionary.ClassAndLoaderVisitor() {
-                    public void visit(Klass kls, Oop loader) {
-                        JSJavaKlass  jk = factory.newJSJavaKlass(kls);
-                        if (jk == null) {
-                            return;
-                        }
-                        JSJavaObject k = jk.getJSJavaClass();
-                        JSJavaObject l = factory.newJSJavaObject(loader);
-                        if (k != null) {
-                         if (k != null) {
-                       try {
-                               finalFunc.call(new Object[] { k, l });
-                       } catch (ScriptException exp) {
-                         throw new RuntimeException(exp);
-                       }
-                           }
-                        }
+                public void visit(Klass kls, Oop loader) {
+                    JSJavaKlass jk = factory.newJSJavaKlass(kls);
+                    if (jk == null) {
+                        return;
                     }
-                });
-
-        } else {
-            sysDict.classesDo(new SystemDictionary.ClassVisitor() {
-                    public void visit(Klass kls) {
-                        JSJavaKlass jk = factory.newJSJavaKlass(kls);
-                        if (jk == null) {
-                            return;
-                        }
-                        JSJavaClass k = jk.getJSJavaClass();
+                    JSJavaObject k = jk.getJSJavaClass();
+                    JSJavaObject l = factory.newJSJavaObject(loader);
+                    if (k != null) {
                         if (k != null) {
-                            if (k != null) {
-                        try {
-                                  finalFunc.call(new Object[] { k });
-                        } catch (ScriptException exp) {
-                          throw new RuntimeException(exp);
-                        }
+                            try {
+                                finalFunc.call(new Object[]{k, l});
+                            } catch (ScriptException exp) {
+                                throw new RuntimeException(exp);
                             }
                         }
                     }
-                });
+                }
+            });
+
+        } else {
+            sysDict.classesDo(new SystemDictionary.ClassVisitor() {
+                public void visit(Klass kls) {
+                    JSJavaKlass jk = factory.newJSJavaKlass(kls);
+                    if (jk == null) {
+                        return;
+                    }
+                    JSJavaClass k = jk.getJSJavaClass();
+                    if (k != null) {
+                        if (k != null) {
+                            try {
+                                finalFunc.call(new Object[]{k});
+                            } catch (ScriptException exp) {
+                                throw new RuntimeException(exp);
+                            }
+                        }
+                    }
+                }
+            });
         }
     }
 
@@ -222,13 +224,14 @@ public class JSJavaHeap extends DefaultScriptObject {
 
     //-- Internals only below this point
     private static Map fields = new HashMap();
+
     private static void addField(String name, int fieldId) {
         fields.put(name, new Integer(fieldId));
     }
 
     private static int getFieldID(String name) {
         Integer res = (Integer) fields.get(name);
-        return (res != null)? res.intValue() : FIELD_UNDEFINED;
+        return (res != null) ? res.intValue() : FIELD_UNDEFINED;
     }
 
     static {
@@ -236,17 +239,17 @@ public class JSJavaHeap extends DefaultScriptObject {
         addField("used", FIELD_USED);
         addField("forEachObject", FIELD_FOR_EACH_OBJECT);
         addField("forEachClass", FIELD_FOR_EACH_CLASS);
-      try {
-          Class myClass = JSJavaHeap.class;
-          forEachObjectMethod = myClass.getMethod("forEachObject",
-                                new Class[] { Object[].class });
-          forEachClassMethod = myClass.getMethod("forEachClass",
-                                new Class[] {Object[].class });
-      } catch (RuntimeException re) {
-          throw re;
-      } catch (Exception exp) {
-          throw new RuntimeException(exp);
-      }
+        try {
+            Class myClass = JSJavaHeap.class;
+            forEachObjectMethod = myClass.getMethod("forEachObject",
+                    new Class[]{Object[].class});
+            forEachClassMethod = myClass.getMethod("forEachClass",
+                    new Class[]{Object[].class});
+        } catch (RuntimeException re) {
+            throw re;
+        } catch (Exception exp) {
+            throw new RuntimeException(exp);
+        }
     }
 
     private long getCapacity() {

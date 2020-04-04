@@ -26,6 +26,7 @@ package sun.jvm.hotspot.tools;
 
 import sun.jvm.hotspot.utilities.HeapHprofBinWriter;
 import sun.jvm.hotspot.debugger.JVMDebugger;
+
 import java.io.IOException;
 
 /*
@@ -50,7 +51,7 @@ public class HeapDumper extends Tool {
 
     protected void printFlagsUsage() {
         System.out.println("    <no option>\tto dump heap to " +
-            DEFAULT_DUMP_FILE);
+                DEFAULT_DUMP_FILE);
         System.out.println("    -f <file>\tto dump heap to <file>");
         super.printFlagsUsage();
     }
@@ -73,8 +74,8 @@ public class HeapDumper extends Tool {
         if (args.length > 2) {
             if (args[0].equals("-f")) {
                 file = args[1];
-                String[] newargs = new String[args.length-2];
-                System.arraycopy(args, 2, newargs, 0, args.length-2);
+                String[] newargs = new String[args.length - 2];
+                System.arraycopy(args, 2, newargs, 0, args.length - 2);
                 args = newargs;
             }
         }

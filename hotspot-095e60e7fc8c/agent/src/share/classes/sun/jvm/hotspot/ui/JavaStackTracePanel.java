@@ -31,12 +31,14 @@ import javax.swing.event.*;
 import sun.jvm.hotspot.runtime.*;
 import sun.jvm.hotspot.ui.classbrowser.*;
 
-/** Provides Java stack trace of a Java Thread */
+/**
+ * Provides Java stack trace of a Java Thread
+ */
 
 public class JavaStackTracePanel extends JPanel {
-    private JSplitPane          splitPane;
-    private SAEditorPane        stackTraceEditor;
-    private SAEditorPane        contentEditor;
+    private JSplitPane splitPane;
+    private SAEditorPane stackTraceEditor;
+    private SAEditorPane contentEditor;
     private HTMLGenerator htmlGen = new HTMLGenerator();
 
     public JavaStackTracePanel() {
@@ -46,12 +48,12 @@ public class JavaStackTracePanel extends JPanel {
     private void initUI() {
         setLayout(new BorderLayout());
         HyperlinkListener hyperListener = new HyperlinkListener() {
-                         public void hyperlinkUpdate(HyperlinkEvent e) {
-                            if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                               setContentText(htmlGen.genHTMLForHyperlink(e.getDescription()));
-                            }
-                         }
-                      };
+            public void hyperlinkUpdate(HyperlinkEvent e) {
+                if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                    setContentText(htmlGen.genHTMLForHyperlink(e.getDescription()));
+                }
+            }
+        };
 
         stackTraceEditor = new SAEditorPane();
         stackTraceEditor.addHyperlinkListener(hyperListener);

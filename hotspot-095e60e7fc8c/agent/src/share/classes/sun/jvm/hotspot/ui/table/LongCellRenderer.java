@@ -39,7 +39,7 @@ public class LongCellRenderer extends DefaultTableCellRenderer {
     // Subclassed to set the background value
     public Component getTableCellRendererComponent(JTable table, Object value,
                                                    boolean isSelected, boolean hasFocus,
-                                                   int row, int column)  {
+                                                   int row, int column) {
         if (textField == null) {
             textField = new JFormattedTextField();
             textField.setFont(table.getFont());
@@ -47,16 +47,16 @@ public class LongCellRenderer extends DefaultTableCellRenderer {
         }
 
         textField.setForeground(isSelected ? table.getSelectionForeground() :
-                                table.getForeground());
+                table.getForeground());
         textField.setBackground(isSelected ? table.getSelectionBackground() :
-                                table.getBackground());
+                table.getBackground());
         if (hasFocus) {
             textField.setBorder(UIManager.getBorder("Table.focusCellHighlightBorder"));
         } else {
             textField.setBorder(noFocusBorder);
         }
 
-        textField.setValue((Long)value);
+        textField.setValue((Long) value);
 
         return textField;
     }

@@ -30,16 +30,13 @@ import javax.swing.KeyStroke;
 // Referenced classes of package com.sun.java.swing.action:
 //            DelegateAction, ActionManager
 
-public class OkAction extends DelegateAction
-{
+public class OkAction extends DelegateAction {
 
-    public OkAction()
-    {
+    public OkAction() {
         this(VALUE_SMALL_ICON);
     }
 
-    public OkAction(String iconPath)
-    {
+    public OkAction(String iconPath) {
         super("OK", ActionManager.getIcon(iconPath));
         putValue("ActionCommandKey", "ok-command");
         putValue("ShortDescription", "Acknowleges the action");

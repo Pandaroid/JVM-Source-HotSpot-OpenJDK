@@ -29,12 +29,11 @@ import sun.jvm.hotspot.oops.Instance;
 import sun.jvm.hotspot.oops.OopUtilities;
 
 public class StringReferenceImpl extends ObjectReferenceImpl
-    implements StringReference
-{
+        implements StringReference {
     private String value;
 
     StringReferenceImpl(VirtualMachine aVm, sun.jvm.hotspot.oops.Instance oRef) {
-        super(aVm,oRef);
+        super(aVm, oRef);
         value = OopUtilities.stringOopToString(oRef);
     }
 

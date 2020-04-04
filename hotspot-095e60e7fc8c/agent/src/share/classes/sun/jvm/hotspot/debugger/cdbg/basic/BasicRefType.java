@@ -28,44 +28,48 @@ import sun.jvm.hotspot.debugger.*;
 import sun.jvm.hotspot.debugger.cdbg.*;
 
 public class BasicRefType extends BasicType implements RefType {
-  private Type targetType;
+    private Type targetType;
 
-  public BasicRefType(String name, int size, Type targetType) {
-    this(name, size, targetType, 0);
-  }
-
-  private BasicRefType(String name, int size, Type targetType, int cvAttributes) {
-    super(name, size, cvAttributes);
-    this.targetType = targetType;
-    if (!((BasicType) targetType).isLazy()) {
-      computeName();
+    public BasicRefType(String name, int size, Type targetType) {
+        this(name, size, targetType, 0);
     }
-  }
 
-  public RefType asRef() { return this; }
+    private BasicRefType(String name, int size, Type targetType, int cvAttributes) {
+        super(name, size, cvAttributes);
+        this.targetType = targetType;
+        if (!((BasicType) targetType).isLazy()) {
+            computeName();
+        }
+    }
 
-  public Type getTargetType() { return targetType; }
+    public RefType asRef() {
+        return this;
+    }
 
-  Type resolveTypes(BasicCDebugInfoDataBase db, ResolveListener listener) {
-    super.resolveTypes(db, listener);
-    targetType = db.resolveType(this, targetType, listener, "resolving ref type");
-    computeName();
-    return this;
-  }
+    public Type getTargetType() {
+        return targetType;
+    }
 
-  public void iterateObject(Address a, ObjectVisitor v, FieldIdentifier f) {
-    v.doRef(f, a.getAddressAt(0));
-  }
+    Type resolveTypes(BasicCDebugInfoDataBase db, ResolveListener listener) {
+        super.resolveTypes(db, listener);
+        targetType = db.resolveType(this, targetType, listener, "resolving ref type");
+        computeName();
+        return this;
+    }
 
-  protected Type createCVVariant(int cvAttributes) {
-    return new BasicRefType(getName(), getSize(), getTargetType(), cvAttributes);
-  }
+    public void iterateObject(Address a, ObjectVisitor v, FieldIdentifier f) {
+        v.doRef(f, a.getAddressAt(0));
+    }
 
-  public void visit(TypeVisitor v) {
-    v.doRefType(this);
-  }
+    protected Type createCVVariant(int cvAttributes) {
+        return new BasicRefType(getName(), getSize(), getTargetType(), cvAttributes);
+    }
 
-  private void computeName() {
-    setName(targetType.getName() + " &");
-  }
+    public void visit(TypeVisitor v) {
+        v.doRefType(this);
+    }
+
+    private void computeName() {
+        setName(targetType.getName() + " &");
+    }
 }

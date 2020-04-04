@@ -26,6 +26,7 @@ package sun.jvm.hotspot.runtime.solaris_amd64;
 
 import java.io.*;
 import java.util.*;
+
 import sun.jvm.hotspot.debugger.*;
 import sun.jvm.hotspot.debugger.amd64.*;
 import sun.jvm.hotspot.runtime.*;
@@ -59,18 +60,18 @@ public class SolarisAMD64JavaThreadPDAccess implements JavaThreadPDAccess {
         Type type = db.lookupType("JavaThread");
         Type anchorType = db.lookupType("JavaFrameAnchor");
 
-        lastJavaFPField    = anchorType.getAddressField("_last_Java_fp");
-        osThreadField      = type.getAddressField("_osthread");
+        lastJavaFPField = anchorType.getAddressField("_last_Java_fp");
+        osThreadField = type.getAddressField("_osthread");
 
         type = db.lookupType("OSThread");
-        osThreadThreadIDField   = type.getCIntegerField("_thread_id");
+        osThreadThreadIDField = type.getCIntegerField("_thread_id");
     }
 
-    public    Address getLastJavaFP(Address addr) {
+    public Address getLastJavaFP(Address addr) {
         return lastJavaFPField.getValue(addr.addOffsetTo(sun.jvm.hotspot.runtime.JavaThread.getAnchorField().getOffset()));
     }
 
-    public    Address getLastJavaPC(Address addr) {
+    public Address getLastJavaPC(Address addr) {
         return null;
     }
 
@@ -83,8 +84,8 @@ public class SolarisAMD64JavaThreadPDAccess implements JavaThreadPDAccess {
         if (fp == null) {
             return null; // no information
         }
-        Address pc =  thread.getLastJavaPC();
-        if ( pc != null ) {
+        Address pc = thread.getLastJavaPC();
+        if (pc != null) {
             return new X86Frame(thread.getLastJavaSP(), fp, pc);
         } else {
             return new X86Frame(thread.getLastJavaSP(), fp);

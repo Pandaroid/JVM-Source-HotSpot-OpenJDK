@@ -30,16 +30,13 @@ import javax.swing.KeyStroke;
 // Referenced classes of package com.sun.java.swing.action:
 //            DelegateAction, ActionManager
 
-public class HelpAction extends DelegateAction
-{
+public class HelpAction extends DelegateAction {
 
-    public HelpAction()
-    {
+    public HelpAction() {
         this("general/Help16.gif");
     }
 
-    public HelpAction(String iconPath)
-    {
+    public HelpAction(String iconPath) {
         super("Help", ActionManager.getIcon(iconPath));
         putValue("ActionCommandKey", "help-command");
         putValue("ShortDescription", "Help...");

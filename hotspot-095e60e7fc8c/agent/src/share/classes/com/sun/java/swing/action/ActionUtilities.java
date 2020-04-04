@@ -27,18 +27,15 @@ package com.sun.java.swing.action;
 
 import javax.swing.ImageIcon;
 
-class ActionUtilities
-{
+class ActionUtilities {
 
-    ActionUtilities()
-    {
+    ActionUtilities() {
     }
 
-    public ImageIcon getIcon(String name)
-    {
+    public ImageIcon getIcon(String name) {
         String imagePath = "/toolbarButtonGraphics/" + name;
         java.net.URL url = getClass().getResource(imagePath);
-        if(url != null)
+        if (url != null)
             return new ImageIcon(url);
         else
             return null;

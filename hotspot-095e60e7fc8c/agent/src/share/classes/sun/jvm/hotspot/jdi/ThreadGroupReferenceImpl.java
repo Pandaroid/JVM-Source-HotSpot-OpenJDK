@@ -29,11 +29,11 @@ import sun.jvm.hotspot.oops.Instance;
 import sun.jvm.hotspot.oops.OopUtilities;
 import sun.jvm.hotspot.runtime.JavaThread;
 import com.sun.jdi.*;
+
 import java.util.*;
 
 public class ThreadGroupReferenceImpl extends ObjectReferenceImpl
-    implements ThreadGroupReference
-{
+        implements ThreadGroupReference {
     ThreadGroupReferenceImpl(VirtualMachine aVm, sun.jvm.hotspot.oops.Oop oRef) {
         super(aVm, oRef);
     }
@@ -47,8 +47,8 @@ public class ThreadGroupReferenceImpl extends ObjectReferenceImpl
     }
 
     public ThreadGroupReference parent() {
-        return (ThreadGroupReferenceImpl)vm.threadGroupMirror(
-               (Instance)OopUtilities.threadGroupOopGetParent(ref()));
+        return (ThreadGroupReferenceImpl) vm.threadGroupMirror(
+                (Instance) OopUtilities.threadGroupOopGetParent(ref()));
     }
 
     public void suspend() {
@@ -69,7 +69,7 @@ public class ThreadGroupReferenceImpl extends ObjectReferenceImpl
         for (int ii = 0; ii < myThreads.length; ii++) {
             JavaThread jt = OopUtilities.threadOopGetJavaThread(myThreads[ii]);
             if (jt != null) {
-                ThreadReferenceImpl xx = (ThreadReferenceImpl)vm.threadMirror(jt);
+                ThreadReferenceImpl xx = (ThreadReferenceImpl) vm.threadMirror(jt);
                 myList.add(xx);
             }
         }
@@ -80,8 +80,8 @@ public class ThreadGroupReferenceImpl extends ObjectReferenceImpl
         Oop[] myGroups = OopUtilities.threadGroupOopGetGroups(ref());
         ArrayList myList = new ArrayList(myGroups.length);
         for (int ii = 0; ii < myGroups.length; ii++) {
-            ThreadGroupReferenceImpl xx = (ThreadGroupReferenceImpl)vm.threadGroupMirror(
-                                          (Instance)myGroups[ii]);
+            ThreadGroupReferenceImpl xx = (ThreadGroupReferenceImpl) vm.threadGroupMirror(
+                    (Instance) myGroups[ii]);
             myList.add(xx);
 
         }
@@ -90,6 +90,6 @@ public class ThreadGroupReferenceImpl extends ObjectReferenceImpl
 
     public String toString() {
         return "instance of " + referenceType().name() +
-               "(name='" + name() + "', " + "id=" + uniqueID() + ")";
+                "(name='" + name() + "', " + "id=" + uniqueID() + ")";
     }
 }

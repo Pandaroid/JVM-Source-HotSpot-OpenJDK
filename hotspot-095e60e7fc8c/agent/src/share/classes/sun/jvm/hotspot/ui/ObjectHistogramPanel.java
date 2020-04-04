@@ -58,7 +58,7 @@ public class ObjectHistogramPanel extends JPanel implements ActionListener {
     private ObjectHistogramTableModel dataModel;
     private ObjectHistogramToolBar toolbar;
     private StatusBar statusBar;
-    private JTable     table;
+    private JTable table;
     private java.util.List listeners;
 
     public ObjectHistogramPanel(ObjectHistogram histo) {
@@ -68,12 +68,12 @@ public class ObjectHistogramPanel extends JPanel implements ActionListener {
         table = new JTable(dataModel, new ObjectHistogramColummModel());
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.addMouseListener(new MouseAdapter() {
-                public void mouseClicked(MouseEvent evt) {
-                    if (evt.getClickCount() == 2) {
-                        fireShowObjectsOfType();
-                    }
+            public void mouseClicked(MouseEvent evt) {
+                if (evt.getClickCount() == 2) {
+                    fireShowObjectsOfType();
                 }
-            });
+            }
+        });
 
         JTableHeader header = table.getTableHeader();
         header.setDefaultRenderer(new SortHeaderCellRenderer(header, dataModel));
@@ -161,8 +161,8 @@ public class ObjectHistogramPanel extends JPanel implements ActionListener {
      * A table model which encapsulates the ObjectHistogram
      */
     private class ObjectHistogramTableModel extends SortableTableModel {
-        private String[] columnNames = { "Size", "Count", "Class Description" };
-        private Class[] columnClasses = { Long.class, Long.class, String.class };
+        private String[] columnNames = {"Size", "Count", "Class Description"};
+        private Class[] columnClasses = {Long.class, Long.class, String.class};
 
         public ObjectHistogramTableModel(ObjectHistogram histo) {
             // Set the rows
@@ -192,16 +192,16 @@ public class ObjectHistogramPanel extends JPanel implements ActionListener {
         }
 
         public Object getValueForColumn(Object obj, int col) {
-            ObjectHistogramElement el = (ObjectHistogramElement)obj;
+            ObjectHistogramElement el = (ObjectHistogramElement) obj;
             switch (col) {
-            case 0:
-                return new Long(el.getSize());
-            case 1:
-                return new Long(el.getCount());
-            case 2:
-                return el.getDescription();
-            default:
-                throw new RuntimeException("Index (" + col + ") out of bounds");
+                case 0:
+                    return new Long(el.getSize());
+                case 1:
+                    return new Long(el.getCount());
+                case 2:
+                    return el.getDescription();
+                default:
+                    throw new RuntimeException("Index (" + col + ") out of bounds");
             }
         }
 
@@ -219,11 +219,11 @@ public class ObjectHistogramPanel extends JPanel implements ActionListener {
              * Returns the value for the comparing object for the
              * column.
              *
-             * @param obj Object that was passed for Comparator
+             * @param obj    Object that was passed for Comparator
              * @param column the column to retrieve
              */
             public Object getValueForColumn(Object obj, int column) {
-                ObjectHistogramTableModel omodel = (ObjectHistogramTableModel)model;
+                ObjectHistogramTableModel omodel = (ObjectHistogramTableModel) model;
                 return omodel.getValueForColumn(obj, column);
             }
         }
@@ -281,7 +281,7 @@ public class ObjectHistogramPanel extends JPanel implements ActionListener {
     /**
      * Find and select the row that contains the text in the find field starting
      * from the current selected row.
-     *
+     * <p>
      * Uses a linear search from the current row. Could be optimized withing the
      * model and internal representation.
      */
@@ -304,7 +304,7 @@ public class ObjectHistogramPanel extends JPanel implements ActionListener {
 
         String value;
         for (int i = row; i < model.getRowCount(); i++) {
-            value = (String)model.getValueAt(i, 2);
+            value = (String) model.getValueAt(i, 2);
             if (value != null && value.startsWith(findText)) {
                 table.setRowSelectionInterval(i, i);
                 Rectangle cellBounds = table.getCellRect(i, 0, true);
@@ -315,7 +315,7 @@ public class ObjectHistogramPanel extends JPanel implements ActionListener {
 
         // Wrap the table to search in the top rows.
         for (int i = 0; i < row; i++) {
-            value = (String)model.getValueAt(i, 2);
+            value = (String) model.getValueAt(i, 2);
             if (value != null && value.startsWith(findText)) {
                 table.setRowSelectionInterval(i, i);
                 Rectangle cellBounds = table.getCellRect(i, 0, true);

@@ -30,16 +30,13 @@ import javax.swing.KeyStroke;
 // Referenced classes of package com.sun.java.swing.action:
 //            StateChangeAction, ActionManager
 
-public class AlignLeftAction extends StateChangeAction
-{
+public class AlignLeftAction extends StateChangeAction {
 
-    public AlignLeftAction()
-    {
+    public AlignLeftAction() {
         this("text/AlignLeft16.gif");
     }
 
-    public AlignLeftAction(String iconPath)
-    {
+    public AlignLeftAction(String iconPath) {
         super("Left Align", ActionManager.getIcon(iconPath));
         putValue("ActionCommandKey", "align-left-command");
         putValue("ShortDescription", "Left Align");

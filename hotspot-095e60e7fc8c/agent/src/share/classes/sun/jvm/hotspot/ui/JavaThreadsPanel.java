@@ -54,26 +54,28 @@ import com.sun.java.swing.action.*;
 public class JavaThreadsPanel extends SAPanel implements ActionListener {
     private JavaThreadsTableModel dataModel;
     private StatusBar statusBar;
-    private JTable     threadTable;
+    private JTable threadTable;
     private java.util.List cachedThreads = new ArrayList();
 
 
-    /** Constructor assumes the threads panel is created while the VM is
-        suspended. Subsequent resume and suspend operations of the VM
-        will cause the threads panel to clear and fill itself back in,
-        respectively. */
+    /**
+     * Constructor assumes the threads panel is created while the VM is
+     * suspended. Subsequent resume and suspend operations of the VM
+     * will cause the threads panel to clear and fill itself back in,
+     * respectively.
+     */
     public JavaThreadsPanel() {
         VM.getVM().registerVMResumedObserver(new Observer() {
-                public void update(Observable o, Object data) {
-                    decache();
-                }
-            });
+            public void update(Observable o, Object data) {
+                decache();
+            }
+        });
 
         VM.getVM().registerVMSuspendedObserver(new Observer() {
-                public void update(Observable o, Object data) {
-                    cache();
-                }
-            });
+            public void update(Observable o, Object data) {
+                cache();
+            }
+        });
 
         cache();
 
@@ -85,13 +87,13 @@ public class JavaThreadsPanel extends SAPanel implements ActionListener {
         threadTable = new JTable(dataModel, new JavaThreadsColumnModel());
         threadTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         threadTable.addMouseListener(new MouseAdapter() {
-                public void mouseClicked(MouseEvent evt) {
-                    if (evt.getClickCount() == 2) {
-                        // double clicking will display the oop inspector.
-                        fireShowThreadOopInspector();
-                    }
+            public void mouseClicked(MouseEvent evt) {
+                if (evt.getClickCount() == 2) {
+                    // double clicking will display the oop inspector.
+                    fireShowThreadOopInspector();
                 }
-            });
+            }
+        });
 
         add(new JavaThreadsToolBar(statusBar), BorderLayout.NORTH);
         add(new ThreadPanel(threadTable), BorderLayout.CENTER);
@@ -134,29 +136,29 @@ public class JavaThreadsPanel extends SAPanel implements ActionListener {
             StateChangeAction action = manager.getStateChangeAction(ThreadInfoAction.VALUE_COMMAND);
             if (action != null) {
                 action.setItemListener(new ItemListener() {
-                        public void itemStateChanged(ItemEvent evt) {
-                            if (evt.getStateChange() == ItemEvent.SELECTED) {
-                                showOutputPane();
-                            } else {
-                                hideOutputPane();
-                            }
+                    public void itemStateChanged(ItemEvent evt) {
+                        if (evt.getStateChange() == ItemEvent.SELECTED) {
+                            showOutputPane();
+                        } else {
+                            hideOutputPane();
                         }
-                    });
+                    }
+                });
             }
 
             // A listener is added to listen to changes in row selection
             // and changes the contents of the ThreadInfoPanel.
             ListSelectionModel selModel = table.getSelectionModel();
             selModel.addListSelectionListener(new ListSelectionListener() {
-                    public void valueChanged(ListSelectionEvent evt) {
-                        if (evt.getValueIsAdjusting() == false) {
-                            setActionsEnabled(true);
-                            if (isInfoVisible()) {
-                                showCurrentThreadInfo();
-                            }
+                public void valueChanged(ListSelectionEvent evt) {
+                    if (evt.getValueIsAdjusting() == false) {
+                        setActionsEnabled(true);
+                        if (isInfoVisible()) {
+                            showCurrentThreadInfo();
                         }
                     }
-                });
+                }
+            });
         }
 
         /**
@@ -166,11 +168,11 @@ public class JavaThreadsPanel extends SAPanel implements ActionListener {
             return (splitPane.getBottomComponent() != null);
         }
 
-        private void showOutputPane()  {
-            if (splitPane.getBottomComponent() == null)  {
+        private void showOutputPane() {
+            if (splitPane.getBottomComponent() == null) {
                 splitPane.setBottomComponent(threadInfo);
 
-                if (dividerLocation == -1)  {
+                if (dividerLocation == -1) {
                     // Calculate the divider location from the pref size.
                     Dimension pSize = this.getSize();
                     dividerLocation = pSize.height / 2;
@@ -182,7 +184,7 @@ public class JavaThreadsPanel extends SAPanel implements ActionListener {
             }
         }
 
-        private void hideOutputPane()  {
+        private void hideOutputPane() {
             dividerLocation = splitPane.getDividerLocation();
             splitPane.remove(threadInfo);
             splitPane.setDividerSize(0);
@@ -223,7 +225,7 @@ public class JavaThreadsPanel extends SAPanel implements ActionListener {
     }
 
     private class JavaThreadsColumnModel extends DefaultTableColumnModel {
-        private String[] columnNames = { "OS Thread ID", "Java Thread Name" };
+        private String[] columnNames = {"OS Thread ID", "Java Thread Name"};
 
         public JavaThreadsColumnModel() {
             // Should actually get the line metrics for
@@ -252,7 +254,7 @@ public class JavaThreadsPanel extends SAPanel implements ActionListener {
      * Encapsulates the set of threads in a table model
      */
     private class JavaThreadsTableModel extends AbstractTableModel {
-        private String[] columnNames = { "OS Thread ID", "Java Thread Name" };
+        private String[] columnNames = {"OS Thread ID", "Java Thread Name"};
 
         private java.util.List elements;
 
@@ -275,12 +277,12 @@ public class JavaThreadsPanel extends SAPanel implements ActionListener {
         public Object getValueAt(int row, int col) {
             CachedThread thread = getRow(row);
             switch (col) {
-            case 0:
-                return thread.getThreadID();
-            case 1:
-                return thread.getThreadName();
-            default:
-                throw new RuntimeException("Index (" + col + ", " + row + ") out of bounds");
+                case 0:
+                    return thread.getThreadID();
+                case 1:
+                    return thread.getThreadName();
+                default:
+                    throw new RuntimeException("Index (" + col + ", " + row + ") out of bounds");
             }
         }
 
@@ -292,7 +294,7 @@ public class JavaThreadsPanel extends SAPanel implements ActionListener {
         }
 
         private CachedThread getRow(int row) {
-            return (CachedThread)elements.get(row);
+            return (CachedThread) elements.get(row);
         }
 
         private String threadIDAt(int index) {
@@ -326,16 +328,16 @@ public class JavaThreadsPanel extends SAPanel implements ActionListener {
                 statusBar.setMessage("No thread crashes encountered");
             }
         } else if (command.equals(JavaStackTraceAction.VALUE_COMMAND)) {
-           fireShowJavaStackTrace();
+            fireShowJavaStackTrace();
         }
     }
 
     // Cached data for a thread
     private class CachedThread {
         private JavaThread thread;
-        private String     threadID;
-        private String     threadName;
-        private boolean    computed;
+        private String threadID;
+        private String threadName;
+        private boolean computed;
 
         public CachedThread(JavaThread thread) {
             this.thread = thread;
@@ -364,7 +366,7 @@ public class JavaThreadsPanel extends SAPanel implements ActionListener {
         private void compute() {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             thread.printThreadIDOn(new PrintStream(bos));
-            threadID   = bos.toString();
+            threadID = bos.toString();
             threadName = thread.getThreadName();
 
             computed = true;
@@ -393,7 +395,6 @@ public class JavaThreadsPanel extends SAPanel implements ActionListener {
         DelegateAction action = manager.getDelegateAction(actionName);
         action.addActionListener(this);
     }
-
 
 
     private void fireShowThreadOopInspector() {

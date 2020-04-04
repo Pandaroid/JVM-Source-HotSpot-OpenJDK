@@ -31,142 +31,146 @@ import sun.jvm.hotspot.runtime.*;
 import sun.jvm.hotspot.types.*;
 import sun.jvm.hotspot.utilities.*;
 
-/** A very simple data structure representing a contigous region of
-    address space. */
+/**
+ * A very simple data structure representing a contigous region of
+ * address space.
+ */
 
 public class MemRegion implements Cloneable {
-  private Address start;
-  private long byteSize;
+    private Address start;
+    private long byteSize;
 
-  private static AddressField  startField;
-  private static CIntegerField wordSizeField;
+    private static AddressField startField;
+    private static CIntegerField wordSizeField;
 
-  static {
-    VM.registerVMInitializedObserver(new Observer() {
-        public void update(Observable o, Object data) {
-          initialize(VM.getVM().getTypeDataBase());
+    static {
+        VM.registerVMInitializedObserver(new Observer() {
+            public void update(Observable o, Object data) {
+                initialize(VM.getVM().getTypeDataBase());
+            }
+        });
+    }
+
+    private static synchronized void initialize(TypeDataBase db) {
+        Type type = db.lookupType("MemRegion");
+
+        startField = type.getAddressField("_start");
+        wordSizeField = type.getCIntegerField("_word_size");
+    }
+
+    public MemRegion() {
+    }
+
+    /**
+     * This constructor takes a "MemRegion*" in the target process
+     */
+    public MemRegion(Address memRegionAddr) {
+        this(startField.getValue(memRegionAddr),
+                wordSizeField.getValue(memRegionAddr));
+    }
+
+    public MemRegion(Address start, long wordSize) {
+        setStart(start);
+        setWordSize(wordSize);
+    }
+
+    public MemRegion(Address start, Address limit) {
+        setStart(start);
+        byteSize = limit.minus(start);
+    }
+
+    public Object clone() {
+        return new MemRegion(start, byteSize);
+    }
+
+    public MemRegion copy() {
+        return (MemRegion) clone();
+    }
+
+    public MemRegion intersection(MemRegion mr2) {
+        MemRegion res = new MemRegion();
+        if (AddressOps.gt(mr2.start(), start())) {
+            res.setStart(mr2.start());
+        } else {
+            res.setStart(start());
         }
-      });
-  }
-
-  private static synchronized void initialize(TypeDataBase db) {
-    Type type = db.lookupType("MemRegion");
-
-    startField    = type.getAddressField("_start");
-    wordSizeField = type.getCIntegerField("_word_size");
-  }
-
-  public MemRegion() {
-  }
-
-  /** This constructor takes a "MemRegion*" in the target process */
-  public MemRegion(Address memRegionAddr) {
-    this(startField.getValue(memRegionAddr),
-         wordSizeField.getValue(memRegionAddr));
-  }
-
-  public MemRegion(Address start, long wordSize) {
-    setStart(start);
-    setWordSize(wordSize);
-  }
-
-  public MemRegion(Address start, Address limit) {
-    setStart(start);
-    byteSize = limit.minus(start);
-  }
-
-  public Object clone() {
-    return new MemRegion(start, byteSize);
-  }
-
-  public MemRegion copy() {
-    return (MemRegion) clone();
-  }
-
-  public MemRegion intersection(MemRegion mr2) {
-    MemRegion res = new MemRegion();
-    if (AddressOps.gt(mr2.start(), start())) {
-      res.setStart(mr2.start());
-    } else {
-      res.setStart(start());
+        Address resEnd;
+        Address end = end();
+        Address mr2End = mr2.end();
+        if (AddressOps.lt(end, mr2End)) {
+            resEnd = end;
+        } else {
+            resEnd = mr2End;
+        }
+        if (AddressOps.lt(resEnd, res.start())) {
+            res.setStart(null);
+            res.setWordSize(0);
+        } else {
+            res.setEnd(resEnd);
+        }
+        return res;
     }
-    Address resEnd;
-    Address end = end();
-    Address mr2End = mr2.end();
-    if (AddressOps.lt(end, mr2End)) {
-      resEnd = end;
-    } else {
-      resEnd = mr2End;
+
+    public MemRegion union(MemRegion mr2) {
+        MemRegion res = new MemRegion();
+        if (AddressOps.lt(mr2.start(), start())) {
+            res.setStart(mr2.start());
+        } else {
+            res.setStart(start());
+        }
+        Address resEnd;
+        Address end = end();
+        Address mr2End = mr2.end();
+        if (AddressOps.gt(end, mr2End)) {
+            resEnd = end;
+        } else {
+            resEnd = mr2End;
+        }
+        res.setEnd(resEnd);
+        return res;
     }
-    if (AddressOps.lt(resEnd, res.start())) {
-      res.setStart(null);
-      res.setWordSize(0);
-    } else {
-      res.setEnd(resEnd);
+
+    public Address start() {
+        return start;
     }
-    return res;
-  }
 
-  public MemRegion union(MemRegion mr2) {
-    MemRegion res = new MemRegion();
-    if (AddressOps.lt(mr2.start(), start())) {
-      res.setStart(mr2.start());
-    } else {
-      res.setStart(start());
+    public OopHandle startAsOopHandle() {
+        return start().addOffsetToAsOopHandle(0);
     }
-    Address resEnd;
-    Address end = end();
-    Address mr2End = mr2.end();
-    if (AddressOps.gt(end, mr2End)) {
-      resEnd = end;
-    } else {
-      resEnd = mr2End;
+
+    public Address end() {
+        return start.addOffsetTo(byteSize);
     }
-    res.setEnd(resEnd);
-    return res;
-  }
 
-  public Address start() {
-    return start;
-  }
+    public OopHandle endAsOopHandle() {
+        return end().addOffsetToAsOopHandle(0);
+    }
 
-  public OopHandle startAsOopHandle() {
-    return start().addOffsetToAsOopHandle(0);
-  }
+    public void setStart(Address start) {
+        this.start = start;
+    }
 
-  public Address end() {
-    return start.addOffsetTo(byteSize);
-  }
+    public void setEnd(Address end) {
+        byteSize = end.minus(start);
+    }
 
-  public OopHandle endAsOopHandle() {
-    return end().addOffsetToAsOopHandle(0);
-  }
+    public void setWordSize(long wordSize) {
+        byteSize = VM.getVM().getAddressSize() * wordSize;
+    }
 
-  public void setStart(Address start) {
-    this.start = start;
-  }
+    public boolean contains(MemRegion mr2) {
+        return AddressOps.lte(start, mr2.start) && AddressOps.gte(end(), mr2.end());
+    }
 
-  public void setEnd(Address end) {
-    byteSize = end.minus(start);
-  }
+    public boolean contains(Address addr) {
+        return AddressOps.gte(addr, start()) && AddressOps.lt(addr, end());
+    }
 
-  public void setWordSize(long wordSize) {
-    byteSize = VM.getVM().getAddressSize() * wordSize;
-  }
+    public long byteSize() {
+        return byteSize;
+    }
 
-  public boolean contains(MemRegion mr2) {
-    return AddressOps.lte(start, mr2.start) && AddressOps.gte(end(), mr2.end());
-  }
-
-  public boolean contains(Address addr) {
-    return AddressOps.gte(addr, start()) && AddressOps.lt(addr, end());
-  }
-
-  public long byteSize() {
-    return byteSize;
-  }
-
-  public long wordSize() {
-    return byteSize / VM.getVM().getAddressSize();
-  }
+    public long wordSize() {
+        return byteSize / VM.getVM().getAddressSize();
+    }
 }

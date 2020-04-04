@@ -26,8 +26,7 @@ package sun.jvm.hotspot.jdi;
 
 import com.sun.jdi.*;
 
-public abstract class TypeImpl extends MirrorImpl implements Type
-{
+public abstract class TypeImpl extends MirrorImpl implements Type {
     private String typeName;
 
     TypeImpl(VirtualMachine aVm) {
@@ -46,9 +45,9 @@ public abstract class TypeImpl extends MirrorImpl implements Type
 
     public boolean equals(Object obj) {
         if ((obj != null) && (obj instanceof Type)) {
-            Type other = (Type)obj;
+            Type other = (Type) obj;
             return signature().equals(other.signature()) &&
-                   super.equals(obj);
+                    super.equals(obj);
         } else {
             return false;
         }

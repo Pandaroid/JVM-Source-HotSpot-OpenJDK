@@ -33,13 +33,14 @@ import sun.jvm.hotspot.oops.TypeArrayKlass;
 import sun.jvm.hotspot.oops.Klass;
 import sun.jvm.hotspot.oops.Instance;
 import sun.jvm.hotspot.oops.Symbol;
+
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 
 public class ArrayTypeImpl extends ReferenceTypeImpl implements ArrayType {
-  protected ArrayTypeImpl(VirtualMachine aVm, ArrayKlass aRef) {
+    protected ArrayTypeImpl(VirtualMachine aVm, ArrayKlass aRef) {
         super(aVm, aRef);
     }
 
@@ -62,14 +63,14 @@ public class ArrayTypeImpl extends ReferenceTypeImpl implements ArrayType {
             // primitive array klasses are loaded by bootstrap loader
             return null;
         } else {
-            Klass bottomKlass = ((ObjArrayKlass)ref()).getBottomKlass();
+            Klass bottomKlass = ((ObjArrayKlass) ref()).getBottomKlass();
             if (bottomKlass instanceof TypeArrayKlass) {
                 // multidimensional primitive array klasses are loaded by bootstrap loader
                 return null;
             } else {
                 // class loader of any other obj array klass is same as the loader
                 // that loaded the bottom InstanceKlass
-                Instance xx = (Instance)(((InstanceKlass) bottomKlass).getClassLoader());
+                Instance xx = (Instance) (((InstanceKlass) bottomKlass).getClassLoader());
                 return vm.classLoaderMirror(xx);
             }
         }
@@ -95,7 +96,7 @@ public class ArrayTypeImpl extends ReferenceTypeImpl implements ArrayType {
     public Type componentType() throws ClassNotLoadedException {
         ArrayKlass k = (ArrayKlass) ref();
         if (k instanceof ObjArrayKlass) {
-            Klass elementKlass = ((ObjArrayKlass)k).getElementKlass();
+            Klass elementKlass = ((ObjArrayKlass) k).getElementKlass();
             if (elementKlass == null) {
                 throw new ClassNotLoadedException(componentSignature());
             } else {
@@ -113,12 +114,12 @@ public class ArrayTypeImpl extends ReferenceTypeImpl implements ArrayType {
             // component types.
             return source.equals(destination);
         } else {
-           if (destination instanceof PrimitiveType) {
+            if (destination instanceof PrimitiveType) {
                 return false;
             }
 
-            ReferenceTypeImpl refSource = (ReferenceTypeImpl)source;
-            ReferenceTypeImpl refDestination = (ReferenceTypeImpl)destination;
+            ReferenceTypeImpl refSource = (ReferenceTypeImpl) source;
+            ReferenceTypeImpl refDestination = (ReferenceTypeImpl) destination;
             // Assignment of object arrays requires availability
             // of widening conversion of component types
             return refSource.isAssignableTo(refDestination);
@@ -127,13 +128,13 @@ public class ArrayTypeImpl extends ReferenceTypeImpl implements ArrayType {
 
 
     /*
-    * Return true if an instance of the  given reference type
-    * can be assigned to a variable of this type
-    */
+     * Return true if an instance of the  given reference type
+     * can be assigned to a variable of this type
+     */
     boolean isAssignableTo(ReferenceType destType) {
         if (destType instanceof ArrayType) {
             try {
-                Type destComponentType = ((ArrayType)destType).componentType();
+                Type destComponentType = ((ArrayType) destType).componentType();
                 return isComponentAssignable(destComponentType, componentType());
             } catch (ClassNotLoadedException e) {
                 // One or both component types has not yet been
@@ -141,13 +142,13 @@ public class ArrayTypeImpl extends ReferenceTypeImpl implements ArrayType {
                 return false;
             }
         } else {
-            Symbol typeName = ((ReferenceTypeImpl)destType).typeNameAsSymbol();
+            Symbol typeName = ((ReferenceTypeImpl) destType).typeNameAsSymbol();
             if (destType instanceof InterfaceType) {
                 // Every array type implements java.io.Serializable and
                 // java.lang.Cloneable. fixme in JVMDI-JDI, includes only
                 // Cloneable but not Serializable.
                 return typeName.equals(vm.javaLangCloneable()) ||
-                       typeName.equals(vm.javaIoSerializable());
+                        typeName.equals(vm.javaIoSerializable());
             } else {
                 // Only valid ClassType assignee is Object
                 return typeName.equals(vm.javaLangObject());
@@ -181,7 +182,7 @@ public class ArrayTypeImpl extends ReferenceTypeImpl implements ArrayType {
             if (t instanceof PrimitiveType) {
                 return VMModifiers.FINAL | VMModifiers.PUBLIC;
             } else {
-                ReferenceType rt = (ReferenceType)t;
+                ReferenceType rt = (ReferenceType) t;
                 return rt.modifiers();
             }
         } catch (ClassNotLoadedException cnle) {
@@ -191,21 +192,37 @@ public class ArrayTypeImpl extends ReferenceTypeImpl implements ArrayType {
     }
 
     public String toString() {
-       return "array class " + name() + " (" + loaderString() + ")";
+        return "array class " + name() + " (" + loaderString() + ")";
     }
 
     /*
      * Save a pointless trip over the wire for these methods
      * which have undefined results for arrays.
      */
-    public boolean isPrepared() { return true; }
-    public boolean isVerified() { return true; }
-    public boolean isInitialized() { return true; }
-    public boolean failedToInitialize() { return false; }
-    public boolean isAbstract() { return false; }
+    public boolean isPrepared() {
+        return true;
+    }
+
+    public boolean isVerified() {
+        return true;
+    }
+
+    public boolean isInitialized() {
+        return true;
+    }
+
+    public boolean failedToInitialize() {
+        return false;
+    }
+
+    public boolean isAbstract() {
+        return false;
+    }
 
     /*
      * Defined always to be true for arrays
      */
-    public boolean isFinal() { return true; }
+    public boolean isFinal() {
+        return true;
+    }
 }

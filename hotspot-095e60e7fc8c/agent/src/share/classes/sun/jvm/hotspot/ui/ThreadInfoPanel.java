@@ -31,7 +31,9 @@ import javax.swing.*;
 import sun.jvm.hotspot.memory.*;
 import sun.jvm.hotspot.runtime.*;
 
-/** Provides implementation level info about a Java Thread */
+/**
+ * Provides implementation level info about a Java Thread
+ */
 
 public class ThreadInfoPanel extends JPanel {
 

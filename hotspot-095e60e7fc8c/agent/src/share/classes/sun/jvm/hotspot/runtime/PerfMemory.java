@@ -25,24 +25,25 @@
 package sun.jvm.hotspot.runtime;
 
 import java.util.*;
+
 import sun.jvm.hotspot.debugger.*;
 import sun.jvm.hotspot.oops.*;
 import sun.jvm.hotspot.types.*;
 
 public class PerfMemory {
-    private static AddressField  startField;
-    private static AddressField  endField;
-    private static AddressField  topField;
+    private static AddressField startField;
+    private static AddressField endField;
+    private static AddressField topField;
     private static CIntegerField capacityField;
-    private static AddressField  prologueField;
-    private static JIntField     initializedField;
+    private static AddressField prologueField;
+    private static JIntField initializedField;
 
     static {
         VM.registerVMInitializedObserver(new Observer() {
-                public void update(Observable o, Object data) {
-                    initialize(VM.getVM().getTypeDataBase());
-                }
-            });
+            public void update(Observable o, Object data) {
+                initialize(VM.getVM().getTypeDataBase());
+            }
+        });
     }
 
     private static synchronized void initialize(TypeDataBase db) {
@@ -78,13 +79,13 @@ public class PerfMemory {
 
     public static PerfDataPrologue prologue() {
         return (PerfDataPrologue) VMObjectFactory.newObject(
-                   PerfDataPrologue.class, prologueField.getValue());
+                PerfDataPrologue.class, prologueField.getValue());
     }
 
     public static boolean contains(Address addr) {
         return start() != null &&
-            addr.minus(start()) >= 0 &&
-            end().minus(addr) > 0;
+                addr.minus(start()) >= 0 &&
+                end().minus(addr) > 0;
     }
 
     // an interface supplied to iterate PerfDataEntries
@@ -101,7 +102,7 @@ public class PerfMemory {
 
         for (int i = 0; i < num; i++) {
             PerfDataEntry pde = (PerfDataEntry) VMObjectFactory.newObject(
-                               PerfDataEntry.class, addr.addOffsetTo(off));
+                    PerfDataEntry.class, addr.addOffsetTo(off));
             off += pde.entryLength();
             if (visitor.visit(pde) == false) return;
         }

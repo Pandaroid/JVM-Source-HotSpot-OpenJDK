@@ -31,7 +31,7 @@ import sun.jvm.hotspot.utilities.*;
 
 public class ProcAMD64Thread implements ThreadProxy {
     private ProcDebugger debugger;
-    private int         id;
+    private int id;
 
     public ProcAMD64Thread(ProcDebugger debugger, Address addr) {
         this.debugger = debugger;
@@ -39,7 +39,7 @@ public class ProcAMD64Thread implements ThreadProxy {
         // FIXME: the size here should be configurable. However, making it
         // so would produce a dependency on the "types" package from the
         // debugger package, which is not desired.
-        this.id       = (int) addr.getCIntegerAt(0, 4, true);
+        this.id = (int) addr.getCIntegerAt(0, 4, true);
     }
 
     public ProcAMD64Thread(ProcDebugger debugger, long id) {
@@ -64,7 +64,7 @@ public class ProcAMD64Thread implements ThreadProxy {
     }
 
     public void setContext(ThreadContext context)
-    throws IllegalThreadStateException, DebuggerException {
+            throws IllegalThreadStateException, DebuggerException {
         throw new DebuggerException("Unimplemented");
     }
 

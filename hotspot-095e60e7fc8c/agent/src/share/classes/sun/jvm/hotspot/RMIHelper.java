@@ -28,6 +28,7 @@ import java.io.*;
 import java.net.*;
 import java.rmi.*;
 import java.rmi.registry.*;
+
 import sun.jvm.hotspot.debugger.DebuggerException;
 
 public class RMIHelper {
@@ -55,7 +56,7 @@ public class RMIHelper {
         }
 
         tmp = System.getProperty("sun.jvm.hotspot.rmi.serverNamePrefix");
-        serverNamePrefix = (tmp != null)? serverNamePrefix : "SARemoteDebugger";
+        serverNamePrefix = (tmp != null) ? serverNamePrefix : "SARemoteDebugger";
     }
 
     public static void rebind(String uniqueID, Remote object) throws DebuggerException {
@@ -119,12 +120,12 @@ public class RMIHelper {
     private static String getName(String uniqueID) {
         String name = null;
         if (uniqueID != null) {
-           name = serverNamePrefix + "_" + uniqueID;
+            name = serverNamePrefix + "_" + uniqueID;
         } else {
-           name = serverNamePrefix;
+            name = serverNamePrefix;
         }
         if (port != Registry.REGISTRY_PORT) {
-           name = "//localhost:" + port + "/" + name;
+            name = "//localhost:" + port + "/" + name;
         }
         return name;
     }

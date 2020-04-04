@@ -27,10 +27,11 @@ package sun.jvm.hotspot.ui;
 import java.awt.datatransfer.*;
 import java.io.IOException;
 
-/** String transferable for drag-and-drop.
-
-    @author Shannon Hickey
-*/
+/**
+ * String transferable for drag-and-drop.
+ *
+ * @author Shannon Hickey
+ */
 
 class StringTransferable implements Transferable {
 

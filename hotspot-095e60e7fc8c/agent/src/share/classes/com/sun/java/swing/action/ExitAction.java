@@ -30,11 +30,9 @@ import javax.swing.KeyStroke;
 // Referenced classes of package com.sun.java.swing.action:
 //            DelegateAction, ActionManager
 
-public class ExitAction extends DelegateAction
-{
+public class ExitAction extends DelegateAction {
 
-    public ExitAction()
-    {
+    public ExitAction() {
         super("Exit", ActionManager.getIcon(VALUE_SMALL_ICON));
         putValue("ActionCommandKey", "exit-command");
         putValue("ShortDescription", "Exits the application");

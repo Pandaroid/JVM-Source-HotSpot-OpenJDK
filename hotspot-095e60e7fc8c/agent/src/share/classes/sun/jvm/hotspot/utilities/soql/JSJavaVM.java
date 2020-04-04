@@ -25,25 +25,26 @@
 package sun.jvm.hotspot.utilities.soql;
 
 import java.util.*;
+
 import sun.jvm.hotspot.debugger.*;
 import sun.jvm.hotspot.oops.*;
 import sun.jvm.hotspot.runtime.*;
 
 public class JSJavaVM extends DefaultScriptObject {
     private static final int FIELD_ADDRESS_SIZE = 0;
-    private static final int FIELD_BUILD_INFO   = 1;
-    private static final int FIELD_CPU          = 2;
-    private static final int FIELD_FLAGS        = 3;
-    private static final int FIELD_HEAP         = 4;
-    private static final int FIELD_OS           = 5;
-    private static final int FIELD_SYS_PROPS    = 6;
-    private static final int FIELD_THREADS      = 7;
-    private static final int FIELD_TYPE         = 8;
-    private static final int FIELD_VERSION      = 9;
-    private static final int FIELD_CLASS_PATH   = 10;
-    private static final int FIELD_BOOT_CLASS_PATH  = 11;
-    private static final int FIELD_USER_DIR     = 12;
-    private static final int FIELD_UNDEFINED    = -1;
+    private static final int FIELD_BUILD_INFO = 1;
+    private static final int FIELD_CPU = 2;
+    private static final int FIELD_FLAGS = 3;
+    private static final int FIELD_HEAP = 4;
+    private static final int FIELD_OS = 5;
+    private static final int FIELD_SYS_PROPS = 6;
+    private static final int FIELD_THREADS = 7;
+    private static final int FIELD_TYPE = 8;
+    private static final int FIELD_VERSION = 9;
+    private static final int FIELD_CLASS_PATH = 10;
+    private static final int FIELD_BOOT_CLASS_PATH = 11;
+    private static final int FIELD_USER_DIR = 12;
+    private static final int FIELD_UNDEFINED = -1;
 
     public JSJavaVM(JSJavaFactory factory) {
         this.factory = factory;
@@ -53,35 +54,35 @@ public class JSJavaVM extends DefaultScriptObject {
     public Object get(String name) {
         int fieldID = getFieldID(name);
         switch (fieldID) {
-        case FIELD_ADDRESS_SIZE:
-            return new Long(getVMBit());
-        case FIELD_BUILD_INFO:
-            return vm.getVMInternalInfo();
-        case FIELD_CPU:
-            return vm.getCPU();
-        case FIELD_FLAGS:
-            return getFlags();
-        case FIELD_HEAP:
-            return getHeap();
-        case FIELD_OS:
-            return vm.getOS();
-        case FIELD_SYS_PROPS:
-            return getSysProps();
-        case FIELD_THREADS:
-            return getThreads();
-        case FIELD_TYPE:
-            return getType();
-        case FIELD_VERSION:
-            return vm.getVMRelease();
-        case FIELD_CLASS_PATH:
-            return getClassPath();
-        case FIELD_BOOT_CLASS_PATH:
-            return getBootClassPath();
-        case FIELD_USER_DIR:
-            return getUserDir();
-        case FIELD_UNDEFINED:
-        default:
-            return super.get(name);
+            case FIELD_ADDRESS_SIZE:
+                return new Long(getVMBit());
+            case FIELD_BUILD_INFO:
+                return vm.getVMInternalInfo();
+            case FIELD_CPU:
+                return vm.getCPU();
+            case FIELD_FLAGS:
+                return getFlags();
+            case FIELD_HEAP:
+                return getHeap();
+            case FIELD_OS:
+                return vm.getOS();
+            case FIELD_SYS_PROPS:
+                return getSysProps();
+            case FIELD_THREADS:
+                return getThreads();
+            case FIELD_TYPE:
+                return getType();
+            case FIELD_VERSION:
+                return vm.getVMRelease();
+            case FIELD_CLASS_PATH:
+                return getClassPath();
+            case FIELD_BOOT_CLASS_PATH:
+                return getBootClassPath();
+            case FIELD_USER_DIR:
+                return getUserDir();
+            case FIELD_UNDEFINED:
+            default:
+                return super.get(name);
         }
     }
 
@@ -122,13 +123,14 @@ public class JSJavaVM extends DefaultScriptObject {
 
     //-- Internals only below this point
     private static Map fields = new HashMap();
+
     private static void addField(String name, int fieldId) {
         fields.put(name, new Integer(fieldId));
     }
 
     private static int getFieldID(String name) {
         Integer res = (Integer) fields.get(name);
-        return (res != null)? res.intValue() : FIELD_UNDEFINED;
+        return (res != null) ? res.intValue() : FIELD_UNDEFINED;
     }
 
     static {
@@ -225,10 +227,10 @@ public class JSJavaVM extends DefaultScriptObject {
         return vm.getSystemProperty("user.dir");
     }
 
-    private JSMap      flagsCache;
+    private JSMap flagsCache;
     private JSJavaHeap heapCache;
-    private JSMap      sysPropsCache;
-    private JSList     threadsCache;
+    private JSMap sysPropsCache;
+    private JSList threadsCache;
     private final JSJavaFactory factory;
     private final VM vm;
 }

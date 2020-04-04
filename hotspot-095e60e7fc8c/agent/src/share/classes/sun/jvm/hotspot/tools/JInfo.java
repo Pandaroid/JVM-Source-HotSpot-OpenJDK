@@ -63,14 +63,14 @@ public class JInfo extends Tool {
     public void run() {
         Tool tool = null;
         switch (mode) {
-        case MODE_FLAGS:
-            printVMFlags();
-            return;
-        case MODE_SYSPROPS:
-            tool = new SysPropsDumper();
-            break;
-        case MODE_BOTH: {
-            tool = new Tool() {
+            case MODE_FLAGS:
+                printVMFlags();
+                return;
+            case MODE_SYSPROPS:
+                tool = new SysPropsDumper();
+                break;
+            case MODE_BOTH: {
+                tool = new Tool() {
                     public void run() {
                         Tool sysProps = new SysPropsDumper();
                         sysProps.setAgent(getAgent());
@@ -86,9 +86,9 @@ public class JInfo extends Tool {
             }
             break;
 
-        default:
-            usage();
-            break;
+            default:
+                usage();
+                break;
         }
         tool.setAgent(getAgent());
         tool.run();
@@ -97,41 +97,41 @@ public class JInfo extends Tool {
     public static void main(String[] args) {
         int mode = -1;
         switch (args.length) {
-        case 1:
-            if (args[0].charAt(0) == '-') {
-                // -h or -help or some invalid flag
-                new JInfo(mode).usage();
-            } else {
-                mode = MODE_BOTH;
-            }
-            break;
-        case 2:
-        case 3: {
-            String modeFlag = args[0];
-            if (modeFlag.equals("-flags")) {
-                mode = MODE_FLAGS;
-            } else if (modeFlag.equals("-sysprops")) {
-                mode = MODE_SYSPROPS;
-            } else if (modeFlag.charAt(0) == '-') {
-                // -h or -help or some invalid flag
-                new JInfo(mode).usage();
-            } else {
-                mode = MODE_BOTH;
-            }
-
-            if (mode != MODE_BOTH) {
-                // we have to consume first flag argument.
-                String[] newArgs = new String[args.length - 1];
-                for (int i = 0; i < newArgs.length; i++) {
-                    newArgs[i] = args[i + 1];
+            case 1:
+                if (args[0].charAt(0) == '-') {
+                    // -h or -help or some invalid flag
+                    new JInfo(mode).usage();
+                } else {
+                    mode = MODE_BOTH;
                 }
-                args = newArgs;
-            }
-            break;
-        }
+                break;
+            case 2:
+            case 3: {
+                String modeFlag = args[0];
+                if (modeFlag.equals("-flags")) {
+                    mode = MODE_FLAGS;
+                } else if (modeFlag.equals("-sysprops")) {
+                    mode = MODE_SYSPROPS;
+                } else if (modeFlag.charAt(0) == '-') {
+                    // -h or -help or some invalid flag
+                    new JInfo(mode).usage();
+                } else {
+                    mode = MODE_BOTH;
+                }
 
-        default:
-            new JInfo(mode).usage();
+                if (mode != MODE_BOTH) {
+                    // we have to consume first flag argument.
+                    String[] newArgs = new String[args.length - 1];
+                    for (int i = 0; i < newArgs.length; i++) {
+                        newArgs[i] = args[i + 1];
+                    }
+                    args = newArgs;
+                }
+                break;
+            }
+
+            default:
+                new JInfo(mode).usage();
         }
 
         JInfo jinfo = new JInfo(mode);

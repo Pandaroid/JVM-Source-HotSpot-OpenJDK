@@ -23,6 +23,7 @@
  */
 
 import com.sun.jdi.*;
+
 import java.util.*;
 
 
@@ -33,8 +34,8 @@ import java.util.*;
 class comparator implements Comparator {
 
     public int compare(Object o1, Object o2) {
-        ReferenceType rt1 = (ReferenceType)o1;
-        ReferenceType rt2 = (ReferenceType)o2;
+        ReferenceType rt1 = (ReferenceType) o1;
+        ReferenceType rt2 = (ReferenceType) o2;
         return rt1.signature().compareTo(rt2.signature());
     }
 
@@ -70,6 +71,7 @@ public class sagdoit {
         doClasses();  //fixme jj: uncomment this to see all class info
 
     }
+
     public void doThreadGroups() {
         doThreadGroupList(myVm.topLevelThreadGroups());
     }
@@ -81,8 +83,8 @@ public class sagdoit {
         }
 
         Iterator myIter = groups.iterator();
-        while(myIter.hasNext()) {
-            ThreadGroupReference aGroup = (ThreadGroupReference)myIter.next();
+        while (myIter.hasNext()) {
+            ThreadGroupReference aGroup = (ThreadGroupReference) myIter.next();
             doOneThreadGroup(aGroup);
         }
 
@@ -112,8 +114,8 @@ public class sagdoit {
             return;
         }
         Iterator myIter = threads.iterator();
-        while(myIter.hasNext()) {
-            ThreadReference aThread = (ThreadReference)myIter.next();
+        while (myIter.hasNext()) {
+            ThreadReference aThread = (ThreadReference) myIter.next();
             doOneThread(aThread);
         }
     }
@@ -159,14 +161,14 @@ public class sagdoit {
             return;
         }
         indent(4);
-        for (Iterator it = localVars.iterator(); it.hasNext();) {
+        for (Iterator it = localVars.iterator(); it.hasNext(); ) {
             LocalVariable lv = (LocalVariable) it.next();
             pp("lv name = " + lv.name() +
-               ", type =  " + lv.typeName() +
-               ", sig =   " + lv.signature() +
-               ", gsig =  " + lv.genericSignature() +
-               ", isVis = " + lv.isVisible(frame) +
-               ", isArg = " + lv.isArgument());
+                    ", type =  " + lv.typeName() +
+                    ", sig =   " + lv.signature() +
+                    ", gsig =  " + lv.genericSignature() +
+                    ", isVis = " + lv.isVisible(frame) +
+                    ", isArg = " + lv.isArgument());
         }
         indent(-4);
     }
@@ -178,7 +180,7 @@ public class sagdoit {
         for (int ii = 0; ii < myClasses.size(); ii++) {
             // Spec says each is a ReferenceType
             //System.out.println("class " + (ii + 1) + " is " + myClasses.get(ii));
-            ReferenceType aClass = (ReferenceType)myClasses.get(ii);
+            ReferenceType aClass = (ReferenceType) myClasses.get(ii);
             System.out.println("class " + (ii + 1) + " is " + aClass.signature());
             doOneClass(aClass);
             // Uncomment this to just do a few classes.
@@ -200,103 +202,120 @@ public class sagdoit {
         doReferenceTypeFields(xx);
 
 
-
-
-
         String className = xx.getClass().getName();
         pp("subclass           = " + className);
 
-         Class referenceType = null;
-         Class arrayType = null;
-         Class classType = null;
-         Class interfaceType = null;
+        Class referenceType = null;
+        Class arrayType = null;
+        Class classType = null;
+        Class interfaceType = null;
 
-         try {
-             referenceType = Class.forName("com.sun.jdi.ReferenceType");
-             arrayType = Class.forName("com.sun.jdi.ArrayType");
-             interfaceType = Class.forName("com.sun.jdi.InterfaceType");
-             classType = Class.forName("com.sun.jdi.ClassType");
-         } catch (ClassNotFoundException ee) {
-         }
+        try {
+            referenceType = Class.forName("com.sun.jdi.ReferenceType");
+            arrayType = Class.forName("com.sun.jdi.ArrayType");
+            interfaceType = Class.forName("com.sun.jdi.InterfaceType");
+            classType = Class.forName("com.sun.jdi.ClassType");
+        } catch (ClassNotFoundException ee) {
+        }
 
 
-         if (referenceType.isInstance(xx)) {
-             pp("ReferenceType fields");
-             ReferenceType rr = (ReferenceType)xx;
+        if (referenceType.isInstance(xx)) {
+            pp("ReferenceType fields");
+            ReferenceType rr = (ReferenceType) xx;
 
-             if (arrayType.isInstance(xx)) {
-                 pp("ArrayType fields");
-             }
+            if (arrayType.isInstance(xx)) {
+                pp("ArrayType fields");
+            }
 
-             if (classType.isInstance(xx)) {
-                 pp("ClassType fields");
-             }
+            if (classType.isInstance(xx)) {
+                pp("ClassType fields");
+            }
 
-             if (interfaceType.isInstance(xx)) {
-                 pp("InterfaceType fields");
-             }
-         }
+            if (interfaceType.isInstance(xx)) {
+                pp("InterfaceType fields");
+            }
+        }
         indent(-5);
 
     }
 
 
-  public void doReferenceTypeFields(ReferenceType xx) {
-    Object zz;
-      pp("classLoader() = " + xx.classLoader());
-      try {zz =xx.sourceName();} catch(AbsentInformationException ee) { zz = ee;} pp("sourceName() = " + zz);
-      try {zz =xx.sourceNames("stratum");} catch(AbsentInformationException ee) { zz = ee;} pp("sourceNames() = " + zz);
-      try {zz =xx.sourcePaths("stratum");} catch(AbsentInformationException ee) { zz = ee;} pp("sourcePaths() = " + zz);
-      //try {zz =xx.sourceDebugExtension();} catch(AbsentInformationException ee) { zz = ee;} pp("sourceDebugExtension() = " + zz);
-      //fixme: jj; should sourceDebugExtension throw UnsupportedOperationException?
-      try {zz =xx.sourceDebugExtension();} catch(Exception ee) { zz = ee;} pp("sourceDebugExtension() = " + zz);
-      // If xx is an array, this can cause a ClassNotLoadedException on the
-      // component type.  Is that a JDI bug?
-      pp("isStatic() = " + xx.isStatic());
-      pp("isAbstract() = " + xx.isAbstract());
-      pp("isFinal() = " + xx.isFinal());
-      pp("isPrepared() = " + xx.isPrepared());
-      pp("isVerified() = " + xx.isVerified());
-      pp("isInitialized() = " + xx.isInitialized());
-      pp("failedToInitialize() = " + xx.failedToInitialize());
-      pp("fields() = " + xx.fields());
-      pp("visibleFields() = " + xx.visibleFields());
-      pp("allFields() = " + xx.allFields());
-      pp("fieldByName(String fieldName) = " + xx.fieldByName("fieldName"));
-      pp("methods() = " + xx.methods());
+    public void doReferenceTypeFields(ReferenceType xx) {
+        Object zz;
+        pp("classLoader() = " + xx.classLoader());
+        try {
+            zz = xx.sourceName();
+        } catch (AbsentInformationException ee) {
+            zz = ee;
+        }
+        pp("sourceName() = " + zz);
+        try {
+            zz = xx.sourceNames("stratum");
+        } catch (AbsentInformationException ee) {
+            zz = ee;
+        }
+        pp("sourceNames() = " + zz);
+        try {
+            zz = xx.sourcePaths("stratum");
+        } catch (AbsentInformationException ee) {
+            zz = ee;
+        }
+        pp("sourcePaths() = " + zz);
+        //try {zz =xx.sourceDebugExtension();} catch(AbsentInformationException ee) { zz = ee;} pp("sourceDebugExtension() = " + zz);
+        //fixme: jj; should sourceDebugExtension throw UnsupportedOperationException?
+        try {
+            zz = xx.sourceDebugExtension();
+        } catch (Exception ee) {
+            zz = ee;
+        }
+        pp("sourceDebugExtension() = " + zz);
+        // If xx is an array, this can cause a ClassNotLoadedException on the
+        // component type.  Is that a JDI bug?
+        pp("isStatic() = " + xx.isStatic());
+        pp("isAbstract() = " + xx.isAbstract());
+        pp("isFinal() = " + xx.isFinal());
+        pp("isPrepared() = " + xx.isPrepared());
+        pp("isVerified() = " + xx.isVerified());
+        pp("isInitialized() = " + xx.isInitialized());
+        pp("failedToInitialize() = " + xx.failedToInitialize());
+        pp("fields() = " + xx.fields());
+        pp("visibleFields() = " + xx.visibleFields());
+        pp("allFields() = " + xx.allFields());
+        pp("fieldByName(String fieldName) = " + xx.fieldByName("fieldName"));
+        pp("methods() = " + xx.methods());
 
 
-       List meths = xx.methods();
-       Iterator iter = meths.iterator();
-       while (iter.hasNext()) {
-           Method mm = (Method)iter.next();
-           pp("  name/sig:" + mm.name() + "/" + mm.signature());
-       }
+        List meths = xx.methods();
+        Iterator iter = meths.iterator();
+        while (iter.hasNext()) {
+            Method mm = (Method) iter.next();
+            pp("  name/sig:" + mm.name() + "/" + mm.signature());
+        }
 
-      pp(" visibleMethods() = " + xx.visibleMethods());
+        pp(" visibleMethods() = " + xx.visibleMethods());
 
-      //if (1 == 1) return;
+        //if (1 == 1) return;
 
-      pp("allMethods() = " + xx.allMethods());
+        pp("allMethods() = " + xx.allMethods());
 
 
-      pp("methodsByName(String name) = " + xx.methodsByName("name"));
-      pp("methodsByName(String name, String signature) = " + xx.methodsByName("name", "signature"));
-      pp("nestedTypes() = " + xx.nestedTypes());
-      //pp("getValue(Field field) = " + xx.getValue("field"));
-      pp("getValue(Field field) = " + "fixme: jjh");
-      //pp("getValues(List fields) = " + xx.getValues(new List[] = {"fields"}));
-      pp("getValues(List fields) = " + "fixme: jjh");
-      pp("classObject() = " + xx.classObject());
-      //x      pp("allLineLocations() = " + xx.allLineLocations());
-      //x      pp("allLineLocations(String stratum, String sourceName) = " + xx.allLineLocations("stratum", "sourceName"));
-      //x      pp("locationsOfLine(int lineNumber) = " + xx.locationsOfLine(89));
-      //x      pp("locationsOfLine(String stratum, String sourceName, int lineNumber) = " + xx.locationsOfLine("stratum", "sourceName", 89));
-      pp("availableStrata() = " + xx.availableStrata());
-      pp("defaultStratum() = " + xx.defaultStratum());
-      pp("equals(Object obj) = " + xx.equals(xx));
-      pp("hashCode() = " + xx.hashCode());
-  }
+        pp("methodsByName(String name) = " + xx.methodsByName("name"));
+        pp("methodsByName(String name, String signature) = " + xx.methodsByName("name", "signature"));
+        pp("nestedTypes() = " + xx.nestedTypes());
+        //pp("getValue(Field field) = " + xx.getValue("field"));
+        pp("getValue(Field field) = " + "fixme: jjh");
+        //pp("getValues(List fields) = " + xx.getValues(new List[] = {"fields"}));
+        pp("getValues(List fields) = " + "fixme: jjh");
+        pp("classObject() = " + xx.classObject());
+        //x      pp("allLineLocations() = " + xx.allLineLocations());
+        //x      pp("allLineLocations(String stratum, String sourceName) = " + xx.allLineLocations("stratum", "sourceName"));
+        //x      pp("locationsOfLine(int lineNumber) = " + xx.locationsOfLine(89));
+        //x      pp("locationsOfLine(String stratum, String sourceName, int lineNumber) = " + xx.locationsOfLine("stratum", "sourceName", 89));
+        pp("availableStrata() = " + xx.availableStrata());
+        pp("defaultStratum() = " + xx.defaultStratum());
+        pp("equals(Object obj) = " + xx.equals(xx));
+        pp("hashCode() = " + xx.hashCode());
+    }
 
 }
 

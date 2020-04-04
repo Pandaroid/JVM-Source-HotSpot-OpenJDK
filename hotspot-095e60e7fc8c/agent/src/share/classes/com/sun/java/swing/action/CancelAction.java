@@ -30,16 +30,13 @@ import javax.swing.KeyStroke;
 // Referenced classes of package com.sun.java.swing.action:
 //            DelegateAction, ActionManager
 
-public class CancelAction extends DelegateAction
-{
+public class CancelAction extends DelegateAction {
 
-    public CancelAction()
-    {
+    public CancelAction() {
         this(VALUE_SMALL_ICON);
     }
 
-    public CancelAction(String iconPath)
-    {
+    public CancelAction(String iconPath) {
         super("Cancel", ActionManager.getIcon(iconPath));
         putValue("ActionCommandKey", "cancel-command");
         putValue("ShortDescription", "Cancels the action");

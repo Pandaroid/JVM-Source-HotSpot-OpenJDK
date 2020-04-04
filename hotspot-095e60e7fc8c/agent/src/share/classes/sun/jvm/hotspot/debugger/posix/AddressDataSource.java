@@ -24,6 +24,7 @@
 package sun.jvm.hotspot.debugger.posix;
 
 import java.io.*;
+
 import sun.jvm.hotspot.debugger.*;
 import sun.jvm.hotspot.debugger.posix.elf.*;
 

@@ -35,7 +35,7 @@ import java.util.Collections;
 import java.lang.ref.SoftReference;
 
 public class InterfaceTypeImpl extends ReferenceTypeImpl
-                               implements InterfaceType {
+        implements InterfaceType {
     private SoftReference superInterfacesCache = null;
     private SoftReference subInterfacesCache = null;
     private SoftReference implementorsCache = null;
@@ -45,7 +45,7 @@ public class InterfaceTypeImpl extends ReferenceTypeImpl
     }
 
     public List superinterfaces() throws ClassNotPreparedException {
-        List superinterfaces = (superInterfacesCache != null)? (List) superInterfacesCache.get() : null;
+        List superinterfaces = (superInterfacesCache != null) ? (List) superInterfacesCache.get() : null;
         if (superinterfaces == null) {
             checkPrepared();
             superinterfaces = Collections.unmodifiableList(getInterfaces());
@@ -55,19 +55,19 @@ public class InterfaceTypeImpl extends ReferenceTypeImpl
     }
 
     public List subinterfaces() {
-        List subinterfaces = (subInterfacesCache != null)? (List) subInterfacesCache.get() : null;
+        List subinterfaces = (subInterfacesCache != null) ? (List) subInterfacesCache.get() : null;
         if (subinterfaces == null) {
             List all = vm.allClasses();
             subinterfaces = new ArrayList();
             Iterator iter = all.iterator();
             while (iter.hasNext()) {
-                ReferenceType refType = (ReferenceType)iter.next();
+                ReferenceType refType = (ReferenceType) iter.next();
                 if (refType instanceof InterfaceType) {
-                    InterfaceType interfaze = (InterfaceType)refType;
+                    InterfaceType interfaze = (InterfaceType) refType;
                     if (interfaze.isPrepared() && interfaze.superinterfaces().contains(this)) {
                         subinterfaces.add(interfaze);
                     }
-               }
+                }
             }
             subinterfaces = Collections.unmodifiableList(subinterfaces);
             subInterfacesCache = new SoftReference(subinterfaces);
@@ -76,15 +76,15 @@ public class InterfaceTypeImpl extends ReferenceTypeImpl
     }
 
     public List implementors() {
-        List implementors = (implementorsCache != null)? (List) implementorsCache.get() : null;
+        List implementors = (implementorsCache != null) ? (List) implementorsCache.get() : null;
         if (implementors == null) {
             List all = vm.allClasses();
             implementors = new ArrayList();
             Iterator iter = all.iterator();
             while (iter.hasNext()) {
-                ReferenceType refType = (ReferenceType)iter.next();
+                ReferenceType refType = (ReferenceType) iter.next();
                 if (refType instanceof ClassType) {
-                    ClassType clazz = (ClassType)refType;
+                    ClassType clazz = (ClassType) refType;
                     if (clazz.isPrepared() && clazz.interfaces().contains(this)) {
                         implementors.add(clazz);
                     }
@@ -104,7 +104,7 @@ public class InterfaceTypeImpl extends ReferenceTypeImpl
          */
         Iterator iter = superinterfaces().iterator();
         while (iter.hasNext()) {
-            InterfaceTypeImpl interfaze = (InterfaceTypeImpl)iter.next();
+            InterfaceTypeImpl interfaze = (InterfaceTypeImpl) iter.next();
             interfaze.addVisibleMethods(methodMap);
         }
 
@@ -120,7 +120,7 @@ public class InterfaceTypeImpl extends ReferenceTypeImpl
         List interfaces = allSuperinterfaces();
         Iterator iter = interfaces.iterator();
         while (iter.hasNext()) {
-            InterfaceType interfaze = (InterfaceType)iter.next();
+            InterfaceType interfaze = (InterfaceType) iter.next();
             list.addAll(interfaze.methods());
         }
 
@@ -149,7 +149,7 @@ public class InterfaceTypeImpl extends ReferenceTypeImpl
         List immediate = new ArrayList(superinterfaces());
         Iterator iter = immediate.iterator();
         while (iter.hasNext()) {
-            InterfaceType interfaze = (InterfaceType)iter.next();
+            InterfaceType interfaze = (InterfaceType) iter.next();
             if (list.contains(interfaze)) {
                 iter.remove();
             }
@@ -165,7 +165,7 @@ public class InterfaceTypeImpl extends ReferenceTypeImpl
          */
         iter = immediate.iterator();
         while (iter.hasNext()) {
-            InterfaceTypeImpl interfaze = (InterfaceTypeImpl)iter.next();
+            InterfaceTypeImpl interfaze = (InterfaceTypeImpl) iter.next();
             interfaze.addSuperinterfaces(list);
         }
     }
@@ -180,7 +180,7 @@ public class InterfaceTypeImpl extends ReferenceTypeImpl
             List supers = superinterfaces();
             Iterator iter = supers.iterator();
             while (iter.hasNext()) {
-                InterfaceTypeImpl interfaze = (InterfaceTypeImpl)iter.next();
+                InterfaceTypeImpl interfaze = (InterfaceTypeImpl) iter.next();
                 if (interfaze.isAssignableTo(type)) {
                     return true;
                 }
@@ -199,6 +199,6 @@ public class InterfaceTypeImpl extends ReferenceTypeImpl
     }
 
     public String toString() {
-       return "interface " + name() + " (" + loaderString() + ")";
+        return "interface " + name() + " (" + loaderString() + ")";
     }
 }

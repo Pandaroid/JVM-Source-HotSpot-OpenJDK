@@ -27,10 +27,10 @@ package sun.jvm.hotspot.jdi;
 import com.sun.jdi.*;
 
 public class ByteValueImpl extends PrimitiveValueImpl
-                           implements ByteValue {
+        implements ByteValue {
     private byte value;
 
-    ByteValueImpl(VirtualMachine aVm,byte aValue) {
+    ByteValueImpl(VirtualMachine aVm, byte aValue) {
         super(aVm);
 
         value = aValue;
@@ -38,8 +38,8 @@ public class ByteValueImpl extends PrimitiveValueImpl
 
     public boolean equals(Object obj) {
         if ((obj != null) && (obj instanceof ByteValue)) {
-            return (value == ((ByteValue)obj).value())
-                   && super.equals(obj);
+            return (value == ((ByteValue) obj).value())
+                    && super.equals(obj);
         } else {
             return false;
         }
@@ -65,7 +65,7 @@ public class ByteValueImpl extends PrimitiveValueImpl
     }
 
     public boolean booleanValue() {
-        return(value == 0)?false:true;
+        return (value == 0) ? false : true;
     }
 
     public byte byteValue() {
@@ -73,27 +73,27 @@ public class ByteValueImpl extends PrimitiveValueImpl
     }
 
     public char charValue() {
-        return(char)value;
+        return (char) value;
     }
 
     public short shortValue() {
-        return(short)value;
+        return (short) value;
     }
 
     public int intValue() {
-        return(int)value;
+        return (int) value;
     }
 
     public long longValue() {
-        return(long)value;
+        return (long) value;
     }
 
     public float floatValue() {
-        return(float)value;
+        return (float) value;
     }
 
     public double doubleValue() {
-        return(double)value;
+        return (double) value;
     }
 
     char checkedCharValue() throws InvalidTypeException {

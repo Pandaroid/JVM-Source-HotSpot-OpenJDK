@@ -45,7 +45,7 @@ public class VoidValueImpl extends ValueImpl implements VoidValue {
     }
 
     ValueImpl prepareForAssignmentTo(ValueContainer destination)
-                    throws InvalidTypeException {
+            throws InvalidTypeException {
 
         throw new InvalidTypeException();
     }

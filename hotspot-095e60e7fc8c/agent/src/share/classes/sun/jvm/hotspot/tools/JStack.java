@@ -49,9 +49,9 @@ public class JStack extends Tool {
     }
 
     protected void printFlagsUsage() {
-       System.out.println("    -l\tto print java.util.concurrent locks");
-       System.out.println("    -m\tto print both java and native frames (mixed mode)");
-       super.printFlagsUsage();
+        System.out.println("    -l\tto print java.util.concurrent locks");
+        System.out.println("    -m\tto print both java and native frames (mixed mode)");
+        super.printFlagsUsage();
     }
 
     public void run() {

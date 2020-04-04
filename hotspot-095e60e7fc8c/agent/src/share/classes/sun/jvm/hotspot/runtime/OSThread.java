@@ -25,6 +25,7 @@
 package sun.jvm.hotspot.runtime;
 
 import java.util.*;
+
 import sun.jvm.hotspot.debugger.*;
 import sun.jvm.hotspot.types.*;
 
@@ -33,6 +34,7 @@ import sun.jvm.hotspot.types.*;
 public class OSThread extends VMObject {
     private static JIntField interruptedField;
     private static Field threadIdField;
+
     static {
         VM.registerVMInitializedObserver(new Observer() {
             public void update(Observable o, Object data) {
@@ -52,7 +54,7 @@ public class OSThread extends VMObject {
     }
 
     public boolean interrupted() {
-        return ((int)interruptedField.getValue(addr)) != 0;
+        return ((int) interruptedField.getValue(addr)) != 0;
     }
 
     public int threadId() {

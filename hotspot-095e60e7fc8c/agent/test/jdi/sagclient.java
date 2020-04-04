@@ -46,20 +46,20 @@ public class sagclient {
         vmmgr = Bootstrap.virtualMachineManager();
         List attachingConnectors = vmmgr.attachingConnectors();
         if (attachingConnectors.isEmpty()) {
-            System.err.println( "ERROR: No attaching connectors");
+            System.err.println("ERROR: No attaching connectors");
             return;
         }
         Iterator myIt = attachingConnectors.iterator();
         while (myIt.hasNext()) {
-            AttachingConnector tmpCon = (AttachingConnector)myIt.next();
+            AttachingConnector tmpCon = (AttachingConnector) myIt.next();
             if (tmpCon.name().equals(
-                "sun.jvm.hotspot.jdi.SACoreAttachingConnector")) {
+                    "sun.jvm.hotspot.jdi.SACoreAttachingConnector")) {
                 myCoreConn = tmpCon;
             } else if (tmpCon.name().equals(
-                "sun.jvm.hotspot.jdi.SAPIDAttachingConnector")) {
+                    "sun.jvm.hotspot.jdi.SAPIDAttachingConnector")) {
                 myPIDConn = tmpCon;
             } else if (tmpCon.name().equals(
-                "sun.jvm.hotspot.jdi.SADebugServerAttachingConnector")) {
+                    "sun.jvm.hotspot.jdi.SADebugServerAttachingConnector")) {
                 myDbgSvrConn = tmpCon;
             }
         }
@@ -69,31 +69,31 @@ public class sagclient {
         String debugServer = null;
         int pid = 0;
         switch (args.length) {
-        case (0):
-            break;
-        case (1):
-            // If all numbers, it is a PID to attach to
-            // Else, it is a pathname to a .../bin/java for a core file.
-            try {
-                pidText = args[0];
-                pid = Integer.parseInt(pidText);
-                System.out.println( "pid: " + pid);
-                vm = attachPID(pid);
-            } catch (NumberFormatException e) {
-                System.out.println("trying remote server ..");
-                debugServer = args[0];
-                System.out.println( "remote server: " + debugServer);
-                vm = attachDebugServer(debugServer);
-            }
-            break;
+            case (0):
+                break;
+            case (1):
+                // If all numbers, it is a PID to attach to
+                // Else, it is a pathname to a .../bin/java for a core file.
+                try {
+                    pidText = args[0];
+                    pid = Integer.parseInt(pidText);
+                    System.out.println("pid: " + pid);
+                    vm = attachPID(pid);
+                } catch (NumberFormatException e) {
+                    System.out.println("trying remote server ..");
+                    debugServer = args[0];
+                    System.out.println("remote server: " + debugServer);
+                    vm = attachDebugServer(debugServer);
+                }
+                break;
 
-        case (2):
-            execPath = args[0];
-            coreFilename = args[1];
-            System.out.println( "jdk: " + execPath);
-            System.out.println( "core: " + coreFilename);
-            vm = attachCore(coreFilename, execPath);
-            break;
+            case (2):
+                execPath = args[0];
+                coreFilename = args[1];
+                System.out.println("jdk: " + execPath);
+                System.out.println("core: " + coreFilename);
+                vm = attachCore(coreFilename, execPath);
+                break;
         }
 
 
@@ -109,10 +109,10 @@ public class sagclient {
         Map connArgs = myCoreConn.defaultArguments();
         System.out.println("connArgs = " + connArgs);
         VirtualMachine vm;
-        Connector.StringArgument connArg = (Connector.StringArgument)connArgs.get("core");
+        Connector.StringArgument connArg = (Connector.StringArgument) connArgs.get("core");
         connArg.setValue(coreFilename);
 
-        connArg =  (Connector.StringArgument)connArgs.get("javaExecutable");
+        connArg = (Connector.StringArgument) connArgs.get("javaExecutable");
         connArg.setValue(execPath);
         try {
             vm = myCoreConn.attach(connArgs);
@@ -124,13 +124,13 @@ public class sagclient {
             vm = null;
         }
         return vm;
-   }
+    }
 
-   private static VirtualMachine attachPID(int pid) {
+    private static VirtualMachine attachPID(int pid) {
         Map connArgs = myPIDConn.defaultArguments();
         System.out.println("connArgs = " + connArgs);
         VirtualMachine vm;
-        Connector.StringArgument connArg = (Connector.StringArgument)connArgs.get("pid");
+        Connector.StringArgument connArg = (Connector.StringArgument) connArgs.get("pid");
         connArg.setValue(Integer.toString(pid));
 
         try {
@@ -143,14 +143,14 @@ public class sagclient {
             vm = null;
         }
         return vm;
-   }
+    }
 
 
-   private static VirtualMachine attachDebugServer(String debugServer) {
+    private static VirtualMachine attachDebugServer(String debugServer) {
         Map connArgs = myDbgSvrConn.defaultArguments();
         System.out.println("connArgs = " + connArgs);
         VirtualMachine vm;
-        Connector.StringArgument connArg = (Connector.StringArgument)connArgs.get("debugServerName");
+        Connector.StringArgument connArg = (Connector.StringArgument) connArgs.get("debugServerName");
         connArg.setValue(debugServer);
 
         try {
@@ -163,5 +163,5 @@ public class sagclient {
             vm = null;
         }
         return vm;
-   }
+    }
 }

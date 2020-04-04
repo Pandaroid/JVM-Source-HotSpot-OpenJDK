@@ -24,8 +24,10 @@
 
 package sun.jvm.hotspot.runtime;
 
-/** An instance of this exception is thrown when debuggee VM version
-    is not supported current version of SA. */
+/**
+ * An instance of this exception is thrown when debuggee VM version
+ * is not supported current version of SA.
+ */
 public class VMVersionMismatchException extends RuntimeException {
     public VMVersionMismatchException(String supported, String target) {
         super();

@@ -62,6 +62,7 @@ import java.net.*;
 
 class SAJDIClassLoader extends URLClassLoader {
     private static final boolean DEBUG;
+
     static {
         DEBUG = System.getProperty("sun.jvm.hotspot.jdi.SAJDIClassLoader.DEBUG") != null;
     }
@@ -79,13 +80,13 @@ class SAJDIClassLoader extends URLClassLoader {
         this.classPathSet = true;
         try {
             addURL(new File(classPath).toURI().toURL());
-        } catch(MalformedURLException mue) {
+        } catch (MalformedURLException mue) {
             throw new RuntimeException(mue);
         }
     }
 
     public synchronized Class loadClass(String name)
-        throws ClassNotFoundException {
+            throws ClassNotFoundException {
         // First, check if the class has already been loaded
         Class c = findLoadedClass(name);
         if (c == null) {
@@ -105,7 +106,7 @@ class SAJDIClassLoader extends URLClassLoader {
              */
 
             if (name.startsWith("sun.jvm.hotspot.") &&
-                !name.startsWith("sun.jvm.hotspot.debugger.")) {
+                    !name.startsWith("sun.jvm.hotspot.debugger.")) {
                 return findClass(name);
             }
             if (parent != null) {

@@ -25,11 +25,12 @@
 package sun.jvm.hotspot.utilities.soql;
 
 import java.util.*;
+
 import sun.jvm.hotspot.oops.*;
 import sun.jvm.hotspot.utilities.*;
 
 public class JSJavaClass extends JSJavaInstance {
-    public JSJavaClass(Instance instance, JSJavaKlass jk,  JSJavaFactory fac) {
+    public JSJavaClass(Instance instance, JSJavaKlass jk, JSJavaFactory fac) {
         super(instance, fac);
         this.jklass = jk;
     }

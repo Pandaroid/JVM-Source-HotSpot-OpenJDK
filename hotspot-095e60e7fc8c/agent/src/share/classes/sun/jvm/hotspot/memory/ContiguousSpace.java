@@ -32,66 +32,78 @@ import sun.jvm.hotspot.runtime.*;
 import sun.jvm.hotspot.types.*;
 
 public class ContiguousSpace extends CompactibleSpace {
-  private static AddressField topField;
+    private static AddressField topField;
 
-  static {
-    VM.registerVMInitializedObserver(new Observer() {
-        public void update(Observable o, Object data) {
-          initialize(VM.getVM().getTypeDataBase());
-        }
-      });
-  }
+    static {
+        VM.registerVMInitializedObserver(new Observer() {
+            public void update(Observable o, Object data) {
+                initialize(VM.getVM().getTypeDataBase());
+            }
+        });
+    }
 
-  private static synchronized void initialize(TypeDataBase db) {
-    Type type = db.lookupType("ContiguousSpace");
+    private static synchronized void initialize(TypeDataBase db) {
+        Type type = db.lookupType("ContiguousSpace");
 
-    topField = type.getAddressField("_top");
-  }
+        topField = type.getAddressField("_top");
+    }
 
-  public ContiguousSpace(Address addr) {
-    super(addr);
-  }
+    public ContiguousSpace(Address addr) {
+        super(addr);
+    }
 
-  public Address top() {
-    return topField.getValue(addr);
-  }
+    public Address top() {
+        return topField.getValue(addr);
+    }
 
-  /** In bytes */
-  public long capacity() {
-    return end().minus(bottom());
-  }
+    /**
+     * In bytes
+     */
+    public long capacity() {
+        return end().minus(bottom());
+    }
 
-  /** In bytes */
-  public long used() {
-    return top().minus(bottom());
-  }
+    /**
+     * In bytes
+     */
+    public long used() {
+        return top().minus(bottom());
+    }
 
-  /** In bytes */
-  public long free() {
-    return end().minus(top());
-  }
+    /**
+     * In bytes
+     */
+    public long free() {
+        return end().minus(top());
+    }
 
-  /** In a contiguous space we have a more obvious bound on what parts
-      contain objects. */
-  public MemRegion usedRegion() {
-    return new MemRegion(bottom(), top());
-  }
+    /**
+     * In a contiguous space we have a more obvious bound on what parts
+     * contain objects.
+     */
+    public MemRegion usedRegion() {
+        return new MemRegion(bottom(), top());
+    }
 
-  /** Returns regions of Space where live objects live */
-  public List/*<MemRegion>*/ getLiveRegions() {
-    List res = new ArrayList();
-    res.add(new MemRegion(bottom(), top()));
-    return res;
-  }
+    /**
+     * Returns regions of Space where live objects live
+     */
+    public List/*<MemRegion>*/ getLiveRegions() {
+        List res = new ArrayList();
+        res.add(new MemRegion(bottom(), top()));
+        return res;
+    }
 
-  /** Testers */
-  public boolean contains(Address p) {
-    return (bottom().lessThanOrEqual(p) && top().greaterThan(p));
-  }
+    /**
+     * Testers
+     */
+    public boolean contains(Address p) {
+        return (bottom().lessThanOrEqual(p) && top().greaterThan(p));
+    }
 
-  public void printOn(PrintStream tty) {
-    tty.print(" [" + bottom() + "," +
+    public void printOn(PrintStream tty) {
+        tty.print(" [" + bottom() + "," +
                 top() + "," + end() + ")");
-    super.printOn(tty);
-  }
+        super.printOn(tty);
+    }
 }

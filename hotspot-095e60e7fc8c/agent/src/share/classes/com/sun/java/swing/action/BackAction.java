@@ -30,16 +30,13 @@ import javax.swing.KeyStroke;
 // Referenced classes of package com.sun.java.swing.action:
 //            DelegateAction, ActionManager
 
-public class BackAction extends DelegateAction
-{
+public class BackAction extends DelegateAction {
 
-    public BackAction()
-    {
+    public BackAction() {
         this(VALUE_SMALL_ICON);
     }
 
-    public BackAction(String iconPath)
-    {
+    public BackAction(String iconPath) {
         super("< Back", ActionManager.getIcon(iconPath));
         putValue("ActionCommandKey", "back-command");
         putValue("ShortDescription", "Select previous item");

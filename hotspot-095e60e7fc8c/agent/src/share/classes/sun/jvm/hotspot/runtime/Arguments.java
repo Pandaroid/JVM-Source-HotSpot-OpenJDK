@@ -31,7 +31,9 @@ import sun.jvm.hotspot.runtime.*;
 import sun.jvm.hotspot.types.*;
 import sun.jvm.hotspot.utilities.*;
 
-/** This class represent VM's Arguments class -- command line args, flags etc.*/
+/**
+ * This class represent VM's Arguments class -- command line args, flags etc.
+ */
 public class Arguments {
     static {
         VM.registerVMInitializedObserver(new Observer() {

@@ -25,6 +25,7 @@
 package sun.jvm.hotspot.runtime;
 
 import java.util.*;
+
 import sun.jvm.hotspot.debugger.*;
 import sun.jvm.hotspot.types.*;
 import sun.jvm.hotspot.runtime.solaris_sparc.SolarisSPARCJavaThreadPDAccess;
@@ -41,8 +42,8 @@ import sun.jvm.hotspot.utilities.*;
 
 public class Threads {
     private static JavaThreadFactory threadFactory;
-    private static AddressField      threadListField;
-    private static CIntegerField     numOfThreadsField;
+    private static AddressField threadListField;
+    private static CIntegerField numOfThreadsField;
     private static VirtualConstructor virtualConstructor;
     private static JavaThreadPDAccess access;
 
@@ -61,7 +62,7 @@ public class Threads {
         numOfThreadsField = type.getCIntegerField("_number_of_threads");
 
         // Instantiate appropriate platform-specific JavaThreadFactory
-        String os  = VM.getVM().getOS();
+        String os = VM.getVM().getOS();
         String cpu = VM.getVM().getCPU();
 
         access = null;
@@ -76,9 +77,9 @@ public class Threads {
             }
         } else if (os.equals("win32")) {
             if (cpu.equals("x86")) {
-                access =  new Win32X86JavaThreadPDAccess();
+                access = new Win32X86JavaThreadPDAccess();
             } else if (cpu.equals("amd64")) {
-                access =  new Win32AMD64JavaThreadPDAccess();
+                access = new Win32AMD64JavaThreadPDAccess();
             }
         } else if (os.equals("linux")) {
             if (cpu.equals("x86")) {
@@ -88,15 +89,15 @@ public class Threads {
             } else if (cpu.equals("sparc")) {
                 access = new LinuxSPARCJavaThreadPDAccess();
             } else {
-              try {
-                access = (JavaThreadPDAccess)
-                  Class.forName("sun.jvm.hotspot.runtime.linux_" +
-                     cpu.toLowerCase() + ".Linux" + cpu.toUpperCase() +
-                     "JavaThreadPDAccess").newInstance();
-              } catch (Exception e) {
-                throw new RuntimeException("OS/CPU combination " + os + "/" + cpu +
-                                           " not yet supported");
-              }
+                try {
+                    access = (JavaThreadPDAccess)
+                            Class.forName("sun.jvm.hotspot.runtime.linux_" +
+                                    cpu.toLowerCase() + ".Linux" + cpu.toUpperCase() +
+                                    "JavaThreadPDAccess").newInstance();
+                } catch (Exception e) {
+                    throw new RuntimeException("OS/CPU combination " + os + "/" + cpu +
+                            " not yet supported");
+                }
             }
         } else if (os.equals("bsd")) {
             if (cpu.equals("x86")) {
@@ -112,7 +113,7 @@ public class Threads {
 
         if (access == null) {
             throw new RuntimeException("OS/CPU combination " + os + "/" + cpu +
-            " not yet supported");
+                    " not yet supported");
         }
 
         virtualConstructor = new VirtualConstructor(db);
@@ -130,17 +131,19 @@ public class Threads {
     public Threads() {
     }
 
-    /** NOTE: this returns objects of type JavaThread, CompilerThread,
-      JvmtiAgentThread, and ServiceThread.
-      The latter four are subclasses of the former. Most operations
-      (fetching the top frame, etc.) are only allowed to be performed on
-      a "pure" JavaThread. For this reason, {@link
-      sun.jvm.hotspot.runtime.JavaThread#isJavaThread} has been
-      changed from the definition in the VM (which returns true for
-      all of these thread types) to return true for JavaThreads and
-      false for the three subclasses. FIXME: should reconsider the
-      inheritance hierarchy; see {@link
-      sun.jvm.hotspot.runtime.JavaThread#isJavaThread}. */
+    /**
+     * NOTE: this returns objects of type JavaThread, CompilerThread,
+     * JvmtiAgentThread, and ServiceThread.
+     * The latter four are subclasses of the former. Most operations
+     * (fetching the top frame, etc.) are only allowed to be performed on
+     * a "pure" JavaThread. For this reason, {@link
+     * sun.jvm.hotspot.runtime.JavaThread#isJavaThread} has been
+     * changed from the definition in the VM (which returns true for
+     * all of these thread types) to return true for JavaThreads and
+     * false for the three subclasses. FIXME: should reconsider the
+     * inheritance hierarchy; see {@link
+     * sun.jvm.hotspot.runtime.JavaThread#isJavaThread}.
+     */
     public JavaThread first() {
         Address threadAddr = threadListField.getValue();
         if (threadAddr == null) {
@@ -154,21 +157,25 @@ public class Threads {
         return (int) numOfThreadsField.getValue();
     }
 
-    /** Routine for instantiating appropriately-typed wrapper for a
-      JavaThread. Currently needs to be public for OopUtilities to
-      access it. */
+    /**
+     * Routine for instantiating appropriately-typed wrapper for a
+     * JavaThread. Currently needs to be public for OopUtilities to
+     * access it.
+     */
     public JavaThread createJavaThreadWrapper(Address threadAddr) {
         try {
-            JavaThread thread = (JavaThread)virtualConstructor.instantiateWrapperFor(threadAddr);
+            JavaThread thread = (JavaThread) virtualConstructor.instantiateWrapperFor(threadAddr);
             thread.setThreadPDAccess(access);
             return thread;
         } catch (Exception e) {
             throw new RuntimeException("Unable to deduce type of thread from address " + threadAddr +
-            " (expected type JavaThread, CompilerThread, ServiceThread, JvmtiAgentThread, or SurrogateLockerThread)", e);
+                    " (expected type JavaThread, CompilerThread, ServiceThread, JvmtiAgentThread, or SurrogateLockerThread)", e);
         }
     }
 
-    /** Memory operations */
+    /**
+     * Memory operations
+     */
     public void oopsDo(AddressVisitor oopVisitor) {
         // FIXME: add more of VM functionality
         for (JavaThread thread = first(); thread != null; thread = thread.next()) {
@@ -186,8 +193,8 @@ public class Threads {
         }
 
         for (JavaThread thread = first(); thread != null; thread = thread.next()) {
-          if (thread.isLockOwned(o))
-            return thread;
+            if (thread.isLockOwned(o))
+                return thread;
         }
         return null;
     }

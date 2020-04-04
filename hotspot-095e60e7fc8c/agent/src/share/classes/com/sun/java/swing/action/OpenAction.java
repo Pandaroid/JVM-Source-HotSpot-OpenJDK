@@ -30,16 +30,13 @@ import javax.swing.KeyStroke;
 // Referenced classes of package com.sun.java.swing.action:
 //            DelegateAction, ActionManager
 
-public class OpenAction extends DelegateAction
-{
+public class OpenAction extends DelegateAction {
 
-    public OpenAction()
-    {
+    public OpenAction() {
         this("general/Open16.gif");
     }
 
-    public OpenAction(String iconPath)
-    {
+    public OpenAction(String iconPath) {
         super("Open...", ActionManager.getIcon(iconPath));
         putValue("ActionCommandKey", "open-command");
         putValue("ShortDescription", "Open the specified object.");

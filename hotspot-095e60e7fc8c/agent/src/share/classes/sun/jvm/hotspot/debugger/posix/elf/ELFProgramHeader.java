@@ -30,10 +30,14 @@ package sun.jvm.hotspot.debugger.posix.elf;
  * for execution.
  */
 public interface ELFProgramHeader {
-    /** Type defining that the array element is unused.  Other member values
-     * are undefined. */
+    /**
+     * Type defining that the array element is unused.  Other member values
+     * are undefined.
+     */
     public static final int TYPE_NULL = 0;
-    /** Type defining that the array element specifies a loadable segment. */
+    /**
+     * Type defining that the array element specifies a loadable segment.
+     */
     public static final int TYPE_LOAD = 1;
     public static final int TYPE_DYNAMIC = 2;
     public static final int TYPE_INTERP = 3;

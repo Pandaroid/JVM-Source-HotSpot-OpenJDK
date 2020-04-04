@@ -26,21 +26,21 @@ package sun.jvm.hotspot.tools.jcore;
 
 import java.io.*;
 import java.util.*;
+
 import sun.jvm.hotspot.oops.*;
 import sun.jvm.hotspot.runtime.*;
 import sun.jvm.hotspot.utilities.*;
 
-public class ClassWriter implements /* imports */ ClassConstants
-{
+public class ClassWriter implements /* imports */ ClassConstants {
     public static final boolean DEBUG = false;
 
     protected void debugMessage(String message) {
         System.out.println(message);
     }
 
-    protected InstanceKlass     klass;
-    protected DataOutputStream  dos;
-    protected ConstantPool      cpool;
+    protected InstanceKlass klass;
+    protected DataOutputStream dos;
+    protected ConstantPool cpool;
 
     // Map between class name to index of type CONSTANT_Class
     protected Map<String, Short> classToIndex = new HashMap<String, Short>();
@@ -50,16 +50,16 @@ public class ClassWriter implements /* imports */ ClassConstants
 
     // constant pool index for attribute names.
 
-    protected short  _sourceFileIndex;
-    protected short  _innerClassesIndex;
-    protected short  _syntheticIndex;
-    protected short  _deprecatedIndex;
-    protected short  _constantValueIndex;
-    protected short  _codeIndex;
-    protected short  _exceptionsIndex;
-    protected short  _lineNumberTableIndex;
-    protected short  _localVariableTableIndex;
-    protected short  _signatureIndex;
+    protected short _sourceFileIndex;
+    protected short _innerClassesIndex;
+    protected short _syntheticIndex;
+    protected short _deprecatedIndex;
+    protected short _constantValueIndex;
+    protected short _codeIndex;
+    protected short _exceptionsIndex;
+    protected short _lineNumberTableIndex;
+    protected short _localVariableTableIndex;
+    protected short _signatureIndex;
 
     protected static int extractHighShortFromInt(int val) {
         // must stay in sync with ConstantPool::name_and_type_at_put, method_at_put, etc.
@@ -98,8 +98,8 @@ public class ClassWriter implements /* imports */ ClassConstants
     }
 
     protected void writeVersion() throws IOException {
-        dos.writeShort((short)klass.minorVersion());
-        dos.writeShort((short)klass.majorVersion());
+        dos.writeShort((short) klass.minorVersion());
+        dos.writeShort((short) klass.majorVersion());
     }
 
     protected void writeIndex(int index) throws IOException {
@@ -120,12 +120,11 @@ public class ClassWriter implements /* imports */ ClassConstants
 
         for (ci = 1; ci < len; ci++) {
             int cpConstType = tags.at(ci);
-            if(cpConstType == JVM_CONSTANT_Utf8) {
+            if (cpConstType == JVM_CONSTANT_Utf8) {
                 Symbol sym = cpool.getSymbolAt(ci);
                 utf8ToIndex.put(sym.asString(), new Short((short) ci));
-            }
-            else if(cpConstType == JVM_CONSTANT_Long ||
-                      cpConstType == JVM_CONSTANT_Double) {
+            } else if (cpConstType == JVM_CONSTANT_Long ||
+                    cpConstType == JVM_CONSTANT_Double) {
                 ci++;
             }
         }
@@ -134,34 +133,34 @@ public class ClassWriter implements /* imports */ ClassConstants
 
         // class attributes
         Short sourceFileIndex = (Short) utf8ToIndex.get("SourceFile");
-        _sourceFileIndex = (sourceFileIndex != null)? sourceFileIndex.shortValue() : 0;
+        _sourceFileIndex = (sourceFileIndex != null) ? sourceFileIndex.shortValue() : 0;
         if (DEBUG) debugMessage("SourceFile index = " + _sourceFileIndex);
 
         Short innerClassesIndex = (Short) utf8ToIndex.get("InnerClasses");
-        _innerClassesIndex = (innerClassesIndex != null)? innerClassesIndex.shortValue() : 0;
+        _innerClassesIndex = (innerClassesIndex != null) ? innerClassesIndex.shortValue() : 0;
         if (DEBUG) debugMessage("InnerClasses index = " + _innerClassesIndex);
 
         // field attributes
         Short constantValueIndex = (Short) utf8ToIndex.get("ConstantValue");
-        _constantValueIndex = (constantValueIndex != null)?
-                                          constantValueIndex.shortValue() : 0;
+        _constantValueIndex = (constantValueIndex != null) ?
+                constantValueIndex.shortValue() : 0;
         if (DEBUG) debugMessage("ConstantValue index = " + _constantValueIndex);
 
         Short syntheticIndex = (Short) utf8ToIndex.get("Synthetic");
-        _syntheticIndex = (syntheticIndex != null)? syntheticIndex.shortValue() : 0;
+        _syntheticIndex = (syntheticIndex != null) ? syntheticIndex.shortValue() : 0;
         if (DEBUG) debugMessage("Synthetic index = " + _syntheticIndex);
 
         Short deprecatedIndex = (Short) utf8ToIndex.get("Deprecated");
-        _deprecatedIndex = (deprecatedIndex != null)? deprecatedIndex.shortValue() : 0;
+        _deprecatedIndex = (deprecatedIndex != null) ? deprecatedIndex.shortValue() : 0;
         if (DEBUG) debugMessage("Deprecated index = " + _deprecatedIndex);
 
         // method attributes
         Short codeIndex = (Short) utf8ToIndex.get("Code");
-        _codeIndex = (codeIndex != null)? codeIndex.shortValue() : 0;
+        _codeIndex = (codeIndex != null) ? codeIndex.shortValue() : 0;
         if (DEBUG) debugMessage("Code index = " + _codeIndex);
 
         Short exceptionsIndex = (Short) utf8ToIndex.get("Exceptions");
-        _exceptionsIndex = (exceptionsIndex != null)? exceptionsIndex.shortValue() : 0;
+        _exceptionsIndex = (exceptionsIndex != null) ? exceptionsIndex.shortValue() : 0;
         if (DEBUG) debugMessage("Exceptions index = " + _exceptionsIndex);
 
         // Short syntheticIndex = (Short) utf8ToIndex.get("Synthetic");
@@ -169,154 +168,154 @@ public class ClassWriter implements /* imports */ ClassConstants
 
         // Code attributes
         Short lineNumberTableIndex = (Short) utf8ToIndex.get("LineNumberTable");
-        _lineNumberTableIndex = (lineNumberTableIndex != null)?
-                                       lineNumberTableIndex.shortValue() : 0;
+        _lineNumberTableIndex = (lineNumberTableIndex != null) ?
+                lineNumberTableIndex.shortValue() : 0;
         if (DEBUG) debugMessage("LineNumberTable index = " + _lineNumberTableIndex);
 
         Short localVariableTableIndex = (Short) utf8ToIndex.get("LocalVariableTable");
-        _localVariableTableIndex = (localVariableTableIndex != null)?
-                                       localVariableTableIndex.shortValue() : 0;
+        _localVariableTableIndex = (localVariableTableIndex != null) ?
+                localVariableTableIndex.shortValue() : 0;
         if (DEBUG) debugMessage("LocalVariableTable index = " + _localVariableTableIndex);
 
         Short signatureIdx = (Short) utf8ToIndex.get("Signature");
-        _signatureIndex = (signatureIdx != null)? signatureIdx.shortValue() : 0;
+        _signatureIndex = (signatureIdx != null) ? signatureIdx.shortValue() : 0;
         if (DEBUG) debugMessage("Signature index = " + _signatureIndex);
 
-        for(ci = 1; ci < len; ci++) {
+        for (ci = 1; ci < len; ci++) {
             int cpConstType = tags.at(ci);
             // write cp_info
             // write constant type
-            switch(cpConstType) {
+            switch (cpConstType) {
                 case JVM_CONSTANT_Utf8: {
-                     dos.writeByte(cpConstType);
-                     Symbol sym = cpool.getSymbolAt(ci);
-                     dos.writeShort((short)sym.getLength());
-                     dos.write(sym.asByteArray());
-                     if (DEBUG) debugMessage("CP[" + ci + "] = modified UTF-8 " + sym.asString());
-                     break;
+                    dos.writeByte(cpConstType);
+                    Symbol sym = cpool.getSymbolAt(ci);
+                    dos.writeShort((short) sym.getLength());
+                    dos.write(sym.asByteArray());
+                    if (DEBUG) debugMessage("CP[" + ci + "] = modified UTF-8 " + sym.asString());
+                    break;
                 }
 
                 case JVM_CONSTANT_Unicode:
-                     throw new IllegalArgumentException("Unicode constant!");
+                    throw new IllegalArgumentException("Unicode constant!");
 
                 case JVM_CONSTANT_Integer:
-                     dos.writeByte(cpConstType);
-                     dos.writeInt(cpool.getIntAt(ci));
-                     if (DEBUG) debugMessage("CP[" + ci + "] = int " + cpool.getIntAt(ci));
-                     break;
+                    dos.writeByte(cpConstType);
+                    dos.writeInt(cpool.getIntAt(ci));
+                    if (DEBUG) debugMessage("CP[" + ci + "] = int " + cpool.getIntAt(ci));
+                    break;
 
                 case JVM_CONSTANT_Float:
-                     dos.writeByte(cpConstType);
-                     dos.writeFloat(cpool.getFloatAt(ci));
-                     if (DEBUG) debugMessage("CP[" + ci + "] = float " + cpool.getFloatAt(ci));
-                     break;
+                    dos.writeByte(cpConstType);
+                    dos.writeFloat(cpool.getFloatAt(ci));
+                    if (DEBUG) debugMessage("CP[" + ci + "] = float " + cpool.getFloatAt(ci));
+                    break;
 
                 case JVM_CONSTANT_Long: {
-                     dos.writeByte(cpConstType);
-                     long l = cpool.getLongAt(ci);
-                     // long entries occupy two pool entries
-                     ci++;
-                     dos.writeLong(l);
-                     break;
+                    dos.writeByte(cpConstType);
+                    long l = cpool.getLongAt(ci);
+                    // long entries occupy two pool entries
+                    ci++;
+                    dos.writeLong(l);
+                    break;
                 }
 
                 case JVM_CONSTANT_Double:
-                     dos.writeByte(cpConstType);
-                     dos.writeDouble(cpool.getDoubleAt(ci));
-                     // double entries occupy two pool entries
-                     ci++;
-                     break;
+                    dos.writeByte(cpConstType);
+                    dos.writeDouble(cpool.getDoubleAt(ci));
+                    // double entries occupy two pool entries
+                    ci++;
+                    break;
 
                 case JVM_CONSTANT_Class:
                 case JVM_CONSTANT_UnresolvedClass:
                 case JVM_CONSTANT_UnresolvedClassInError: {
-                     dos.writeByte(JVM_CONSTANT_Class);
-                     String klassName = cpool.getKlassNameAt(ci).asString();
-                     Short s = (Short) utf8ToIndex.get(klassName);
-                     classToIndex.put(klassName, new Short((short)ci));
-                     dos.writeShort(s.shortValue());
-                     if (DEBUG) debugMessage("CP[" + ci  + "] = class " + s);
-                     break;
+                    dos.writeByte(JVM_CONSTANT_Class);
+                    String klassName = cpool.getKlassNameAt(ci).asString();
+                    Short s = (Short) utf8ToIndex.get(klassName);
+                    classToIndex.put(klassName, new Short((short) ci));
+                    dos.writeShort(s.shortValue());
+                    if (DEBUG) debugMessage("CP[" + ci + "] = class " + s);
+                    break;
                 }
 
                 case JVM_CONSTANT_String: {
-                     dos.writeByte(cpConstType);
-                     String str = cpool.getUnresolvedStringAt(ci).asString();
-                     Short s = (Short) utf8ToIndex.get(str);
-                     dos.writeShort(s.shortValue());
-                     if (DEBUG) debugMessage("CP[" + ci + "] = string " + s);
-                     break;
+                    dos.writeByte(cpConstType);
+                    String str = cpool.getUnresolvedStringAt(ci).asString();
+                    Short s = (Short) utf8ToIndex.get(str);
+                    dos.writeShort(s.shortValue());
+                    if (DEBUG) debugMessage("CP[" + ci + "] = string " + s);
+                    break;
                 }
 
                 // all external, internal method/field references
                 case JVM_CONSTANT_Fieldref:
                 case JVM_CONSTANT_Methodref:
                 case JVM_CONSTANT_InterfaceMethodref: {
-                     dos.writeByte(cpConstType);
-                     int value = cpool.getIntAt(ci);
-                     short klassIndex = (short) extractLowShortFromInt(value);
-                     short nameAndTypeIndex = (short) extractHighShortFromInt(value);
-                     dos.writeShort(klassIndex);
-                     dos.writeShort(nameAndTypeIndex);
-                     if (DEBUG) debugMessage("CP[" + ci + "] = ref klass = " +
-                           klassIndex + ", N&T = " + nameAndTypeIndex);
-                     break;
+                    dos.writeByte(cpConstType);
+                    int value = cpool.getIntAt(ci);
+                    short klassIndex = (short) extractLowShortFromInt(value);
+                    short nameAndTypeIndex = (short) extractHighShortFromInt(value);
+                    dos.writeShort(klassIndex);
+                    dos.writeShort(nameAndTypeIndex);
+                    if (DEBUG) debugMessage("CP[" + ci + "] = ref klass = " +
+                            klassIndex + ", N&T = " + nameAndTypeIndex);
+                    break;
                 }
 
                 case JVM_CONSTANT_NameAndType: {
-                     dos.writeByte(cpConstType);
-                     int value = cpool.getIntAt(ci);
-                     short nameIndex = (short) extractLowShortFromInt(value);
-                     short signatureIndex = (short) extractHighShortFromInt(value);
-                     dos.writeShort(nameIndex);
-                     dos.writeShort(signatureIndex);
-                     if (DEBUG) debugMessage("CP[" + ci + "] = N&T name = " + nameIndex
-                                        + ", type = " + signatureIndex);
-                     break;
+                    dos.writeByte(cpConstType);
+                    int value = cpool.getIntAt(ci);
+                    short nameIndex = (short) extractLowShortFromInt(value);
+                    short signatureIndex = (short) extractHighShortFromInt(value);
+                    dos.writeShort(nameIndex);
+                    dos.writeShort(signatureIndex);
+                    if (DEBUG) debugMessage("CP[" + ci + "] = N&T name = " + nameIndex
+                            + ", type = " + signatureIndex);
+                    break;
                 }
 
                 case JVM_CONSTANT_MethodHandle: {
-                     dos.writeByte(cpConstType);
-                     int value = cpool.getIntAt(ci);
-                     byte refKind = (byte) extractLowShortFromInt(value);
-                     short memberIndex = (short) extractHighShortFromInt(value);
-                     dos.writeByte(refKind);
-                     dos.writeShort(memberIndex);
-                     if (DEBUG) debugMessage("CP[" + ci + "] = MH kind = " +
-                           refKind + ", mem = " + memberIndex);
-                     break;
+                    dos.writeByte(cpConstType);
+                    int value = cpool.getIntAt(ci);
+                    byte refKind = (byte) extractLowShortFromInt(value);
+                    short memberIndex = (short) extractHighShortFromInt(value);
+                    dos.writeByte(refKind);
+                    dos.writeShort(memberIndex);
+                    if (DEBUG) debugMessage("CP[" + ci + "] = MH kind = " +
+                            refKind + ", mem = " + memberIndex);
+                    break;
                 }
 
                 case JVM_CONSTANT_MethodType: {
-                     dos.writeByte(cpConstType);
-                     int value = cpool.getIntAt(ci);
-                     short refIndex = (short) value;
-                     dos.writeShort(refIndex);
-                     if (DEBUG) debugMessage("CP[" + ci + "] = MT index = " + refIndex);
-                     break;
+                    dos.writeByte(cpConstType);
+                    int value = cpool.getIntAt(ci);
+                    short refIndex = (short) value;
+                    dos.writeShort(refIndex);
+                    if (DEBUG) debugMessage("CP[" + ci + "] = MT index = " + refIndex);
+                    break;
                 }
 
                 case JVM_CONSTANT_InvokeDynamic: {
-                     dos.writeByte(cpConstType);
-                     int value = cpool.getIntAt(ci);
-                     short bsmIndex = (short) extractLowShortFromInt(value);
-                     short nameAndTypeIndex = (short) extractHighShortFromInt(value);
-                     dos.writeShort(bsmIndex);
-                     dos.writeShort(nameAndTypeIndex);
-                     if (DEBUG) debugMessage("CP[" + ci + "] = INDY bsm = " +
-                           bsmIndex + ", N&T = " + nameAndTypeIndex);
-                     break;
+                    dos.writeByte(cpConstType);
+                    int value = cpool.getIntAt(ci);
+                    short bsmIndex = (short) extractLowShortFromInt(value);
+                    short nameAndTypeIndex = (short) extractHighShortFromInt(value);
+                    dos.writeShort(bsmIndex);
+                    dos.writeShort(nameAndTypeIndex);
+                    if (DEBUG) debugMessage("CP[" + ci + "] = INDY bsm = " +
+                            bsmIndex + ", N&T = " + nameAndTypeIndex);
+                    break;
                 }
 
                 default:
-                  throw new InternalError("Unknown tag: " + cpConstType);
+                    throw new InternalError("Unknown tag: " + cpConstType);
             } // switch
         }
     }
 
     protected void writeClassAccessFlags() throws IOException {
-        int flags = (int)(klass.getAccessFlags() & JVM_RECOGNIZED_CLASS_MODIFIERS);
-        dos.writeShort((short)flags);
+        int flags = (int) (klass.getAccessFlags() & JVM_RECOGNIZED_CLASS_MODIFIERS);
+        dos.writeShort((short) flags);
     }
 
     protected void writeThisClass() throws IOException {
@@ -337,6 +336,7 @@ public class ClassWriter implements /* imports */ ClassConstants
             dos.writeShort(0); // no super class
         }
     }
+
     protected void writeInterfaces() throws IOException {
         KlassArray interfaces = klass.getLocalInterfaces();
         final int len = interfaces.length();
@@ -346,10 +346,10 @@ public class ClassWriter implements /* imports */ ClassConstants
         // write interfaces count
         dos.writeShort((short) len);
         for (int i = 0; i < len; i++) {
-           Klass k = interfaces.getAt(i);
-           Short index = (Short) classToIndex.get(k.getName().asString());
-           dos.writeShort(index.shortValue());
-           if (DEBUG) debugMessage("\t" + index);
+            Klass k = interfaces.getAt(i);
+            Short index = (Short) classToIndex.get(k.getName().asString());
+            dos.writeShort(index.shortValue());
+            if (DEBUG) debugMessage("\t" + index);
         }
     }
 
@@ -362,10 +362,10 @@ public class ClassWriter implements /* imports */ ClassConstants
         if (DEBUG) debugMessage("number of fields = " + javaFieldsCount);
 
         for (int index = 0; index < javaFieldsCount; index++) {
-            short accessFlags    = klass.getFieldAccessFlags(index);
+            short accessFlags = klass.getFieldAccessFlags(index);
             dos.writeShort(accessFlags & (short) JVM_RECOGNIZED_FIELD_MODIFIERS);
 
-            short nameIndex    = klass.getFieldNameIndex(index);
+            short nameIndex = klass.getFieldNameIndex(index);
             dos.writeShort(nameIndex);
 
             short signatureIndex = klass.getFieldSignatureIndex(index);
@@ -438,14 +438,14 @@ public class ClassWriter implements /* imports */ ClassConstants
         dos.writeShort((short) m.getNameIndex());
         dos.writeShort((short) m.getSignatureIndex());
         if (DEBUG) debugMessage("\tmethod name = " + m.getNameIndex() + ", signature = "
-                        + m.getSignatureIndex());
+                + m.getSignatureIndex());
 
         final boolean isNative = ((accessFlags & JVM_ACC_NATIVE) != 0);
         final boolean isAbstract = ((accessFlags & JVM_ACC_ABSTRACT) != 0);
 
         short methodAttributeCount = 0;
 
-        final boolean hasSyn = hasSyntheticAttribute((short)accessFlags);
+        final boolean hasSyn = hasSyntheticAttribute((short) accessFlags);
         if (hasSyn)
             methodAttributeCount++;
 
@@ -472,12 +472,12 @@ public class ClassWriter implements /* imports */ ClassConstants
         if (isCodeAvailable) {
             byte[] code = m.getByteCode();
             short codeAttrCount = 0;
-            int codeSize  = 2           /* max_stack   */ +
-                            2           /* max_locals  */ +
-                            4           /* code_length */ +
-                            code.length /* code        */ +
-                            2           /* exp. table len.  */ +
-                            2           /* code attr. count */;
+            int codeSize = 2           /* max_stack   */ +
+                    2           /* max_locals  */ +
+                    4           /* code_length */ +
+                    code.length /* code        */ +
+                    2           /* exp. table len.  */ +
+                    2           /* code attr. count */;
 
             boolean hasExceptionTable = m.hasExceptionTable();
             ExceptionTableElement[] exceptionTable = null;
@@ -487,10 +487,10 @@ public class ClassWriter implements /* imports */ ClassConstants
                 exceptionTableLen = exceptionTable.length;
                 if (DEBUG) debugMessage("\tmethod has exception table");
                 codeSize += exceptionTableLen /* exception table is 4-tuple array */
-                                         * (2 /* start_pc     */ +
-                                            2 /* end_pc       */ +
-                                            2 /* handler_pc   */ +
-                                            2 /* catch_type   */);
+                        * (2 /* start_pc     */ +
+                        2 /* end_pc       */ +
+                        2 /* handler_pc   */ +
+                        2 /* catch_type   */);
             }
 
             boolean hasLineNumberTable = m.hasLineNumberTable();
@@ -503,14 +503,14 @@ public class ClassWriter implements /* imports */ ClassConstants
                 if (DEBUG) debugMessage("\t\tline table length = " + lineNumberTable.length);
 
                 lineNumberAttrLen = 2 /* line number table length         */ +
-                           lineNumberTable.length * (2 /* start_pc */ + 2 /* line_number */);
+                        lineNumberTable.length * (2 /* start_pc */ + 2 /* line_number */);
 
                 codeSize += 2 /* line number table attr index     */ +
-                            4 /* line number table attr length    */ +
-                            lineNumberAttrLen;
+                        4 /* line number table attr length    */ +
+                        lineNumberAttrLen;
 
                 if (DEBUG) debugMessage("\t\tline number table attr size = " +
-                                              lineNumberAttrLen);
+                        lineNumberAttrLen);
 
                 codeAttrCount++;
             }
@@ -523,21 +523,21 @@ public class ClassWriter implements /* imports */ ClassConstants
                 if (DEBUG) debugMessage("\tmethod has local variable table");
                 localVariableTable = m.getLocalVariableTable();
                 if (DEBUG) debugMessage("\t\tlocal variable table length = "
-                              + localVariableTable.length);
+                        + localVariableTable.length);
                 localVarAttrLen =
-                               2 /* local variable table length      */ +
-                               localVariableTable.length * ( 2 /* start_pc          */ +
-                                                          2 /* length            */ +
-                                                          2 /* name_index        */ +
-                                                          2 /* signature_index   */ +
-                                                          2 /* variable index    */ );
+                        2 /* local variable table length      */ +
+                                localVariableTable.length * (2 /* start_pc          */ +
+                                        2 /* length            */ +
+                                        2 /* name_index        */ +
+                                        2 /* signature_index   */ +
+                                        2 /* variable index    */);
 
                 if (DEBUG) debugMessage("\t\tlocal variable attr size = " +
-                                              localVarAttrLen);
+                        localVarAttrLen);
 
                 codeSize += 2 /* local variable table attr index  */ +
-                            4 /* local variable table attr length */ +
-                            localVarAttrLen;
+                        4 /* local variable table attr length */ +
+                        localVarAttrLen;
 
                 codeAttrCount++;
             }
@@ -569,14 +569,14 @@ public class ClassWriter implements /* imports */ ClassConstants
 
             if (exceptionTableLen != 0) {
                 for (int e = 0; e < exceptionTableLen; e++) {
-                     dos.writeShort((short) exceptionTable[e].getStartPC());
-                     dos.writeShort((short) exceptionTable[e].getEndPC());
-                     dos.writeShort((short) exceptionTable[e].getHandlerPC());
-                     dos.writeShort((short) exceptionTable[e].getCatchTypeIndex());
+                    dos.writeShort((short) exceptionTable[e].getStartPC());
+                    dos.writeShort((short) exceptionTable[e].getEndPC());
+                    dos.writeShort((short) exceptionTable[e].getHandlerPC());
+                    dos.writeShort((short) exceptionTable[e].getCatchTypeIndex());
                 }
             }
 
-            dos.writeShort((short)codeAttrCount);
+            dos.writeShort((short) codeAttrCount);
             if (DEBUG) debugMessage("\tcode attribute count = " + codeAttrCount);
 
             // write LineNumberTable, if available.
@@ -585,8 +585,8 @@ public class ClassWriter implements /* imports */ ClassConstants
                 dos.writeInt(lineNumberAttrLen);
                 dos.writeShort((short) lineNumberTable.length);
                 for (int l = 0; l < lineNumberTable.length; l++) {
-                     dos.writeShort((short) lineNumberTable[l].getStartBCI());
-                     dos.writeShort((short) lineNumberTable[l].getLineNumber());
+                    dos.writeShort((short) lineNumberTable[l].getStartBCI());
+                    dos.writeShort((short) lineNumberTable[l].getLineNumber());
                 }
             }
 
@@ -596,11 +596,11 @@ public class ClassWriter implements /* imports */ ClassConstants
                 dos.writeInt(localVarAttrLen);
                 dos.writeShort((short) localVariableTable.length);
                 for (int l = 0; l < localVariableTable.length; l++) {
-                     dos.writeShort((short) localVariableTable[l].getStartBCI());
-                     dos.writeShort((short) localVariableTable[l].getLength());
-                     dos.writeShort((short) localVariableTable[l].getNameCPIndex());
-                     dos.writeShort((short) localVariableTable[l].getDescriptorCPIndex());
-                     dos.writeShort((short) localVariableTable[l].getSlot());
+                    dos.writeShort((short) localVariableTable[l].getStartBCI());
+                    dos.writeShort((short) localVariableTable[l].getLength());
+                    dos.writeShort((short) localVariableTable[l].getNameCPIndex());
+                    dos.writeShort((short) localVariableTable[l].getDescriptorCPIndex());
+                    dos.writeShort((short) localVariableTable[l].getSlot());
                 }
             }
         }
@@ -610,19 +610,19 @@ public class ClassWriter implements /* imports */ ClassConstants
             writeIndex(_exceptionsIndex);
 
             int attrSize = 2 /* number_of_exceptions */ +
-                           exceptions.length * 2 /* exception_index */;
+                    exceptions.length * 2 /* exception_index */;
             dos.writeInt(attrSize);
             dos.writeShort(exceptions.length);
             if (DEBUG) debugMessage("\tmethod has " + exceptions.length
-                                        +  " checked exception(s)");
+                    + " checked exception(s)");
             for (int e = 0; e < exceptions.length; e++) {
-                 short cpIndex = (short) exceptions[e].getClassCPIndex();
-                 dos.writeShort(cpIndex);
+                short cpIndex = (short) exceptions[e].getClassCPIndex();
+                dos.writeShort(cpIndex);
             }
         }
 
         if (isGeneric) {
-           writeGenericSignature(m.getGenericSignature().asString());
+            writeGenericSignature(m.getGenericSignature().asString());
         }
     }
 
@@ -688,11 +688,11 @@ public class ClassWriter implements /* imports */ ClassConstants
         if (numInnerClasses != 0) {
             writeIndex(_innerClassesIndex);
             final int innerAttrLen = 2 /* number_of_inner_classes */ +
-                                     numInnerClasses * (
-                                                 2 /* inner_class_info_index */ +
-                                                 2 /* outer_class_info_index */ +
-                                                 2 /* inner_class_name_index */ +
-                                                 2 /* inner_class_access_flags */);
+                    numInnerClasses * (
+                            2 /* inner_class_info_index */ +
+                                    2 /* outer_class_info_index */ +
+                                    2 /* inner_class_name_index */ +
+                                    2 /* inner_class_access_flags */);
             dos.writeInt(innerAttrLen);
 
             dos.writeShort(numInnerClasses);

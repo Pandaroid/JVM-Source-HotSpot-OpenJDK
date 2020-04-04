@@ -30,16 +30,13 @@ import javax.swing.KeyStroke;
 // Referenced classes of package com.sun.java.swing.action:
 //            DelegateAction, ActionManager
 
-public class SaveAction extends DelegateAction
-{
+public class SaveAction extends DelegateAction {
 
-    public SaveAction()
-    {
+    public SaveAction() {
         this("general/Save16.gif");
     }
 
-    public SaveAction(String iconPath)
-    {
+    public SaveAction(String iconPath) {
         super("Save", ActionManager.getIcon(iconPath));
         putValue("ActionCommandKey", "save-command");
         putValue("ShortDescription", "Commit changes to a permanent storage area");

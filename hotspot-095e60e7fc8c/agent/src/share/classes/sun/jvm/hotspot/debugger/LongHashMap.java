@@ -31,23 +31,22 @@ import java.util.*;
  * instead of Objects. It turns out that using this in the PageCache
  * implementation speeds up heap traversals by a factor of three.
  *
- * @author  Josh Bloch
+ * @author Josh Bloch
  * @author Arthur van Hoff
  */
 
-public class LongHashMap
-{
+public class LongHashMap {
     static class Entry {
-        private int    hash;
-        private long   key;
+        private int hash;
+        private long key;
         private Object value;
-        private Entry  next;
+        private Entry next;
 
         Entry(int hash, long key, Object value, Entry next) {
-            this.hash  = hash;
-            this.key   = key;
+            this.hash = hash;
+            this.key = key;
             this.value = value;
-            this.next  = next;
+            this.next = next;
         }
 
         /**
@@ -55,7 +54,9 @@ public class LongHashMap
          *
          * @return the key corresponding to this entry.
          */
-        long getKey() { return key; }
+        long getKey() {
+            return key;
+        }
 
         /**
          * Returns the value corresponding to this entry.  If the mapping
@@ -64,7 +65,9 @@ public class LongHashMap
          *
          * @return the value corresponding to this entry.
          */
-        Object getValue() { return value; }
+        Object getValue() {
+            return value;
+        }
 
         /**
          * Replaces the value corresponding to this entry with the specified
@@ -74,16 +77,15 @@ public class LongHashMap
          *
          * @param value new value to be stored in this entry.
          * @return old value corresponding to the entry.
-         *
          * @throws UnsupportedOperationException if the <tt>put</tt> operation
-         *            is not supported by the backing map.
-         * @throws ClassCastException if the class of the specified value
-         *            prevents it from being stored in the backing map.
-         * @throws    IllegalArgumentException if some aspect of this value
-         *            prevents it from being stored in the backing map.
-         * @throws NullPointerException the backing map does not permit
-         *            <tt>null</tt> values, and the specified value is
-         *            <tt>null</tt>.
+         *                                       is not supported by the backing map.
+         * @throws ClassCastException            if the class of the specified value
+         *                                       prevents it from being stored in the backing map.
+         * @throws IllegalArgumentException      if some aspect of this value
+         *                                       prevents it from being stored in the backing map.
+         * @throws NullPointerException          the backing map does not permit
+         *                                       <tt>null</tt> values, and the specified value is
+         *                                       <tt>null</tt>.
          */
         Object setValue(Object value) {
             Object oldValue = this.value;
@@ -107,12 +109,12 @@ public class LongHashMap
          *
          * @param o object to be compared for equality with this map entry.
          * @return <tt>true</tt> if the specified object is equal to this map
-         *         entry.
+         * entry.
          */
         public boolean equals(Object o) {
             if (!(o instanceof Entry))
                 return false;
-            Entry e = (Entry)o;
+            Entry e = (Entry) o;
             return (key == e.getKey()) && eq(value, e.getValue());
         }
 
@@ -133,7 +135,7 @@ public class LongHashMap
          * @see #equals(Object)
          */
         public int hashCode() {
-            return hash ^ (value==null ? 0 : value.hashCode());
+            return hash ^ (value == null ? 0 : value.hashCode());
         }
     }
 
@@ -175,32 +177,32 @@ public class LongHashMap
      * Constructs a new, empty map with the specified initial
      * capacity and the specified load factor.
      *
-     * @param      initialCapacity   the initial capacity of the HashMap.
-     * @param      loadFactor        the load factor of the HashMap
-     * @throws     IllegalArgumentException  if the initial capacity is less
-     *               than zero, or if the load factor is nonpositive.
+     * @param initialCapacity the initial capacity of the HashMap.
+     * @param loadFactor      the load factor of the HashMap
+     * @throws IllegalArgumentException if the initial capacity is less
+     *                                  than zero, or if the load factor is nonpositive.
      */
     public LongHashMap(int initialCapacity, float loadFactor) {
         if (initialCapacity < 0)
-            throw new IllegalArgumentException("Illegal Initial Capacity: "+
-                                               initialCapacity);
+            throw new IllegalArgumentException("Illegal Initial Capacity: " +
+                    initialCapacity);
         if (loadFactor <= 0 || Float.isNaN(loadFactor))
-            throw new IllegalArgumentException("Illegal Load factor: "+
-                                               loadFactor);
-        if (initialCapacity==0)
+            throw new IllegalArgumentException("Illegal Load factor: " +
+                    loadFactor);
+        if (initialCapacity == 0)
             initialCapacity = 1;
         this.loadFactor = loadFactor;
         table = new Entry[initialCapacity];
-        threshold = (int)(initialCapacity * loadFactor);
+        threshold = (int) (initialCapacity * loadFactor);
     }
 
     /**
      * Constructs a new, empty map with the specified initial capacity
      * and default load factor, which is <tt>0.75</tt>.
      *
-     * @param   initialCapacity   the initial capacity of the HashMap.
-     * @throws    IllegalArgumentException if the initial capacity is less
-     *              than zero.
+     * @param initialCapacity the initial capacity of the HashMap.
+     * @throws IllegalArgumentException if the initial capacity is less
+     *                                  than zero.
      */
     public LongHashMap(int initialCapacity) {
         this(initialCapacity, 0.75f);
@@ -240,8 +242,8 @@ public class LongHashMap
      * explicitly maps the key to <tt>null</tt>.  The <tt>containsKey</tt>
      * operation may be used to distinguish these two cases.
      *
-     * @return the value to which this map maps the specified key.
      * @param key key whose associated value is to be returned.
+     * @return the value to which this map maps the specified key.
      */
     public Object get(long key) {
         Entry e = getEntry(key);
@@ -252,9 +254,9 @@ public class LongHashMap
      * Returns <tt>true</tt> if this map contains a mapping for the specified
      * key.
      *
+     * @param key key whose presence in this Map is to be tested.
      * @return <tt>true</tt> if this map contains a mapping for the specified
      * key.
-     * @param key key whose presence in this Map is to be tested.
      */
     public boolean containsKey(long key) {
         return getEntry(key) != null;
@@ -271,7 +273,7 @@ public class LongHashMap
         int index = (hash & 0x7FFFFFFF) % tab.length;
 
         for (Entry e = tab[index]; e != null; e = e.next)
-            if (e.hash == hash && e.key ==key)
+            if (e.hash == hash && e.key == key)
                 return e;
 
         return null;
@@ -283,19 +285,19 @@ public class LongHashMap
      *
      * @param value value whose presence in this map is to be tested.
      * @return <tt>true</tt> if this map maps one or more keys to the
-     *         specified value.
+     * specified value.
      */
     public boolean containsValue(Object value) {
         Entry tab[] = table;
 
-        if (value==null) {
-            for (int i = tab.length ; i-- > 0 ;)
-                for (Entry e = tab[i] ; e != null ; e = e.next)
-                    if (e.value==null)
+        if (value == null) {
+            for (int i = tab.length; i-- > 0; )
+                for (Entry e = tab[i]; e != null; e = e.next)
+                    if (e.value == null)
                         return true;
         } else {
-            for (int i = tab.length ; i-- > 0 ;)
-                for (Entry e = tab[i] ; e != null ; e = e.next)
+            for (int i = tab.length; i-- > 0; )
+                for (Entry e = tab[i]; e != null; e = e.next)
                     if (value.equals(e.value))
                         return true;
         }
@@ -308,12 +310,12 @@ public class LongHashMap
      * If the map previously contained a mapping for this key, the old
      * value is replaced.
      *
-     * @param key key with which the specified value is to be associated.
+     * @param key   key with which the specified value is to be associated.
      * @param value value to be associated with the specified key.
      * @return previous value associated with specified key, or <tt>null</tt>
-     *         if there was no mapping for key.  A <tt>null</tt> return can
-     *         also indicate that the HashMap previously associated
-     *         <tt>null</tt> with the specified key.
+     * if there was no mapping for key.  A <tt>null</tt> return can
+     * also indicate that the HashMap previously associated
+     * <tt>null</tt> with the specified key.
      */
     public Object put(long key, Object value) {
         Entry tab[] = table;
@@ -321,7 +323,7 @@ public class LongHashMap
         int index = (hash & 0x7FFFFFFF) % tab.length;
 
         // Look for entry in hash table
-        for (Entry e = tab[index] ; e != null ; e = e.next) {
+        for (Entry e = tab[index]; e != null; e = e.next) {
             if (e.hash == hash && e.key == key) {
                 Object oldValue = e.value;
                 e.value = value;
@@ -348,9 +350,9 @@ public class LongHashMap
      *
      * @param key key whose mapping is to be removed from the map.
      * @return previous value associated with specified key, or <tt>null</tt>
-     *         if there was no mapping for key.  A <tt>null</tt> return can
-     *         also indicate that the map previously associated <tt>null</tt>
-     *         with the specified key.
+     * if there was no mapping for key.  A <tt>null</tt> return can
+     * also indicate that the map previously associated <tt>null</tt>
+     * with the specified key.
      */
     public Object remove(long key) {
         Entry e = removeEntryForKey(key);
@@ -431,11 +433,11 @@ public class LongHashMap
         Entry newTable[] = new Entry[newCapacity];
 
         modCount++;
-        threshold = (int)(newCapacity * loadFactor);
+        threshold = (int) (newCapacity * loadFactor);
         table = newTable;
 
-        for (int i = oldCapacity ; i-- > 0 ;) {
-            for (Entry old = oldTable[i] ; old != null ; ) {
+        for (int i = oldCapacity; i-- > 0; ) {
+            for (Entry old = oldTable[i]; old != null; ) {
                 Entry e = old;
                 old = old.next;
 
@@ -447,7 +449,7 @@ public class LongHashMap
     }
 
     static boolean eq(Object o1, Object o2) {
-        return (o1==null ? o2==null : o1.equals(o2));
+        return (o1 == null ? o2 == null : o1.equals(o2));
     }
 
     Entry newEntry(int hash, long key, Object value, Entry next) {

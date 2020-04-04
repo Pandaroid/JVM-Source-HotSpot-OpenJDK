@@ -37,7 +37,7 @@ import java.util.List;
  * have to be implemented in the subclasses.
  */
 abstract public class TypeComponentImpl extends MirrorImpl
-    implements TypeComponent {
+        implements TypeComponent {
 
     protected final ReferenceTypeImpl declaringType;
     protected String signature;
@@ -56,12 +56,20 @@ abstract public class TypeComponentImpl extends MirrorImpl
     }
 
     abstract public String name();
+
     abstract public int modifiers();
+
     abstract public boolean isPackagePrivate();
+
     abstract public boolean isPrivate();
+
     abstract public boolean isProtected();
+
     abstract public boolean isPublic();
+
     abstract public boolean isStatic();
+
     abstract public boolean isFinal();
+
     abstract public int hashCode();
 }

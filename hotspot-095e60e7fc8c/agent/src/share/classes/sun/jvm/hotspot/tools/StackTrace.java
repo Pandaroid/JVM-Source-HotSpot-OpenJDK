@@ -28,8 +28,10 @@ import sun.jvm.hotspot.debugger.*;
 import sun.jvm.hotspot.runtime.*;
 import sun.jvm.hotspot.oops.*;
 
-/** Traverses and prints the stack traces for all Java threads in the
- * remote VM */
+/**
+ * Traverses and prints the stack traces for all Java threads in the
+ * remote VM
+ */
 public class StackTrace extends Tool {
     // in non-verbose mode pc, sp and Method* are not printed
     public StackTrace(boolean v, boolean concurrentLocks) {
@@ -86,7 +88,7 @@ public class StackTrace extends Tool {
                         for (JavaVFrame vf = cur.getLastJavaVFrameDbg(); vf != null; vf = vf.javaSender()) {
                             Method method = vf.getMethod();
                             tty.print(" - " + method.externalNameAndSignature() +
-                            " @bci=" + vf.getBCI());
+                                    " @bci=" + vf.getBCI());
 
                             int lineNumber = method.getLineNumberFromBCI(vf.getBCI());
                             if (lineNumber != -1) {
@@ -105,7 +107,7 @@ public class StackTrace extends Tool {
                             if (vf.isCompiledFrame()) {
                                 tty.print(" (Compiled frame");
                                 if (vf.isDeoptimized()) {
-                                  tty.print(" [deoptimized]");
+                                    tty.print(" [deoptimized]");
                                 }
                             }
                             if (vf.isInterpretedFrame()) {
@@ -126,20 +128,19 @@ public class StackTrace extends Tool {
                         concLocksPrinter.print(cur, tty);
                     }
                     tty.println();
-              }
-          }
-      }
-      catch (AddressException e) {
-        System.err.println("Error accessing address 0x" + Long.toHexString(e.getAddress()));
-        e.printStackTrace();
-      }
-   }
+                }
+            }
+        } catch (AddressException e) {
+            System.err.println("Error accessing address 0x" + Long.toHexString(e.getAddress()));
+            e.printStackTrace();
+        }
+    }
 
-   public static void main(String[] args) {
-      StackTrace st = new StackTrace();
-      st.execute(args);
-   }
+    public static void main(String[] args) {
+        StackTrace st = new StackTrace();
+        st.execute(args);
+    }
 
-   private boolean verbose;
-   private boolean concurrentLocks;
+    private boolean verbose;
+    private boolean concurrentLocks;
 }

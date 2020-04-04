@@ -28,11 +28,9 @@ package com.sun.java.swing.action;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
-public class HelpMenu extends AbstractAction
-{
+public class HelpMenu extends AbstractAction {
 
-    public HelpMenu()
-    {
+    public HelpMenu() {
         super("Help");
         putValue("ActionCommandKey", "help-menu-command");
         putValue("ShortDescription", "Help operations");
@@ -40,8 +38,7 @@ public class HelpMenu extends AbstractAction
         putValue("MnemonicKey", VALUE_MNEMONIC);
     }
 
-    public void actionPerformed(ActionEvent actionevent)
-    {
+    public void actionPerformed(ActionEvent actionevent) {
     }
 
     public static final String VALUE_COMMAND = "help-menu-command";

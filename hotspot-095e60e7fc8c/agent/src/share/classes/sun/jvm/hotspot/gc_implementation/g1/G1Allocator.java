@@ -12,29 +12,29 @@ import sun.jvm.hotspot.types.TypeDataBase;
 
 public class G1Allocator extends VMObject {
 
-  //size_t _summary_bytes_used;
-  static private CIntegerField summaryBytesUsedField;
+    //size_t _summary_bytes_used;
+    static private CIntegerField summaryBytesUsedField;
 
-  static {
-    VM.registerVMInitializedObserver(new Observer() {
-      public void update(Observable o, Object data) {
-        initialize(VM.getVM().getTypeDataBase());
-      }
-    });
-  }
+    static {
+        VM.registerVMInitializedObserver(new Observer() {
+            public void update(Observable o, Object data) {
+                initialize(VM.getVM().getTypeDataBase());
+            }
+        });
+    }
 
-  static private synchronized void initialize(TypeDataBase db) {
-    Type type = db.lookupType("G1Allocator");
+    static private synchronized void initialize(TypeDataBase db) {
+        Type type = db.lookupType("G1Allocator");
 
-    summaryBytesUsedField = type.getCIntegerField("_summary_bytes_used");
-  }
+        summaryBytesUsedField = type.getCIntegerField("_summary_bytes_used");
+    }
 
-  public long getSummaryBytes() {
-    return summaryBytesUsedField.getValue(addr);
-  }
+    public long getSummaryBytes() {
+        return summaryBytesUsedField.getValue(addr);
+    }
 
-  public G1Allocator(Address addr) {
-    super(addr);
+    public G1Allocator(Address addr) {
+        super(addr);
 
-  }
+    }
 }

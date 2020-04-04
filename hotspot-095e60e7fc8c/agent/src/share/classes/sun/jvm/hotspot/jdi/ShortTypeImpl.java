@@ -37,7 +37,7 @@ public class ShortTypeImpl extends PrimitiveTypeImpl implements ShortType {
     }
 
     PrimitiveValue convert(PrimitiveValue value) throws InvalidTypeException {
-        return vm.mirrorOf(((PrimitiveValueImpl)value).checkedShortValue());
+        return vm.mirrorOf(((PrimitiveValueImpl) value).checkedShortValue());
     }
 
 }

@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
+
 import sun.jvm.hotspot.debugger.Address;
 import sun.jvm.hotspot.memory.CompactibleSpace;
 import sun.jvm.hotspot.memory.MemRegion;
@@ -47,10 +48,10 @@ public class HeapRegion extends CompactibleSpace {
 
     static {
         VM.registerVMInitializedObserver(new Observer() {
-                public void update(Observable o, Object data) {
-                    initialize(VM.getVM().getTypeDataBase());
-                }
-            });
+            public void update(Observable o, Object data) {
+                initialize(VM.getVM().getTypeDataBase());
+            }
+        });
     }
 
     static private synchronized void initialize(TypeDataBase db) {

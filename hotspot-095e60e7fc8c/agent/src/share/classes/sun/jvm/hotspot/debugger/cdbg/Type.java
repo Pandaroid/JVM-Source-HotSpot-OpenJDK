@@ -26,54 +26,88 @@ package sun.jvm.hotspot.debugger.cdbg;
 
 import sun.jvm.hotspot.debugger.*;
 
-/** Models a C or C++ type. Symbols have an associated Type. */
+/**
+ * Models a C or C++ type. Symbols have an associated Type.
+ */
 
 public interface Type {
-  public String       getName();
-  /** Size of the type in bytes */
-  public int          getSize();
+    public String getName();
 
-  public BitType      asBit();
-  public IntType      asInt();
-  public EnumType     asEnum();
-  public FloatType    asFloat();
-  public DoubleType   asDouble();
-  public PointerType  asPointer();
-  public ArrayType    asArray();
-  public RefType      asRef();
-  public CompoundType asCompound();
-  public FunctionType asFunction();
-  public MemberFunctionType asMemberFunction();
-  public VoidType     asVoid();
+    /**
+     * Size of the type in bytes
+     */
+    public int getSize();
 
-  public boolean      isBit();
-  public boolean      isInt();
-  public boolean      isEnum();
-  public boolean      isFloat();
-  public boolean      isDouble();
-  public boolean      isPointer();
-  public boolean      isArray();
-  public boolean      isRef();
-  public boolean      isCompound();
-  public boolean      isFunction();
-  public boolean      isMemberFunction();
-  public boolean      isVoid();
+    public BitType asBit();
 
-  public boolean      isConst();
-  public boolean      isVolatile();
+    public IntType asInt();
 
-  /** Visit an object of this type at the given address with the
-      specified visitor */
-  public void iterateObject(Address a, ObjectVisitor v);
+    public EnumType asEnum();
 
-  /** Alternate visitor which allows end user to specify the
-      FieldIdentifier associated with this type (typically for
-      visiting locals in a frame) */
-  public void iterateObject(Address a, ObjectVisitor v, FieldIdentifier f);
+    public FloatType asFloat();
 
-  /** Returns getName() unless a subclass can return something more
-      appropriate */
-  public String toString();
+    public DoubleType asDouble();
+
+    public PointerType asPointer();
+
+    public ArrayType asArray();
+
+    public RefType asRef();
+
+    public CompoundType asCompound();
+
+    public FunctionType asFunction();
+
+    public MemberFunctionType asMemberFunction();
+
+    public VoidType asVoid();
+
+    public boolean isBit();
+
+    public boolean isInt();
+
+    public boolean isEnum();
+
+    public boolean isFloat();
+
+    public boolean isDouble();
+
+    public boolean isPointer();
+
+    public boolean isArray();
+
+    public boolean isRef();
+
+    public boolean isCompound();
+
+    public boolean isFunction();
+
+    public boolean isMemberFunction();
+
+    public boolean isVoid();
+
+    public boolean isConst();
+
+    public boolean isVolatile();
+
+    /**
+     * Visit an object of this type at the given address with the
+     * specified visitor
+     */
+    public void iterateObject(Address a, ObjectVisitor v);
+
+    /**
+     * Alternate visitor which allows end user to specify the
+     * FieldIdentifier associated with this type (typically for
+     * visiting locals in a frame)
+     */
+    public void iterateObject(Address a, ObjectVisitor v, FieldIdentifier f);
+
+    /**
+     * Returns getName() unless a subclass can return something more
+     * appropriate
+     */
+    public String toString();
 
   /*
   // Kinds of types

@@ -35,16 +35,18 @@ import sun.jvm.hotspot.CommandProcessor;
 import sun.jvm.hotspot.debugger.*;
 import sun.jvm.hotspot.utilities.*;
 
-/** A JPanel subclass containing a scrollable text area displaying the
-    debugger's console, if it has one. This should not be created for
-    a debugger which does not have a console. */
+/**
+ * A JPanel subclass containing a scrollable text area displaying the
+ * debugger's console, if it has one. This should not be created for
+ * a debugger which does not have a console.
+ */
 
 public class CommandProcessorPanel extends JPanel {
     private CommandProcessor commands;
     private JTextArea editor;
     private boolean updating;
-    private int     mark;
-    private String  curText;  // handles multi-line input via '\'
+    private int mark;
+    private String curText;  // handles multi-line input via '\'
 
     // Don't run the "main" method of this class unless this flag is set to true first
     private static final boolean DEBUGGING = false;
@@ -71,70 +73,69 @@ public class CommandProcessorPanel extends JPanel {
         cp.setErr(o);
 
         editor.getDocument().addDocumentListener(new DocumentListener() {
-                public void changedUpdate(DocumentEvent e) {
-                }
+            public void changedUpdate(DocumentEvent e) {
+            }
 
-                public void insertUpdate(DocumentEvent e) {
-                    if (updating) return;
-                    beginUpdate();
-                    editor.setCaretPosition(editor.getDocument().getLength());
-                    if (insertContains(e, '\n')) {
-                        String cmd = getMarkedText();
-                        // Handle multi-line input
-                        if ((cmd.length() == 0) || (cmd.charAt(cmd.length() - 1) != '\\')) {
-                            // Trim "\\n" combinations
-                            final String ln = trimContinuations(cmd);
-                            SwingUtilities.invokeLater(new Runnable() {
-                                    public void run() {
-                                        beginUpdate();
-                                        try {
-                                            commands.executeCommand(ln, true);
-                                            commands.printPrompt();
-                                            Document d = editor.getDocument();
-                                            try {
-                                                d.insertString(d.getLength(), baos.toString(), null);
-                                            }
-                                            catch (BadLocationException ble) {
-                                                ble.printStackTrace();
-                                            }
-                                            baos.reset();
-                                            editor.setCaretPosition(editor.getDocument().getLength());
-                                            setMark();
-                                        } finally {
-                                            endUpdate();
-                                        }
+            public void insertUpdate(DocumentEvent e) {
+                if (updating) return;
+                beginUpdate();
+                editor.setCaretPosition(editor.getDocument().getLength());
+                if (insertContains(e, '\n')) {
+                    String cmd = getMarkedText();
+                    // Handle multi-line input
+                    if ((cmd.length() == 0) || (cmd.charAt(cmd.length() - 1) != '\\')) {
+                        // Trim "\\n" combinations
+                        final String ln = trimContinuations(cmd);
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                beginUpdate();
+                                try {
+                                    commands.executeCommand(ln, true);
+                                    commands.printPrompt();
+                                    Document d = editor.getDocument();
+                                    try {
+                                        d.insertString(d.getLength(), baos.toString(), null);
+                                    } catch (BadLocationException ble) {
+                                        ble.printStackTrace();
                                     }
-                                });
-                        }
-                    } else {
-                        endUpdate();
+                                    baos.reset();
+                                    editor.setCaretPosition(editor.getDocument().getLength());
+                                    setMark();
+                                } finally {
+                                    endUpdate();
+                                }
+                            }
+                        });
                     }
+                } else {
+                    endUpdate();
                 }
+            }
 
-                public void removeUpdate(DocumentEvent e) {
-                }
-            });
+            public void removeUpdate(DocumentEvent e) {
+            }
+        });
 
         // This is a bit of a hack but is probably better than relying on
         // the JEditorPane to update the caret's position precisely the
         // size of the insertion
         editor.addCaretListener(new CaretListener() {
-                public void caretUpdate(CaretEvent e) {
-                    int len = editor.getDocument().getLength();
-                    if (e.getDot() > len) {
-                        editor.setCaretPosition(len);
-                    }
+            public void caretUpdate(CaretEvent e) {
+                int len = editor.getDocument().getLength();
+                if (e.getDot() > len) {
+                    editor.setCaretPosition(len);
                 }
-            });
+            }
+        });
 
         Box hbox = Box.createHorizontalBox();
         hbox.add(Box.createGlue());
         JButton button = new JButton("Clear Saved Text");
         button.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    clear();
-                }
-            });
+            public void actionPerformed(ActionEvent e) {
+                clear();
+            }
+        });
         hbox.add(button);
         hbox.add(Box.createGlue());
         add(hbox, BorderLayout.SOUTH);
@@ -166,8 +167,7 @@ public class CommandProcessorPanel extends JPanel {
                 i--;
             }
             return s.substring(0, i);
-        }
-        catch (BadLocationException e) {
+        } catch (BadLocationException e) {
             e.printStackTrace();
             return null;
         }
@@ -194,8 +194,7 @@ public class CommandProcessorPanel extends JPanel {
                     return true;
                 }
             }
-        }
-        catch (BadLocationException ex) {
+        } catch (BadLocationException ex) {
             ex.printStackTrace();
         }
         return false;
@@ -204,7 +203,7 @@ public class CommandProcessorPanel extends JPanel {
     private String trimContinuations(String text) {
         int i;
         while ((i = text.indexOf("\\\n")) >= 0) {
-            text = text.substring(0, i) + text.substring(i+2, text.length());
+            text = text.substring(0, i) + text.substring(i + 2, text.length());
         }
         return text;
     }
@@ -215,10 +214,10 @@ public class CommandProcessorPanel extends JPanel {
         CommandProcessorPanel panel = new CommandProcessorPanel(null);
         frame.getContentPane().add(panel, BorderLayout.CENTER);
         frame.addWindowListener(new WindowAdapter() {
-                public void windowClosing(WindowEvent e) {
-                    System.exit(0);
-                }
-            });
+            public void windowClosing(WindowEvent e) {
+                System.exit(0);
+            }
+        });
         frame.setSize(500, 500);
         frame.setVisible(true);
         panel.requestFocus();

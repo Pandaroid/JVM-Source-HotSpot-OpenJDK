@@ -96,8 +96,8 @@ public abstract class TableModelComparator implements Comparator {
             int result = 0;
 
             if (o1 instanceof Comparable) {
-                Comparable c1 = (Comparable)o1;
-                Comparable c2 = (Comparable)o2;
+                Comparable c1 = (Comparable) o1;
+                Comparable c2 = (Comparable) o2;
 
                 result = c1.compareTo(c2);
             }
@@ -118,7 +118,7 @@ public abstract class TableModelComparator implements Comparator {
      * Returns the value for the comparing object for the
      * column.
      *
-     * @param obj Row object that was passed into Comparator.
+     * @param obj    Row object that was passed into Comparator.
      * @param column the column to retrieve
      */
     public abstract Object getValueForColumn(Object obj, int column);

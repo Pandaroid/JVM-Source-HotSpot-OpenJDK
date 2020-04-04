@@ -25,22 +25,22 @@
 package sun.jvm.hotspot.debugger;
 
 public class AddressException extends RuntimeException {
-  private long addr;
+    private long addr;
 
-  public AddressException(long addr) {
-    this.addr = addr;
-  }
+    public AddressException(long addr) {
+        this.addr = addr;
+    }
 
-  public AddressException(String detail, long addr) {
-    super(detail);
-    this.addr = addr;
-  }
+    public AddressException(String detail, long addr) {
+        super(detail);
+        this.addr = addr;
+    }
 
-  public long getAddress() {
-    return addr;
-  }
+    public long getAddress() {
+        return addr;
+    }
 
-  public String getMessage() {
-    return Long.toHexString(addr);
-  }
+    public String getMessage() {
+        return Long.toHexString(addr);
+    }
 }

@@ -34,46 +34,46 @@ import sun.jvm.hotspot.runtime.*;
 import sun.jvm.hotspot.types.*;
 
 public class PSOldGen extends VMObject {
-   static {
-      VM.registerVMInitializedObserver(new Observer() {
-         public void update(Observable o, Object data) {
-            initialize(VM.getVM().getTypeDataBase());
-         }
-      });
-   }
+    static {
+        VM.registerVMInitializedObserver(new Observer() {
+            public void update(Observable o, Object data) {
+                initialize(VM.getVM().getTypeDataBase());
+            }
+        });
+    }
 
-   private static synchronized void initialize(TypeDataBase db) {
-      Type type = db.lookupType("PSOldGen");
-      objectSpaceField = type.getAddressField("_object_space");
-   }
+    private static synchronized void initialize(TypeDataBase db) {
+        Type type = db.lookupType("PSOldGen");
+        objectSpaceField = type.getAddressField("_object_space");
+    }
 
-   public PSOldGen(Address addr) {
-      super(addr);
-   }
+    public PSOldGen(Address addr) {
+        super(addr);
+    }
 
-   // Fields
-   private static AddressField objectSpaceField;
+    // Fields
+    private static AddressField objectSpaceField;
 
-   // Accessors
-   public MutableSpace objectSpace() {
-      return (MutableSpace) VMObjectFactory.newObject(MutableSpace.class, objectSpaceField.getValue(addr));
-   }
+    // Accessors
+    public MutableSpace objectSpace() {
+        return (MutableSpace) VMObjectFactory.newObject(MutableSpace.class, objectSpaceField.getValue(addr));
+    }
 
-   public long capacity() {
-      return objectSpace().capacity();
-   }
+    public long capacity() {
+        return objectSpace().capacity();
+    }
 
-   public long used() {
-      return objectSpace().used();
-   }
+    public long used() {
+        return objectSpace().used();
+    }
 
-   public boolean isIn(Address a) {
-      return objectSpace().contains(a);
-   }
+    public boolean isIn(Address a) {
+        return objectSpace().contains(a);
+    }
 
-   public void printOn(PrintStream tty) {
-      tty.print("PSOldGen [ ");
-      objectSpace().printOn(tty);
-      tty.print(" ] ");
-   }
+    public void printOn(PrintStream tty) {
+        tty.print("PSOldGen [ ");
+        objectSpace().printOn(tty);
+        tty.print(" ] ");
+    }
 }

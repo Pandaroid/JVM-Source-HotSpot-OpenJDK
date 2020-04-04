@@ -30,16 +30,13 @@ import javax.swing.KeyStroke;
 // Referenced classes of package com.sun.java.swing.action:
 //            DelegateAction, ActionManager
 
-public class NextAction extends DelegateAction
-{
+public class NextAction extends DelegateAction {
 
-    public NextAction()
-    {
+    public NextAction() {
         this(VALUE_SMALL_ICON);
     }
 
-    public NextAction(String iconPath)
-    {
+    public NextAction(String iconPath) {
         super("Next >", ActionManager.getIcon(iconPath));
         putValue("ActionCommandKey", "next-command");
         putValue("ShortDescription", "Select next item");

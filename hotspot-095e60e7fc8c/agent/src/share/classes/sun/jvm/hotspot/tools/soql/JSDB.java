@@ -29,7 +29,9 @@ import sun.jvm.hotspot.tools.*;
 import sun.jvm.hotspot.utilities.*;
 import sun.jvm.hotspot.utilities.soql.*;
 
-/** This is command line JavaScript debugger console */
+/**
+ * This is command line JavaScript debugger console
+ */
 public class JSDB extends Tool {
 
     public JSDB() {
@@ -47,17 +49,17 @@ public class JSDB extends Tool {
 
     public void run() {
         JSJavaScriptEngine engine = new JSJavaScriptEngine() {
-                private ObjectReader objReader = new ObjectReader();
-                private JSJavaFactory factory = new JSJavaFactoryImpl();
+            private ObjectReader objReader = new ObjectReader();
+            private JSJavaFactory factory = new JSJavaFactoryImpl();
 
-                public ObjectReader getObjectReader() {
-                    return objReader;
-                }
+            public ObjectReader getObjectReader() {
+                return objReader;
+            }
 
-                public JSJavaFactory getJSJavaFactory() {
-                    return factory;
-                }
-            };
+            public JSJavaFactory getJSJavaFactory() {
+                return factory;
+            }
+        };
         engine.startConsole();
     }
 }

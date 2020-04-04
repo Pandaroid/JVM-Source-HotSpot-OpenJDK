@@ -26,6 +26,7 @@ package sun.jvm.hotspot.oops;
 
 import java.io.*;
 import java.util.*;
+
 import sun.jvm.hotspot.debugger.*;
 import sun.jvm.hotspot.runtime.*;
 import sun.jvm.hotspot.types.*;
@@ -36,39 +37,41 @@ import sun.jvm.hotspot.utilities.*;
 // A BitData holds a flag or two in its header.
 public class BitData extends ProfileData {
 
-  // nullSeen:
-  //  saw a null operand (cast/aastore/instanceof)
-  static final int nullSeenFlag              = DataLayout.firstFlag + 0;
-  static final int bitCellCount = 0;
+    // nullSeen:
+    //  saw a null operand (cast/aastore/instanceof)
+    static final int nullSeenFlag = DataLayout.firstFlag + 0;
+    static final int bitCellCount = 0;
 
-  public BitData(DataLayout layout) {
-    super(layout);
-  }
+    public BitData(DataLayout layout) {
+        super(layout);
+    }
 
-  static int staticCellCount() {
-    return bitCellCount;
-  }
+    static int staticCellCount() {
+        return bitCellCount;
+    }
 
-  public int cellCount() {
-    return staticCellCount();
-  }
+    public int cellCount() {
+        return staticCellCount();
+    }
 
-  // Accessor
+    // Accessor
 
-  // The nullSeen flag bit is specially known to the interpreter.
-  // Consulting it allows the compiler to avoid setting up nullCheck traps.
-  boolean nullSeen()     { return flagAt(nullSeenFlag); }
+    // The nullSeen flag bit is specially known to the interpreter.
+    // Consulting it allows the compiler to avoid setting up nullCheck traps.
+    boolean nullSeen() {
+        return flagAt(nullSeenFlag);
+    }
 
-  // Code generation support
-  // static int nullSeenByteConstant() {
-  //   return flagNumberToByteConstant(nullSeenFlag);
-  // }
+    // Code generation support
+    // static int nullSeenByteConstant() {
+    //   return flagNumberToByteConstant(nullSeenFlag);
+    // }
 
-  static int bitDataSize() {
-    return cellOffset(bitCellCount);
-  }
+    static int bitDataSize() {
+        return cellOffset(bitCellCount);
+    }
 
-  public void printDataOn(PrintStream st) {
-    printShared(st, "BitData");
-  }
+    public void printDataOn(PrintStream st) {
+        printShared(st, "BitData");
+    }
 }

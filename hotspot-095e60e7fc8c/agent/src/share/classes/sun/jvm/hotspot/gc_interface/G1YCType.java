@@ -28,18 +28,19 @@ package sun.jvm.hotspot.gc_interface;
 //code.
 
 public enum G1YCType {
-  Normal ("Normal"),
-  InitialMark ("Initial Mark"),
-  DuringMark ("During Mark"),
-  Mixed ("Mixed"),
-  G1YCTypeEndSentinel ("Unknown");
+    Normal("Normal"),
+    InitialMark("Initial Mark"),
+    DuringMark("During Mark"),
+    Mixed("Mixed"),
+    G1YCTypeEndSentinel("Unknown");
 
-  private final String value;
+    private final String value;
 
-  G1YCType(String val) {
-    this.value = val;
-  }
-  public String value() {
-    return value;
-  }
+    G1YCType(String val) {
+        this.value = val;
+    }
+
+    public String value() {
+        return value;
+    }
 }

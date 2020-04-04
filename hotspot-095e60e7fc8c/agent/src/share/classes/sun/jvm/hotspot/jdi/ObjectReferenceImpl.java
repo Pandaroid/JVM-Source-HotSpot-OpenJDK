@@ -25,6 +25,7 @@
 package sun.jvm.hotspot.jdi;
 
 import java.io.*;
+
 import com.sun.jdi.*;
 
 import sun.jvm.hotspot.debugger.Address;
@@ -46,7 +47,7 @@ import sun.jvm.hotspot.utilities.Assert;
 import java.util.*;
 
 public class ObjectReferenceImpl extends ValueImpl implements ObjectReference {
-    private Oop  saObject;
+    private Oop saObject;
     private long myID;
     private boolean monitorInfoCached = false;
     private ThreadReferenceImpl owningThread = null;
@@ -54,6 +55,7 @@ public class ObjectReferenceImpl extends ValueImpl implements ObjectReference {
     private int entryCount = 0;
 
     private static long nextID = 0L;
+
     private static synchronized long nextID() {
         return nextID++;
     }
@@ -81,7 +83,7 @@ public class ObjectReferenceImpl extends ValueImpl implements ObjectReference {
         List list = new ArrayList(1);
         list.add(sig);
         Map map = getValues(list);
-        return(Value)map.get(sig);
+        return (Value) map.get(sig);
     }
 
     public Map getValues(List theFields) {
@@ -91,12 +93,12 @@ public class ObjectReferenceImpl extends ValueImpl implements ObjectReference {
         int size = theFields.size();
         List instanceFields = new ArrayList(size);
 
-        for (int i=0; i<size; i++) {
+        for (int i = 0; i < size; i++) {
             sun.jvm.hotspot.jdi.FieldImpl field =
-                (sun.jvm.hotspot.jdi.FieldImpl)theFields.get(i);
+                    (sun.jvm.hotspot.jdi.FieldImpl) theFields.get(i);
 
             // Make sure the field is valid
-            ((ReferenceTypeImpl)referenceType()).validateFieldAccess(field);
+            ((ReferenceTypeImpl) referenceType()).validateFieldAccess(field);
 
             // FIX ME! We need to do some sanity checking
             // here; make sure the field belongs to this
@@ -118,8 +120,8 @@ public class ObjectReferenceImpl extends ValueImpl implements ObjectReference {
 
         // Then get instance field(s)
         size = instanceFields.size();
-        for (int ii=0; ii<size; ii++){
-            FieldImpl fieldImpl = (FieldImpl)instanceFields.get(ii);
+        for (int ii = 0; ii < size; ii++) {
+            FieldImpl fieldImpl = (FieldImpl) instanceFields.get(ii);
             map.put(fieldImpl, fieldImpl.getValue(saObject));
         }
 
@@ -127,16 +129,16 @@ public class ObjectReferenceImpl extends ValueImpl implements ObjectReference {
     }
 
     public void setValue(Field field, Value value)
-                   throws InvalidTypeException, ClassNotLoadedException {
+            throws InvalidTypeException, ClassNotLoadedException {
         vm.throwNotReadOnlyException("ObjectReference.setValue(...)");
     }
 
     public Value invokeMethod(ThreadReference threadIntf, Method methodIntf,
                               List arguments, int options)
-                              throws InvalidTypeException,
-                                     IncompatibleThreadStateException,
-                                     InvocationException,
-                                     ClassNotLoadedException {
+            throws InvalidTypeException,
+            IncompatibleThreadStateException,
+            InvocationException,
+            ClassNotLoadedException {
         vm.throwNotReadOnlyException("ObjectReference.invokeMethod(...)");
         return null;
     }
@@ -163,7 +165,7 @@ public class ObjectReferenceImpl extends ValueImpl implements ObjectReference {
             throw new UnsupportedOperationException();
         }
 
-        if (! monitorInfoCached) {
+        if (!monitorInfoCached) {
             computeMonitorInfo();
         }
         return waitingThreads;
@@ -175,7 +177,7 @@ public class ObjectReferenceImpl extends ValueImpl implements ObjectReference {
             throw new UnsupportedOperationException();
         }
 
-        if (! monitorInfoCached) {
+        if (!monitorInfoCached) {
             computeMonitorInfo();
         }
         return owningThread;
@@ -187,7 +189,7 @@ public class ObjectReferenceImpl extends ValueImpl implements ObjectReference {
             throw new UnsupportedOperationException();
         }
 
-        if (! monitorInfoCached) {
+        if (!monitorInfoCached) {
             computeMonitorInfo();
         }
         return entryCount;
@@ -198,40 +200,41 @@ public class ObjectReferenceImpl extends ValueImpl implements ObjectReference {
     public List referringObjects(long maxReferrers) {
         if (!vm.canGetInstanceInfo()) {
             throw new UnsupportedOperationException(
-                      "target does not support getting instances");
+                    "target does not support getting instances");
         }
         if (maxReferrers < 0) {
             throw new IllegalArgumentException("maxReferrers is less than zero: "
-                                              + maxReferrers);
+                    + maxReferrers);
         }
         final ObjectReference obj = this;
         final List objects = new ArrayList(0);
         final long max = maxReferrers;
-                vm.saObjectHeap().iterate(new DefaultHeapVisitor() {
-                private long refCount = 0;
-                public boolean doObj(Oop oop) {
-                                        try {
-                                                ObjectReference objref = vm.objectMirror(oop);
-                                                List fields = objref.referenceType().allFields();
-                                                for (int i=0; i < fields.size(); i++) {
-                                                        Field fld = (Field)fields.get(i);
-                                                        if (objref.getValue(fld).equals(obj) && !objects.contains(objref)) {
-                                                                objects.add(objref);
-                                                                refCount++;
-                                                        }
-                                                }
-                                                if (max > 0 && refCount >= max) {
-                                                        return true;
-                                                }
-                                        } catch  (RuntimeException x) {
-                                          // Ignore RuntimeException thrown from vm.objectMirror(oop)
-                                          // for bad oop. It is possible to see some bad oop
-                                          // because heap might be iterating at no safepoint.
-                                        }
-                                        return false;
+        vm.saObjectHeap().iterate(new DefaultHeapVisitor() {
+            private long refCount = 0;
 
+            public boolean doObj(Oop oop) {
+                try {
+                    ObjectReference objref = vm.objectMirror(oop);
+                    List fields = objref.referenceType().allFields();
+                    for (int i = 0; i < fields.size(); i++) {
+                        Field fld = (Field) fields.get(i);
+                        if (objref.getValue(fld).equals(obj) && !objects.contains(objref)) {
+                            objects.add(objref);
+                            refCount++;
+                        }
+                    }
+                    if (max > 0 && refCount >= max) {
+                        return true;
+                    }
+                } catch (RuntimeException x) {
+                    // Ignore RuntimeException thrown from vm.objectMirror(oop)
+                    // for bad oop. It is possible to see some bad oop
+                    // because heap might be iterating at no safepoint.
                 }
-            });
+                return false;
+
+            }
+        });
         return objects;
     }
 
@@ -247,7 +250,7 @@ public class ObjectReferenceImpl extends ValueImpl implements ObjectReference {
         while (frame != null) {
             List monitors = frame.getMonitors();
             OopHandle givenHandle = obj.getHandle();
-            for (Iterator itr = monitors.iterator(); itr.hasNext();) {
+            for (Iterator itr = monitors.iterator(); itr.hasNext(); ) {
                 MonitorInfo mi = (MonitorInfo) itr.next();
                 if (mi.eliminated() && frame.isCompiledFrame()) continue; // skip eliminated monitor
                 if (givenHandle.equals(mi.owner())) {
@@ -281,7 +284,7 @@ public class ObjectReferenceImpl extends ValueImpl implements ObjectReference {
         ObjectMonitor mon = null;
         Address owner = null;
         // check for heavyweight monitor
-        if (! mark.hasMonitor()) {
+        if (!mark.hasMonitor()) {
             // check for lightweight monitor
             if (mark.hasLocker()) {
                 owner = mark.locker().getAddress(); // save the address of the Lock word
@@ -329,7 +332,7 @@ public class ObjectReferenceImpl extends ValueImpl implements ObjectReference {
             // add all contenders
             List pendingThreads = getPendingThreads(mon);
             // convert the JavaThreads to ThreadReferenceImpls
-            for (Iterator itrPend = pendingThreads.iterator(); itrPend.hasNext();) {
+            for (Iterator itrPend = pendingThreads.iterator(); itrPend.hasNext(); ) {
                 waitingThreads.add(vm.threadMirror((JavaThread) itrPend.next()));
             }
 
@@ -341,7 +344,7 @@ public class ObjectReferenceImpl extends ValueImpl implements ObjectReference {
             // pending threads list
             List objWaitingThreads = getWaitingThreads(mon);
             // convert the JavaThreads to ThreadReferenceImpls
-            for (Iterator itrWait = objWaitingThreads.iterator(); itrWait.hasNext();) {
+            for (Iterator itrWait = objWaitingThreads.iterator(); itrWait.hasNext(); ) {
                 waitingThreads.add(vm.threadMirror((JavaThread) itrWait.next()));
             }
         }
@@ -349,9 +352,9 @@ public class ObjectReferenceImpl extends ValueImpl implements ObjectReference {
 
     public boolean equals(Object obj) {
         if ((obj != null) && (obj instanceof ObjectReferenceImpl)) {
-            ObjectReferenceImpl other = (ObjectReferenceImpl)obj;
+            ObjectReferenceImpl other = (ObjectReferenceImpl) obj;
             return (ref().equals(other.ref())) &&
-                   super.equals(obj);
+                    super.equals(obj);
         } else {
             return false;
         }
@@ -362,6 +365,6 @@ public class ObjectReferenceImpl extends ValueImpl implements ObjectReference {
     }
 
     public String toString() {
-        return  "instance of " + referenceType().name() + "(id=" + uniqueID() + ")";
+        return "instance of " + referenceType().name() + "(id=" + uniqueID() + ")";
     }
 }

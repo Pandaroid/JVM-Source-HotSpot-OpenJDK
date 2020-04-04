@@ -27,10 +27,10 @@ package sun.jvm.hotspot.jdi;
 import com.sun.jdi.*;
 
 public class BooleanValueImpl extends PrimitiveValueImpl
-                              implements BooleanValue {
+        implements BooleanValue {
     private boolean value;
 
-    BooleanValueImpl(VirtualMachine aVm,boolean aValue) {
+    BooleanValueImpl(VirtualMachine aVm, boolean aValue) {
         super(aVm);
 
         value = aValue;
@@ -38,8 +38,8 @@ public class BooleanValueImpl extends PrimitiveValueImpl
 
     public boolean equals(Object obj) {
         if ((obj != null) && (obj instanceof BooleanValue)) {
-            return (value == ((BooleanValue)obj).value())
-                   && super.equals(obj);
+            return (value == ((BooleanValue) obj).value())
+                    && super.equals(obj);
         } else {
             return false;
         }
@@ -65,31 +65,31 @@ public class BooleanValueImpl extends PrimitiveValueImpl
     }
 
     public byte byteValue() {
-        return(byte)((value)?1:0);
+        return (byte) ((value) ? 1 : 0);
     }
 
     public char charValue() {
-        return(char)((value)?1:0);
+        return (char) ((value) ? 1 : 0);
     }
 
     public short shortValue() {
-        return(short)((value)?1:0);
+        return (short) ((value) ? 1 : 0);
     }
 
     public int intValue() {
-        return(int)((value)?1:0);
+        return (int) ((value) ? 1 : 0);
     }
 
     public long longValue() {
-        return(long)((value)?1:0);
+        return (long) ((value) ? 1 : 0);
     }
 
     public float floatValue() {
-        return(float)((value)?1.0:0.0);
+        return (float) ((value) ? 1.0 : 0.0);
     }
 
     public double doubleValue() {
-        return(double)((value)?1.0:0.0);
+        return (double) ((value) ? 1.0 : 0.0);
     }
 
     public String toString() {

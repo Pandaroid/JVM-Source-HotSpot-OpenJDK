@@ -56,14 +56,14 @@ public class serialvm {
         vmmgr = Bootstrap.virtualMachineManager();
         List attachingConnectors = vmmgr.attachingConnectors();
         if (attachingConnectors.isEmpty()) {
-            System.err.println( "ERROR: No attaching connectors");
+            System.err.println("ERROR: No attaching connectors");
             return;
         }
         Iterator myIt = attachingConnectors.iterator();
         while (myIt.hasNext()) {
-            AttachingConnector tmpCon = (AttachingConnector)myIt.next();
+            AttachingConnector tmpCon = (AttachingConnector) myIt.next();
             if (tmpCon.name().equals(
-                "sun.jvm.hotspot.jdi.SAPIDAttachingConnector")) {
+                    "sun.jvm.hotspot.jdi.SAPIDAttachingConnector")) {
                 myPIDConn = tmpCon;
                 break;
             }
@@ -72,21 +72,21 @@ public class serialvm {
         int pid1 = 0, pid2 = 0;
         String pidText = null;
         switch (args.length) {
-        case (2):
-            try {
-                pidText = args[0];
-                pid1 = Integer.parseInt(pidText);
-                System.out.println( "pid1: " + pid1);
-                pidText = args[1];
-                pid2 = Integer.parseInt(pidText);
-                System.out.println( "pid2: " + pid2);
-            } catch (NumberFormatException e) {
-                println(e.getMessage());
+            case (2):
+                try {
+                    pidText = args[0];
+                    pid1 = Integer.parseInt(pidText);
+                    System.out.println("pid1: " + pid1);
+                    pidText = args[1];
+                    pid2 = Integer.parseInt(pidText);
+                    System.out.println("pid2: " + pid2);
+                } catch (NumberFormatException e) {
+                    println(e.getMessage());
+                    usage();
+                }
+                break;
+            default:
                 usage();
-            }
-            break;
-        default:
-            usage();
         }
 
         // attach, dispose, attach2, dispose2 pattern
@@ -116,11 +116,11 @@ public class serialvm {
         }
     }
 
-   private static VirtualMachine attachPID(int pid) {
+    private static VirtualMachine attachPID(int pid) {
         Map connArgs = myPIDConn.defaultArguments();
         System.out.println("connArgs = " + connArgs);
         VirtualMachine vm;
-        Connector.StringArgument connArg = (Connector.StringArgument)connArgs.get("pid");
+        Connector.StringArgument connArg = (Connector.StringArgument) connArgs.get("pid");
         connArg.setValue(Integer.toString(pid));
 
         try {
@@ -133,5 +133,5 @@ public class serialvm {
             vm = null;
         }
         return vm;
-   }
+    }
 }

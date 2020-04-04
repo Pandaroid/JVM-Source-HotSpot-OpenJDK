@@ -34,32 +34,32 @@ import sun.jvm.hotspot.types.TypeDataBase;
 import sun.jvm.hotspot.types.WrongTypeException;
 
 public class U2Array extends GenericArray {
-  static {
-    VM.registerVMInitializedObserver(new Observer() {
-      public void update(Observable o, Object data) {
-        initialize(VM.getVM().getTypeDataBase());
-      }
-    });
-  }
+    static {
+        VM.registerVMInitializedObserver(new Observer() {
+            public void update(Observable o, Object data) {
+                initialize(VM.getVM().getTypeDataBase());
+            }
+        });
+    }
 
-  private static synchronized void initialize(TypeDataBase db) throws WrongTypeException {
-    elemType = db.lookupType("u2");
-    Type type = db.lookupType("Array<u2>");
-    dataFieldOffset = type.getAddressField("_data").getOffset();
-  }
+    private static synchronized void initialize(TypeDataBase db) throws WrongTypeException {
+        elemType = db.lookupType("u2");
+        Type type = db.lookupType("Array<u2>");
+        dataFieldOffset = type.getAddressField("_data").getOffset();
+    }
 
-  private static long dataFieldOffset;
-  protected static Type elemType;
+    private static long dataFieldOffset;
+    protected static Type elemType;
 
-  public U2Array(Address addr) {
-    super(addr, dataFieldOffset);
-  }
+    public U2Array(Address addr) {
+        super(addr, dataFieldOffset);
+    }
 
-  public short at(int i) {
-    return (short)getIntegerAt(i);
-  }
+    public short at(int i) {
+        return (short) getIntegerAt(i);
+    }
 
-  public Type getElemType() {
-    return elemType;
-  }
+    public Type getElemType() {
+        return elemType;
+    }
 }

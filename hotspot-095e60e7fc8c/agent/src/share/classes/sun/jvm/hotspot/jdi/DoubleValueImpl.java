@@ -27,10 +27,10 @@ package sun.jvm.hotspot.jdi;
 import com.sun.jdi.*;
 
 public class DoubleValueImpl extends PrimitiveValueImpl
-                             implements DoubleValue {
+        implements DoubleValue {
     private double value;
 
-    DoubleValueImpl(VirtualMachine aVm,double aValue) {
+    DoubleValueImpl(VirtualMachine aVm, double aValue) {
         super(aVm);
 
         value = aValue;
@@ -38,8 +38,8 @@ public class DoubleValueImpl extends PrimitiveValueImpl
 
     public boolean equals(Object obj) {
         if ((obj != null) && (obj instanceof DoubleValue)) {
-            return (value == ((DoubleValue)obj).value()) &&
-                   super.equals(obj);
+            return (value == ((DoubleValue) obj).value()) &&
+                    super.equals(obj);
         } else {
             return false;
         }
@@ -72,35 +72,35 @@ public class DoubleValueImpl extends PrimitiveValueImpl
     }
 
     public boolean booleanValue() {
-        return(value == 0.0)?false:true;
+        return (value == 0.0) ? false : true;
     }
 
     public byte byteValue() {
-        return(byte)value;
+        return (byte) value;
     }
 
     public char charValue() {
-        return(char)value;
+        return (char) value;
     }
 
     public short shortValue() {
-        return(short)value;
+        return (short) value;
     }
 
     public int intValue() {
-        return(int)value;
+        return (int) value;
     }
 
     public long longValue() {
-        return(long)value;
+        return (long) value;
     }
 
     public float floatValue() {
-        return(float)value;
+        return (float) value;
     }
 
     public double doubleValue() {
-        return(double)value;
+        return (double) value;
     }
 
     byte checkedByteValue() throws InvalidTypeException {
@@ -136,7 +136,7 @@ public class DoubleValueImpl extends PrimitiveValueImpl
     }
 
     long checkedLongValue() throws InvalidTypeException {
-        long longValue = (long)value;
+        long longValue = (long) value;
         if (longValue != value) {
             throw new InvalidTypeException("Can't convert " + value + " to long");
         } else {
@@ -145,7 +145,7 @@ public class DoubleValueImpl extends PrimitiveValueImpl
     }
 
     float checkedFloatValue() throws InvalidTypeException {
-        float floatValue = (float)value;
+        float floatValue = (float) value;
         if (floatValue != value) {
             throw new InvalidTypeException("Can't convert " + value + " to float");
         } else {

@@ -36,33 +36,33 @@ import sun.jvm.hotspot.types.TypeDataBase;
 import sun.jvm.hotspot.types.WrongTypeException;
 
 public class KlassArray extends GenericArray {
-  static {
-    VM.registerVMInitializedObserver(new Observer() {
-      public void update(Observable o, Object data) {
-        initialize(VM.getVM().getTypeDataBase());
-      }
-    });
-  }
+    static {
+        VM.registerVMInitializedObserver(new Observer() {
+            public void update(Observable o, Object data) {
+                initialize(VM.getVM().getTypeDataBase());
+            }
+        });
+    }
 
-  private static synchronized void initialize(TypeDataBase db) throws WrongTypeException {
-    elemType = db.lookupType("Klass*");
+    private static synchronized void initialize(TypeDataBase db) throws WrongTypeException {
+        elemType = db.lookupType("Klass*");
 
-    Type type = db.lookupType("Array<Klass*>");
-    dataFieldOffset = type.getAddressField("_data").getOffset();
-  }
+        Type type = db.lookupType("Array<Klass*>");
+        dataFieldOffset = type.getAddressField("_data").getOffset();
+    }
 
-  private static long dataFieldOffset;
-  protected static Type elemType;
+    private static long dataFieldOffset;
+    protected static Type elemType;
 
-  public KlassArray(Address addr) {
-    super(addr, dataFieldOffset);
-  }
+    public KlassArray(Address addr) {
+        super(addr, dataFieldOffset);
+    }
 
-  public Klass getAt(int i) {
-    return (Klass) Metadata.instantiateWrapperFor(getAddressAt(i));
-  }
+    public Klass getAt(int i) {
+        return (Klass) Metadata.instantiateWrapperFor(getAddressAt(i));
+    }
 
-  public Type getElemType() {
-    return elemType;
-  }
+    public Type getElemType() {
+        return elemType;
+    }
 }

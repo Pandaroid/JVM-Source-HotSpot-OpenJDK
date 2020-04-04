@@ -29,6 +29,7 @@ import java.lang.reflect.Constructor;
 import java.util.jar.JarOutputStream;
 import java.util.jar.JarEntry;
 import java.util.jar.Manifest;
+
 import sun.jvm.hotspot.memory.*;
 import sun.jvm.hotspot.oops.*;
 import sun.jvm.hotspot.debugger.*;
@@ -37,9 +38,9 @@ import sun.jvm.hotspot.tools.*;
 
 public class ClassDump extends Tool {
     private ClassFilter classFilter;
-    private String      outputDirectory;
+    private String outputDirectory;
     private JarOutputStream jarStream;
-    private String      pkgList;
+    private String pkgList;
 
     public ClassDump() {
         super();
@@ -79,7 +80,7 @@ public class ClassDump extends Tool {
                 // If we have a pkgList, pass it, otherwise let the filter read
                 // its own System property for the list of classes.
                 String filterClassName = System.getProperty("sun.jvm.hotspot.tools.jcore.filter",
-                                                            "sun.jvm.hotspot.tools.jcore.PackageNameFilter");
+                        "sun.jvm.hotspot.tools.jcore.PackageNameFilter");
                 try {
                     Class filterClass = Class.forName(filterClassName);
                     if (pkgList == null) {
@@ -88,7 +89,7 @@ public class ClassDump extends Tool {
                         Constructor con = filterClass.getConstructor(String.class);
                         classFilter = (ClassFilter) con.newInstance(pkgList);
                     }
-                } catch(Exception exp) {
+                } catch (Exception exp) {
                     System.err.println("Warning: Can not create class filter!");
                 }
             }
@@ -103,21 +104,20 @@ public class ClassDump extends Tool {
             // walk through the system dictionary
             SystemDictionary dict = VM.getVM().getSystemDictionary();
             dict.classesDo(new SystemDictionary.ClassVisitor() {
-                    public void visit(Klass k) {
-                        if (k instanceof InstanceKlass) {
-                            try {
-                                dumpKlass((InstanceKlass) k);
-                            } catch (Exception e) {
-                                System.out.println(k.getName().asString());
-                                e.printStackTrace();
-                            }
+                public void visit(Klass k) {
+                    if (k instanceof InstanceKlass) {
+                        try {
+                            dumpKlass((InstanceKlass) k);
+                        } catch (Exception e) {
+                            System.out.println(k.getName().asString());
+                            e.printStackTrace();
                         }
                     }
-                });
-        }
-        catch (AddressException e) {
+                }
+            });
+        } catch (AddressException e) {
             System.err.println("Error accessing address 0x"
-                               + Long.toHexString(e.getAddress()));
+                    + Long.toHexString(e.getAddress()));
             e.printStackTrace();
         }
         if (jarStream != null) {
@@ -135,7 +135,7 @@ public class ClassDump extends Tool {
     }
 
     private void dumpKlass(InstanceKlass kls) {
-        if (classFilter != null && ! classFilter.canInclude(kls) ) {
+        if (classFilter != null && !classFilter.canInclude(kls)) {
             return;
         }
 
@@ -151,7 +151,7 @@ public class ClassDump extends Tool {
                 File dir = null;
                 if (index != -1) {
                     String dirName = klassName.substring(0, index);
-                    dir = new File(outputDirectory,  dirName);
+                    dir = new File(outputDirectory, dirName);
                 } else {
                     dir = new File(outputDirectory);
                 }
@@ -169,7 +169,7 @@ public class ClassDump extends Tool {
                     os.close();
                 }
             }
-        } catch(IOException exp) {
+        } catch (IOException exp) {
             exp.printStackTrace();
         }
     }

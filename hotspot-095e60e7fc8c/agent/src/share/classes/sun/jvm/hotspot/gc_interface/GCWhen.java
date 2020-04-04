@@ -27,18 +27,19 @@ package sun.jvm.hotspot.gc_interface;
 //These definitions should be kept in sync with the definitions in the HotSpot code.
 
 public enum GCWhen {
-  BeforeGC ("Before GC"),
-  AfterGC ("After GC"),
-  GCWhenEndSentinel ("GCWhenEndSentinel");
+    BeforeGC("Before GC"),
+    AfterGC("After GC"),
+    GCWhenEndSentinel("GCWhenEndSentinel");
 
-  private final String value;
+    private final String value;
 
-  GCWhen(String val) {
-    this.value = val;
-  }
-  public String value() {
-    return value;
-  }
+    GCWhen(String val) {
+        this.value = val;
+    }
+
+    public String value() {
+        return value;
+    }
 }
 
 

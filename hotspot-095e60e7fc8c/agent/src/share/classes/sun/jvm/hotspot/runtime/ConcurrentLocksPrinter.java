@@ -26,6 +26,7 @@ package sun.jvm.hotspot.runtime;
 
 import java.io.*;
 import java.util.*;
+
 import sun.jvm.hotspot.memory.*;
 import sun.jvm.hotspot.oops.*;
 
@@ -42,10 +43,10 @@ public class ConcurrentLocksPrinter {
         if (locks == null || locks.isEmpty()) {
             tty.println("    - None");
         } else {
-            for (Iterator itr = locks.iterator(); itr.hasNext();) {
+            for (Iterator itr = locks.iterator(); itr.hasNext(); ) {
                 Oop oop = (Oop) itr.next();
                 tty.println("    - <" + oop.getHandle() + ">, (a " +
-                       oop.getKlass().getName().asString() + ")");
+                        oop.getKlass().getName().asString() + ")");
             }
         }
     }
@@ -68,20 +69,20 @@ public class ConcurrentLocksPrinter {
         // may be not loaded at all
         if (absOwnSyncKlass != null) {
             heap.iterateObjectsOfKlass(new DefaultHeapVisitor() {
-                    public boolean doObj(Oop oop) {
-                        JavaThread thread = getOwnerThread(oop);
-                        if (thread != null) {
-                            List locks = (List) locksMap.get(thread);
-                            if (locks == null) {
-                                locks = new LinkedList();
-                                locksMap.put(thread, locks);
-                            }
-                            locks.add(oop);
+                public boolean doObj(Oop oop) {
+                    JavaThread thread = getOwnerThread(oop);
+                    if (thread != null) {
+                        List locks = (List) locksMap.get(thread);
+                        if (locks == null) {
+                            locks = new LinkedList();
+                            locksMap.put(thread, locks);
                         }
-                        return false;
+                        locks.add(oop);
                     }
+                    return false;
+                }
 
-                }, absOwnSyncKlass, true);
+            }, absOwnSyncKlass, true);
         }
     }
 }

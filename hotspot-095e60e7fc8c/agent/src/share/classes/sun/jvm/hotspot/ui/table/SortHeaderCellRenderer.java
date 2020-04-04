@@ -57,7 +57,7 @@ public class SortHeaderCellRenderer extends DefaultTableCellRenderer {
     }
 
     /**
-     *  Retrieves an Image Icon from the JLF graphics repository.
+     * Retrieves an Image Icon from the JLF graphics repository.
      */
     public ImageIcon getIcon(String name) {
         String imagePath = "/toolbarButtonGraphics/" + name;
@@ -70,7 +70,7 @@ public class SortHeaderCellRenderer extends DefaultTableCellRenderer {
 
     public Component getTableCellRendererComponent(JTable table, Object value,
                                                    boolean isSelected, boolean hasFocus,
-                                                   int row, int column)  {
+                                                   int row, int column) {
         setText((value == null) ? "" : value.toString());
 
         Icon icon = null;

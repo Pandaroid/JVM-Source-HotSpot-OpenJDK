@@ -28,11 +28,13 @@ import sun.jvm.hotspot.debugger.*;
 
 class BsdThread implements ThreadProxy {
     private BsdDebugger debugger;
-    private int         thread_id;
-    private long        unique_thread_id;
+    private int thread_id;
+    private long unique_thread_id;
 
-    /** The address argument must be the address of the _thread_id in the
-        OSThread. It's value is result ::gettid() call. */
+    /**
+     * The address argument must be the address of the _thread_id in the
+     * OSThread. It's value is result ::gettid() call.
+     */
     BsdThread(BsdDebugger debugger, Address threadIdAddr, Address uniqueThreadIdAddr) {
         this.debugger = debugger;
         // FIXME: size of data fetched here should be configurable.
@@ -78,11 +80,13 @@ class BsdThread implements ThreadProxy {
     }
 
     public void setContext(ThreadContext context)
-      throws IllegalThreadStateException, DebuggerException {
+            throws IllegalThreadStateException, DebuggerException {
         throw new DebuggerException("Unimplemented");
     }
 
-    /** this is not interface function, used in core file to get unique thread id on Macosx*/
+    /**
+     * this is not interface function, used in core file to get unique thread id on Macosx
+     */
     public long getUniqueThreadId() {
         return unique_thread_id;
     }

@@ -30,16 +30,13 @@ import javax.swing.KeyStroke;
 // Referenced classes of package com.sun.java.swing.action:
 //            DelegateAction, ActionManager
 
-public class NewAction extends DelegateAction
-{
+public class NewAction extends DelegateAction {
 
-    public NewAction()
-    {
+    public NewAction() {
         this("general/New16.gif");
     }
 
-    public NewAction(String iconPath)
-    {
+    public NewAction(String iconPath) {
         super("New", ActionManager.getIcon(iconPath));
         putValue("ActionCommandKey", "new-command");
         putValue("ShortDescription", "Create a new object.");

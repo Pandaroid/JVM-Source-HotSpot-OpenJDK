@@ -30,9 +30,9 @@ import javax.script.ScriptException;
  * properties in ScriptObjects.
  */
 public interface Callable {
-  /**
-   * Call the underlying function passing the given
-   * arguments and return the result.
-   */
-  public Object call(Object[] args) throws ScriptException;
+    /**
+     * Call the underlying function passing the given
+     * arguments and return the result.
+     */
+    public Object call(Object[] args) throws ScriptException;
 }

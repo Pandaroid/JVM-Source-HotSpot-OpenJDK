@@ -27,9 +27,11 @@ package sun.jvm.hotspot.debugger.amd64;
 import sun.jvm.hotspot.debugger.*;
 import sun.jvm.hotspot.debugger.cdbg.*;
 
-/** Specifies the thread context on amd64 platforms; only a sub-portion
+/**
+ * Specifies the thread context on amd64 platforms; only a sub-portion
  * of the context is guaranteed to be present on all operating
- * systems. */
+ * systems.
+ */
 
 public abstract class AMD64ThreadContext implements ThreadContext {
     // Taken from /usr/include/sys/regset.h on Solaris/AMD64.
@@ -45,8 +47,8 @@ public abstract class AMD64ThreadContext implements ThreadContext {
     public static final int R12 = 3;
     public static final int R11 = 4;
     public static final int R10 = 5;
-    public static final int R9  = 6;
-    public static final int R8  = 7;
+    public static final int R9 = 6;
+    public static final int R8 = 7;
     public static final int RDI = 8;
     public static final int RSI = 9;
     public static final int RBP = 10;
@@ -71,10 +73,10 @@ public abstract class AMD64ThreadContext implements ThreadContext {
     public static final int NPRGREG = 28;
 
     private static final String[] regNames = {
-        "r15",  "r14", "r13", "r12", "r11", "r10", "r9", "r8",
-        "rdi",  "rsi", "rbp", "rbx", "rdx", "rcx", "rax", "trapno",
-        "err",  "rip", "cs",  "rfl", "rsp", "ss",  "fs", "gs",
-        "es",   "ds",  "fsbase", "gsbase"
+            "r15", "r14", "r13", "r12", "r11", "r10", "r9", "r8",
+            "rdi", "rsi", "rbp", "rbx", "rdx", "rcx", "rax", "trapno",
+            "err", "rip", "cs", "rfl", "rsp", "ss", "fs", "gs",
+            "es", "ds", "fsbase", "gsbase"
     };
 
     private long[] data;
@@ -103,11 +105,15 @@ public abstract class AMD64ThreadContext implements ThreadContext {
         return null;
     }
 
-    /** This can't be implemented in this class since we would have to
-     * tie the implementation to, for example, the debugging system */
+    /**
+     * This can't be implemented in this class since we would have to
+     * tie the implementation to, for example, the debugging system
+     */
     public abstract void setRegisterAsAddress(int index, Address value);
 
-    /** This can't be implemented in this class since we would have to
-     * tie the implementation to, for example, the debugging system */
+    /**
+     * This can't be implemented in this class since we would have to
+     * tie the implementation to, for example, the debugging system
+     */
     public abstract Address getRegisterAsAddress(int index);
 }

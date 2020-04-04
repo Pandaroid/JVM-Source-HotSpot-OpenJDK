@@ -26,6 +26,7 @@ package sun.jvm.hotspot.utilities;
 
 import java.io.*;
 import java.util.*;
+
 import sun.jvm.hotspot.oops.*;
 import sun.jvm.hotspot.runtime.*;
 
@@ -60,7 +61,7 @@ import sun.jvm.hotspot.runtime.*;
  * <li>Java boolean - GXL bool atttribute
  * <li>Java char - GXL string attribute
  * </ul>
- *
+ * <p>
  * Exact Java primitive type code is written in 'kind' attribute of
  * 'attr' element.  Type code is specified in JVM spec. second edition
  * section 4.3.2 (Field Descriptor).
@@ -100,7 +101,7 @@ public class HeapGXLWriter extends AbstractHeapGraphWriter {
         out.println("'/>");
     }
 
-    protected void writeObjectHeader(Oop oop) throws IOException  {
+    protected void writeObjectHeader(Oop oop) throws IOException {
         refFields = new ArrayList();
         isArray = oop.isArray();
 
@@ -113,11 +114,11 @@ public class HeapGXLWriter extends AbstractHeapGraphWriter {
         out.println("'>");
     }
 
-    protected void writeObjectFooter(Oop oop) throws IOException  {
+    protected void writeObjectFooter(Oop oop) throws IOException {
         out.println("</node>");
 
         // write the reference fields as edges
-        for (Iterator itr = refFields.iterator(); itr.hasNext();) {
+        for (Iterator itr = refFields.iterator(); itr.hasNext(); ) {
             OopField field = (OopField) itr.next();
             Oop ref = field.getValue(oop);
 
@@ -141,7 +142,7 @@ public class HeapGXLWriter extends AbstractHeapGraphWriter {
     }
 
     protected void writePrimitiveArray(TypeArray array)
-        throws IOException  {
+            throws IOException {
         writeObjectHeader(array);
         // write array length
         writeArrayLength(array);
@@ -162,7 +163,7 @@ public class HeapGXLWriter extends AbstractHeapGraphWriter {
         writeObjectFooter(array);
     }
 
-    protected void writeClass(Instance instance) throws IOException  {
+    protected void writeClass(Instance instance) throws IOException {
         writeObjectHeader(instance);
         Klass reflectedType = java_lang_Class.asKlass(instance);
         boolean isInstanceKlass = (reflectedType instanceof InstanceKlass);
@@ -177,9 +178,9 @@ public class HeapGXLWriter extends AbstractHeapGraphWriter {
                 // write object-size as an attribute
                 long sizeInBytes = reflectedType.getLayoutHelper();
                 writeAttribute("object-size", "int",
-                               Long.toString(sizeInBytes));
+                        Long.toString(sizeInBytes));
                 // write static fields of this class.
-                writeObjectFields((InstanceKlass)reflectedType);
+                writeObjectFields((InstanceKlass) reflectedType);
             }
         }
         out.println("</node>");
@@ -187,8 +188,8 @@ public class HeapGXLWriter extends AbstractHeapGraphWriter {
         // write edges for super class and direct interfaces
         if (reflectedType != null) {
             Klass superType = reflectedType.getSuper();
-            Oop superMirror = (superType == null)?
-                              null : superType.getJavaMirror();
+            Oop superMirror = (superType == null) ?
+                    null : superType.getJavaMirror();
             writeEdge(instance, superMirror, "extends");
             if (isInstanceKlass) {
                 // write edges for directly implemented interfaces
@@ -213,7 +214,7 @@ public class HeapGXLWriter extends AbstractHeapGraphWriter {
                 writeEdge(instance, null, "protection-domain");
 
                 // write edges for static reference fields from this class
-                for (Iterator itr = refFields.iterator(); itr.hasNext();) {
+                for (Iterator itr = refFields.iterator(); itr.hasNext(); ) {
                     OopField field = (OopField) itr.next();
                     Oop ref = field.getValue(reflectedType);
                     String name = field.getID().getName();
@@ -225,52 +226,52 @@ public class HeapGXLWriter extends AbstractHeapGraphWriter {
     }
 
     protected void writeReferenceField(Oop oop, OopField field)
-        throws IOException {
+            throws IOException {
         refFields.add(field);
     }
 
     protected void writeByteField(Oop oop, ByteField field)
-        throws IOException {
+            throws IOException {
         writeField(field, "int", "B", Byte.toString(field.getValue(oop)));
     }
 
     protected void writeCharField(Oop oop, CharField field)
-        throws IOException {
+            throws IOException {
         writeField(field, "string", "C",
-                   escapeXMLChars(Character.toString(field.getValue(oop))));
+                escapeXMLChars(Character.toString(field.getValue(oop))));
     }
 
     protected void writeBooleanField(Oop oop, BooleanField field)
-        throws IOException {
+            throws IOException {
         writeField(field, "bool", "Z", Boolean.toString(field.getValue(oop)));
     }
 
     protected void writeShortField(Oop oop, ShortField field)
-        throws IOException {
+            throws IOException {
         writeField(field, "int", "S", Short.toString(field.getValue(oop)));
     }
 
     protected void writeIntField(Oop oop, IntField field)
-        throws IOException {
+            throws IOException {
         writeField(field, "int", "I", Integer.toString(field.getValue(oop)));
     }
 
     protected void writeLongField(Oop oop, LongField field)
-        throws IOException {
+            throws IOException {
         writeField(field, "int", "J", Long.toString(field.getValue(oop)));
     }
 
     protected void writeFloatField(Oop oop, FloatField field)
-        throws IOException {
+            throws IOException {
         writeField(field, "float", "F", Float.toString(field.getValue(oop)));
     }
 
     protected void writeDoubleField(Oop oop, DoubleField field)
-        throws IOException {
+            throws IOException {
         writeField(field, "float", "D", Double.toString(field.getValue(oop)));
     }
 
-    protected void writeHeapFooter() throws IOException  {
+    protected void writeHeapFooter() throws IOException {
         out.println("</graph>");
         out.println("</gxl>");
     }
@@ -287,7 +288,7 @@ public class HeapGXLWriter extends AbstractHeapGraphWriter {
     private static String escapeXMLChars(String s) {
         // FIXME: is there a better way or API?
         StringBuffer result = null;
-        for(int i = 0, max = s.length(), delta = 0; i < max; i++) {
+        for (int i = 0, max = s.length(), delta = 0; i < max; i++) {
             char c = s.charAt(i);
             String replacement = null;
             if (c == '&') {
@@ -300,13 +301,13 @@ public class HeapGXLWriter extends AbstractHeapGraphWriter {
                 replacement = "&quot;";
             } else if (c == '\'') {
                 replacement = "&apos;";
-            } else if (c <  '\u0020' || (c > '\ud7ff' && c < '\ue000') ||
-                       c == '\ufffe' || c == '\uffff') {
+            } else if (c < '\u0020' || (c > '\ud7ff' && c < '\ue000') ||
+                    c == '\ufffe' || c == '\uffff') {
                 // These are illegal in XML -- put these in a CDATA section.
                 // Refer to section 2.2 Characters in XML specification at
                 // http://www.w3.org/TR/2004/REC-xml-20040204/
                 replacement = "<![CDATA[&#x" +
-                    Integer.toHexString((int)c) + ";]]>";
+                        Integer.toHexString((int) c) + ";]]>";
             }
 
             if (replacement != null) {
@@ -334,7 +335,7 @@ public class HeapGXLWriter extends AbstractHeapGraphWriter {
 
     private void writeArrayLength(Array array) throws IOException {
         writeAttribute("length", "int",
-                       Integer.toString((int) array.getLength()));
+                Integer.toString((int) array.getLength()));
     }
 
     private void writeAttribute(String name, String type, String value) {
@@ -360,7 +361,7 @@ public class HeapGXLWriter extends AbstractHeapGraphWriter {
     }
 
     private void writeField(Field field, String type, String kind,
-                            String value) throws IOException  {
+                            String value) throws IOException {
         // 'type' is GXL type of the attribute
         // 'kind' is Java type code ("B", "C", "Z", "S", "I", "J", "F", "D")
         if (isArray) {
@@ -391,12 +392,12 @@ public class HeapGXLWriter extends AbstractHeapGraphWriter {
         VM vm = VM.getVM();
         writeAttribute("vm-version", "string", vm.getVMRelease());
         writeAttribute("vm-type", "string",
-                       (vm.isClientCompiler())? "client" :
-                       ((vm.isServerCompiler())? "server" : "core"));
+                (vm.isClientCompiler()) ? "client" :
+                        ((vm.isServerCompiler()) ? "server" : "core"));
         writeAttribute("os", "string", vm.getOS());
         writeAttribute("cpu", "string", vm.getCPU());
         writeAttribute("pointer-size", "string",
-                       Integer.toString((int)vm.getOopSize() * 8));
+                Integer.toString((int) vm.getOopSize() * 8));
     }
 
     // XML encoding that we'll use

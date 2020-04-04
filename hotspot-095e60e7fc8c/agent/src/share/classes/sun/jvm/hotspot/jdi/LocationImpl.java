@@ -41,8 +41,8 @@ public class LocationImpl extends MirrorImpl implements Location {
         super(vm);
 
         this.method = method;
-        this.codeIndex = method.isNative()? -1 : codeIndex;
-        this.declaringType = (ReferenceTypeImpl)method.declaringType();
+        this.codeIndex = method.isNative() ? -1 : codeIndex;
+        this.declaringType = (ReferenceTypeImpl) method.declaringType();
     }
 
     /*
@@ -56,16 +56,16 @@ public class LocationImpl extends MirrorImpl implements Location {
 
         this.method = null;
         this.codeIndex = codeIndex;
-        this.declaringType = (ReferenceTypeImpl)declaringType;
+        this.declaringType = (ReferenceTypeImpl) declaringType;
         this.methodRef = methodRef;
     }
 
     public boolean equals(Object obj) {
         if ((obj != null) && (obj instanceof Location)) {
-            Location other = (Location)obj;
+            Location other = (Location) obj;
             return (method().equals(other.method())) &&
-                   (codeIndex() == other.codeIndex()) &&
-                   super.equals(obj);
+                    (codeIndex() == other.codeIndex()) &&
+                    super.equals(obj);
         } else {
             return false;
         }
@@ -75,7 +75,7 @@ public class LocationImpl extends MirrorImpl implements Location {
         /*
          * TO DO: better hash code?
          */
-        return method().hashCode() + (int)codeIndex();
+        return method().hashCode() + (int) codeIndex();
     }
 
     public int compareTo(Location other) {
@@ -120,9 +120,9 @@ public class LocationImpl extends MirrorImpl implements Location {
         }
 
         /* compute the line info */
-        MethodImpl methodImpl = (MethodImpl)method();
-         lineInfo = methodImpl.codeIndexToLineInfo(stratum,
-                                                   codeIndex());
+        MethodImpl methodImpl = (MethodImpl) method();
+        lineInfo = methodImpl.codeIndexToLineInfo(stratum,
+                codeIndex());
 
         /* cache it */
         addBaseLineInfo(lineInfo);
@@ -141,23 +141,23 @@ public class LocationImpl extends MirrorImpl implements Location {
         /* check if there is cached info to use */
         lineInfo = otherLineInfo; // copy because of concurrency
         if (lineInfo != null &&
-                           stratum.id().equals(lineInfo.liStratum())) {
+                stratum.id().equals(lineInfo.liStratum())) {
             return lineInfo;
         }
         int baseLineNumber = lineNumber(SDE.BASE_STRATUM_NAME);
         SDE.LineStratum lineStratum =
-                  stratum.lineStratum(declaringType, baseLineNumber);
+                stratum.lineStratum(declaringType, baseLineNumber);
 
         if (lineStratum != null && lineStratum.lineNumber() != -1) {
             lineInfo = new StratumLineInfo(stratum.id(),
-                                           lineStratum.lineNumber(),
-                                           lineStratum.sourceName(),
-                                           lineStratum.sourcePath());
+                    lineStratum.lineNumber(),
+                    lineStratum.sourceName(),
+                    lineStratum.sourcePath());
         } else {
             /* find best match */
-            MethodImpl methodImpl = (MethodImpl)method();
+            MethodImpl methodImpl = (MethodImpl) method();
             lineInfo = methodImpl.codeIndexToLineInfo(stratum,
-                                                      codeIndex());
+                    codeIndex());
         }
 
         /* cache it */
@@ -179,12 +179,12 @@ public class LocationImpl extends MirrorImpl implements Location {
     }
 
     public String sourceName(String stratumID)
-                               throws AbsentInformationException {
+            throws AbsentInformationException {
         return sourceName(declaringType.stratum(stratumID));
     }
 
     String sourceName(SDE.Stratum stratum)
-                               throws AbsentInformationException {
+            throws AbsentInformationException {
         return getLineInfo(stratum).liSourceName();
     }
 
@@ -193,12 +193,12 @@ public class LocationImpl extends MirrorImpl implements Location {
     }
 
     public String sourcePath(String stratumID)
-                               throws AbsentInformationException {
+            throws AbsentInformationException {
         return sourcePath(declaringType.stratum(stratumID));
     }
 
     String sourcePath(SDE.Stratum stratum)
-                               throws AbsentInformationException {
+            throws AbsentInformationException {
         return getLineInfo(stratum).liSourcePath();
     }
 

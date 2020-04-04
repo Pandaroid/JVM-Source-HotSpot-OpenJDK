@@ -30,16 +30,13 @@ import javax.swing.KeyStroke;
 // Referenced classes of package com.sun.java.swing.action:
 //            StateChangeAction, ActionManager
 
-public class AlignCenterAction extends StateChangeAction
-{
+public class AlignCenterAction extends StateChangeAction {
 
-    public AlignCenterAction()
-    {
+    public AlignCenterAction() {
         this("text/AlignCenter16.gif");
     }
 
-    public AlignCenterAction(String iconPath)
-    {
+    public AlignCenterAction(String iconPath) {
         super("Center", ActionManager.getIcon(iconPath));
         putValue("ActionCommandKey", "align-center-command");
         putValue("ShortDescription", "Center");

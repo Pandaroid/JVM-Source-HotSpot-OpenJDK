@@ -29,16 +29,13 @@ package com.sun.java.swing.action;
 // Referenced classes of package com.sun.java.swing.action:
 //            DelegateAction, ActionManager
 
-public class AboutAction extends DelegateAction
-{
+public class AboutAction extends DelegateAction {
 
-    public AboutAction()
-    {
+    public AboutAction() {
         this("general/About16.gif");
     }
 
-    public AboutAction(String iconPath)
-    {
+    public AboutAction(String iconPath) {
         super("About...", ActionManager.getIcon(iconPath));
         putValue("ActionCommandKey", "about-command");
         putValue("ShortDescription", "About...");
